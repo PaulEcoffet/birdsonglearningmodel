@@ -81,9 +81,17 @@ celerybeat-schedule
 # virtualenv
 venv/
 ENV/
+.venv
 
 # Spyder project settings
 .spyderproject
 
 # Rope project settings
 .ropeproject
+
+##########################
+#### PROJECT SPECIFIC ####
+##########################
+
+# exclude the data folder because it contains more than 100Gio of data.
+data/
