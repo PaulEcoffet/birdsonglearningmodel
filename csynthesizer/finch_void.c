@@ -21,8 +21,8 @@
 #define c 35000
 
 struct Par {
-		    double A1; double A2; double A3; 
-		    double Ancho1; double Ancho2; double Ancho3;                 
+		    double A1; double A2; double A3;
+		    double Ancho1; double Ancho2; double Ancho3;
 		double r; double gamma2; double gamma3;
 		double gm; double forcing1; double forcing2;
 	       	double alfa1; double alfa2; double beta1; double beta2; double beta3; double alfa3;
@@ -34,21 +34,21 @@ struct Par {
 void takens(int n,double v[],double dv[],double t) {
         extern double PRESSURE,presion,acople;
         double x,y,i1,i2,i3,w2,alfa=50,x2,y2, x3, y3;
-      
+
 x=v[0]; y=v[1], i1=v[2], i2=v[3]; i3=v[4];x2=v[5],y2=v[6], w2=v[7];
 x3=v[8]; y3=v[9];
 
  dv[0]=  y;
  dv[1]=  aa.alfa1*aa.gm*aa.gm+aa.beta1*aa.gm*aa.gm*(x)-aa.gm*aa.gm*x*x*x-aa.gm*x*x*y+aa.gm*aa.gm*x*x-aa.gm*x*y;
 
- dv[2]=i2; 
- dv[3]=-aa.s1overLG*aa.s1overCH*i1-aa.rdis*(aa.s1overLB+aa.s1overLG)*i2+i3*(aa.s1overLG*aa.s1overCH-aa.rdis*aa.RB*aa.s1overLG*aa.s1overLB)+(aa.s1overLG)*aa.forcing2+aa.rdis*aa.s1overLG*aa.s1overLB*aa.forcing1; 
- dv[4]=-(1/aa.s1overLG)*aa.s1overLB*i2-aa.RB*aa.s1overLB*i3+aa.s1overLB*aa.forcing1;  
+ dv[2]=i2;
+ dv[3]=-aa.s1overLG*aa.s1overCH*i1-aa.rdis*(aa.s1overLB+aa.s1overLG)*i2+i3*(aa.s1overLG*aa.s1overCH-aa.rdis*aa.RB*aa.s1overLG*aa.s1overLB)+(aa.s1overLG)*aa.forcing2+aa.rdis*aa.s1overLG*aa.s1overLB*aa.forcing1;
+ dv[4]=-(1/aa.s1overLG)*aa.s1overLB*i2-aa.RB*aa.s1overLB*i3+aa.s1overLB*aa.forcing1;
 
- dv[5]= y2; 
+ dv[5]= y2;
  dv[6]= aa.alfa2*aa.gm*aa.gm+aa.beta2*aa.gm*aa.gm*(x2)-aa.gm*aa.gm*x2*x2*x2-aa.gm*x2*x2*y2+aa.gm*aa.gm*x2*x2-aa.gm*x2*y2;
- dv[7]= 0.; 
- 
+ dv[7]= 0.;
+
  dv[8]=  y3;
  dv[9]=  -1.*aa.gamma2*aa.gamma2*aa.alfa3*x3+aa.gamma2*aa.beta3*y3-aa.gamma3*aa.gamma2*2.0*(40)*(40)*x3*x3*y3;
 
@@ -117,14 +117,14 @@ ptr2=fopen(salida,"r");
 ptr3=fopen(envolvente,"r");
 
    sprintf(FileName,"song_%s", salida);
-    ptr4=fopen(FileName, "w");
+    ptr4=stdout;
 
 
 
  v[0]=.000000000005;v[1]=0.00000000001;
  v[2]=.000000000001;v[3]=0.00000000001;
  v[4]=.000000000001;
- 
+
 v[5]=.0000000000045;v[6]=.000000000000001;
 
 v[7]=0.;
@@ -173,7 +173,7 @@ ancho1 = aa.Ancho1; ancho2 = aa.Ancho2; ancho3 = ancho2; largo1 = 1.5; largo2 =1
   tau2=rint(largo2/(c*dt+0.0));
   tau3=rint(largo3/(c*dt+0.0));
 
- 
+
   maxtau=tau3;
   if(tau1>=tau2&&tau1>=tau3) maxtau=tau1;
   if(tau2>=tau1&&tau2>=tau3) maxtau=tau2;
@@ -234,11 +234,11 @@ aa.noise=0;
 preout=aa.RB*v[4];
 
 if(taux==20) {
-    
-		fscanf(ptr2,"%lg %lg",&nada,&aa.beta1); 
-		fscanf(ptr3,"%lg %lg %lg",&nada,&nada,&aa.amplitud);                
+
+		fscanf(ptr2,"%lg %lg",&nada,&aa.beta1);
+		fscanf(ptr3,"%lg %lg %lg",&nada,&nada,&aa.amplitud);
 		fprintf(ptr4,"%lg\n",preout*10);
-                 
+
 		taux=0;
              }
     taux++;
@@ -247,15 +247,15 @@ if(taux==20) {
 
 
 if(tiempot>0.00){
- 
+
 aa.alfa1= -0.15-0.00*aa.amplitud;
-aa.alfa2=0.15; aa.beta2=0.1; 
-aa.r=0.1; 
+aa.alfa2=0.15; aa.beta2=0.1;
+aa.r=0.1;
 aa.noise=.21*(ran1(&idum)-0.5);
 aa.beta1= aa.beta1+0.01*aa.noise;
-aa.s1overCH=(360/0.8)*1e08; 
-aa.s1overLB=1.*1e-04; 
-aa.s1overLG=(1/82.); 
+aa.s1overCH=(360/0.8)*1e08;
+aa.s1overLB=1.*1e-04;
+aa.s1overLG=(1/82.);
 aa.RB=(.5)*1e07;
 
 aa.rdis=(300./5.)*(10000.);
