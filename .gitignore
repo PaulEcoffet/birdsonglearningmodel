@@ -94,4 +94,4 @@ ENV/
 ##########################
 
 # exclude the data folder because it contains more than 100Gio of data.
-data/
+data/behavioural
