@@ -32,7 +32,7 @@ def hill_climbing(function, goal, guess, guess_deviation=0.01, goal_delta=0.01, 
         cur_res = function(cur_guess)
         if goal.shape == cur_res.shape:
             cur_score = np.linalg.norm(goal - cur_res, 2)
-            temp = 10 - 10*(i/max_iter)
+            temp = 5 - 5*(i/max_iter)
             if cur_score < best_score or rng.uniform() < np.exp(-(cur_score - best_score)/temp):
                 if (best_score > cur_score and np.random.uniform() < 0.1):
                     print(cur_score)

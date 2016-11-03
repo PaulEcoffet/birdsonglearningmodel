@@ -4,11 +4,11 @@ from io import BytesIO
 
 
 def gen_sound(params, length, samplerate=44100):
-    t = np.linspace(0, 1, length+2)  # + 2 padding is necessary with ba synth.
-    a, b, c, d, e, f, g, h, i, j = params
+    t = np.linspace(0, length/samplerate, length+2)  # + 2 padding is necessary with ba synth.
+    a, b, c, d, e, f, g, h, i, j, k = params
     alpha_beta = np.stack((
-        a*t + b + c*np.cos(d * t + e),
-        f*t + g + h*np.cos(i * t + j)), axis=-1
+        a*np.exp(-b*t) + c * np.cos(d * 2 * np.pi * t + e) + f,
+        g*t + h + i*np.cos(j * 2 * np.pi * t + k)), axis=-1
     )
     out = synthesize(alpha_beta)
     return out
