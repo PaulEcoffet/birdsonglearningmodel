@@ -2,13 +2,18 @@ import subprocess
 import numpy as np
 from io import BytesIO
 
+def f(x, p, nb_exp=2, nb_sin=2):
+    ip = np.nditer(p)
+    x = x/22500
+    return np.sum([next(ip) * np.exp(-next(ip) * x) for i in range(nb_exp)]
+                + [next(ip) * np.sin((next(ip) + 2*np.pi * x) / next(ip)) for i in range(nb_sin)] + [next(ip)], axis=0)
 
-def gen_sound(params, length, samplerate=44100):
-    t = np.linspace(0, length/samplerate, length+2)  # + 2 padding is necessary with ba synth.
-    a, b, c, d, e, f, g, h, i, j, k = params
+def gen_sound(params, length, alphaf_shape=(1, 3), betaf_shape=(0, 1)):
+    t = np.arange(0, length+2)  # + 2 padding is necessary with ba synth.
+    nb_args_alpha = alphaf_shape[0] * 2 + alphaf_shape[1] * 3 + 1
     alpha_beta = np.stack((
-        a*np.exp(-b*t) + c * np.cos(d * 2 * np.pi * t + e) + f,
-        g*t + h + i*np.cos(j * 2 * np.pi * t + k)), axis=-1
+        f(t, params[:nb_args_alpha], alphaf_shape[0], alphaf_shape[1]),
+        f(t, params[nb_args_alpha:], betaf_shape[0], betaf_shape[1])), axis=-1
     )
     out = synthesize(alpha_beta)
     return out
@@ -17,9 +22,10 @@ def synthesize(alpha_beta, amplitudeforwav=False):
     input_bytes = BytesIO()
     input_bytes.write(bytes(str(len(alpha_beta)) + "\n", 'utf-8'))
     np.savetxt(input_bytes, alpha_beta)
-    out_raw = subprocess.run(["../csynthesizer/alphabeta2dat"],
-                    input=input_bytes.getvalue(),
-                    stdout=subprocess.PIPE).stdout
+    out_raw_call = subprocess.Popen(["../csynthesizer/alphabeta2dat"],
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE)
+    out_raw = out_raw_call.communicate(input=input_bytes.getvalue())[0]
     input_bytes.close()
     out = np.fromstring(out_raw, dtype=float, sep="\n")
     if amplitudeforwav:
