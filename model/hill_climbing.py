@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def hill_climbing(function, goal, guess, guess_deviation=0.01, goal_delta=0.01, max_iter=100000, seed=None):
+def hill_climbing(function, goal, guess, guess_deviation=0.01, goal_delta=0.01, temp_max=5, max_iter=100000, seed=None, verbose=False):
     """
     Do a hill climbing algorithm to find which is the best value x so that
     function(x) = goal
@@ -32,12 +32,12 @@ def hill_climbing(function, goal, guess, guess_deviation=0.01, goal_delta=0.01, 
         cur_res = function(cur_guess)
         if goal.shape == cur_res.shape:
             cur_score = np.linalg.norm(goal - cur_res, 2)
-            temp = 5 - 5*(i/max_iter)
+            temp = temp_max - temp_max*(i/max_iter)
             if cur_score < best_score or rng.uniform() < np.exp(-(cur_score - best_score)/temp):
-                if (best_score > cur_score and np.random.uniform() < 0.1):
-                    print(cur_score)
                 best_score = cur_score
                 best_res = cur_res
                 best_guess = cur_guess
+                if verbose:
+                    print(best_score, '(', i, ')')
         i += 1
     return best_guess, best_res, best_score
