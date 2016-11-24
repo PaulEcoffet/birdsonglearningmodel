@@ -1,7 +1,10 @@
 import numpy as np
 
 
-def hill_climbing(function, goal, guess, guess_deviation=0.01, goal_delta=0.01, temp_max=5, max_iter=100000, seed=None, verbose=False):
+def hill_climbing(function, goal, guess,
+                  guess_deviation=0.01, goal_delta=0.01, temp_max=5,
+                  comparison_method=None,
+                  max_iter=100000, seed=None, verbose=False):
     """
     Do a hill climbing algorithm to find which is the best value x so that
     function(x) = goal
@@ -16,6 +19,9 @@ def hill_climbing(function, goal, guess, guess_deviation=0.01, goal_delta=0.01, 
         raise ValueError("The goal error margin (goal_delta) should be a positive number")
     if max_iter < 1:
         raise ValueError("The max number of iteration without progress should be at least 1")
+
+    if comparison_method is None:
+        comparison_method = lambda g, c: np.linalg.norm(g - c, 2)
     size = guess.size
     best_res = function(guess)
     best_guess = guess
@@ -27,17 +33,16 @@ def hill_climbing(function, goal, guess, guess_deviation=0.01, goal_delta=0.01, 
     rng = np.random.RandomState(seed)
 
     i = 0
-    while np.linalg.norm(goal - best_res, 2) > goal_delta and i < max_iter:
+    while comparison_method(goal, best_res) > goal_delta and i < max_iter:
         cur_guess = rng.multivariate_normal(best_guess, guess_deviation)
         cur_res = function(cur_guess)
-        if goal.shape == cur_res.shape:
-            cur_score = np.linalg.norm(goal - cur_res, 2)
-            temp = temp_max - temp_max*(i/max_iter)
-            if cur_score < best_score or rng.uniform() < np.exp(-(cur_score - best_score)/temp):
-                best_score = cur_score
-                best_res = cur_res
-                best_guess = cur_guess
-                if verbose:
-                    print(best_score, '(', i, ')')
+        cur_score = comparison_method(goal, cur_res)
+        temp = temp_max - temp_max*(i/max_iter)
+        if cur_score < best_score or rng.uniform() < np.exp(-(cur_score - best_score)/temp):
+            best_score = cur_score
+            best_res = cur_res
+            best_guess = cur_guess
+            if verbose and np.random.uniform() < 0.01:
+                print(best_score, '(', i, ')')
         i += 1
     return best_guess, best_res, best_score

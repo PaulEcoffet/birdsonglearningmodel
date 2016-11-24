@@ -6,6 +6,7 @@ import copy
 import matplotlib.pyplot as plt
 import seaborn as sns
 import itertools
+from fastdtw import fastdtw
 
 from hill_climbing import hill_climbing
 
@@ -33,6 +34,7 @@ def fit_func(goal, f, params, dev):
     params_out, y, score = hill_climbing(
         lambda param: f(np.arange(len(goal)), param),
         goal, guess, guess_deviation=dev,
+        comparison_method=lambda g, c: fastdtw(g, c, dist=2)[0],
         max_iter=100000)
     return params_out, score
 
