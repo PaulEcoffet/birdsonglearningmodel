@@ -25,10 +25,11 @@ def gen_sound(params, length, alphaf_shape=(1, 3), betaf_shape=(1, 1)):
 def gen_alphabeta(params, length, alphaf_shape=(1, 3), betaf_shape=(1, 1)):
     t = np.linspace(0, (length+2)/44100, length+2)  # + 2 padding is necessary with ba synth.
     nb_args_alpha = alphaf_shape[0] * 2 + alphaf_shape[1] * 3 + 1
-    alpha_beta = np.stack((
-        f(t, params[:nb_args_alpha], alphaf_shape[0], alphaf_shape[1]),
-        f(t, params[nb_args_alpha:], betaf_shape[0], betaf_shape[1])), axis=-1
-    )
+    alpha_beta = np.stack(
+        (
+            f(t, params[:nb_args_alpha], alphaf_shape[0], alphaf_shape[1]),
+            f(t, params[nb_args_alpha:], betaf_shape[0], betaf_shape[1])
+        ), axis=-1)
     return alpha_beta
 
 def synthesize(alpha_beta, amplitudeforwav=False):
