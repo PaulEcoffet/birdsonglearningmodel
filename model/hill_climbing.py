@@ -4,7 +4,7 @@ import numpy as np
 def hill_climbing(function, goal, guess,
                   guess_deviation=0.01, goal_delta=0.01, temp_max=5,
                   comparison_method=None,
-                  max_iter=100000, seed=None, verbose=False):
+                  max_iter=100000, seed=None, verbose=False, guess_min=None, guess_max=None):
     """
     Do a hill climbing algorithm to find which is the best value x so that
     function(x) = goal
@@ -22,9 +22,13 @@ def hill_climbing(function, goal, guess,
 
     if comparison_method is None:
         comparison_method = lambda g, c: np.linalg.norm(g - c, 2)
+    if guess_min is None:
+        guess_min = -np.inf
+    if guess_max is None:
+        guess_max = np.inf
     size = guess.size
     best_res = function(guess)
-    best_guess = guess
+    best_guess = np.clip(guess, guess_min, guess_max)
     best_score = np.inf
 
     if max_iter is None:
@@ -34,7 +38,7 @@ def hill_climbing(function, goal, guess,
 
     i = 0
     while comparison_method(goal, best_res) > goal_delta and i < max_iter:
-        cur_guess = rng.multivariate_normal(best_guess, guess_deviation)
+        cur_guess = np.clip(rng.multivariate_normal(best_guess, guess_deviation), guess_min, guess_max)
         cur_res = function(cur_guess)
         cur_score = comparison_method(goal, cur_res)
         temp = temp_max - temp_max*(i/max_iter)
