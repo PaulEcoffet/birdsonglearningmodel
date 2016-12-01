@@ -34,7 +34,7 @@ def fit_func(goal, f, params, dev):
     params_out, y, score = hill_climbing(
         lambda param: f(np.arange(len(goal)), param),
         goal, guess, guess_deviation=dev,
-        comparison_method=lambda g, c: fastdtw(g, c, dist=2)[0],
+        comparison_method=lambda g, c: fastdtw(g, c)[0],
         max_iter=100000)
     return params_out, score
 
@@ -55,7 +55,7 @@ if __name__ == "__main__":
             print(goal)
             print("*"*80)
             i = 1
-            j = 3
+            j = 4
             print(i, j)
             prior = []
             dev = []
