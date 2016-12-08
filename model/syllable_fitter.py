@@ -71,8 +71,9 @@ if __name__ == "__main__":
             print(x)
             print('alpha(t) = ' + f_str(x[:1*2+3*3+1], nb_exp=1, nb_sin=3, x='t'))
             print('beta(t) = ' + f_str(x[1*2+3*3+1:], nb_exp=1, nb_sin=1, x='t'))
-            plt.plot(np.arange(0,len(tutor_syllable)+2)/44100, gen_alphabeta(x, len(tutor_syllable))[:, 0], label='a')
-            plt.plot(np.arange(0,len(tutor_syllable)+2)/44100, gen_alphabeta(x, len(tutor_syllable))[:, 1], label='b')
+            alpha_beta = gen_alphabeta(x, len(tutor_syllable))
+            plt.plot(np.arange(0,len(tutor_syllable)+2)/44100, alpha_beta[:, 0], label='a')
+            plt.plot(np.arange(0,len(tutor_syllable)+2)/44100, alpha_beta[:, 1], label='b')
             plt.legend()
             plt.show()
             if score < best_score:
