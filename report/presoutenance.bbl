@@ -1,0 +1,133 @@
+% $ biblatex auxiliary file $
+% $ biblatex bbl format version 2.8 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated by
+% biber as required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+
+\refsection{0}
+  \sortlist[entry]{nyt/global/}
+    \entry{deregnaucourt_how_2005}{article}{}
+      \name{author}{5}{}{%
+        {{hash=d77f14051997568772ade136cb2e76ce}{%
+           family={Derégnaucourt},
+           familyi={D\bibinitperiod},
+           given={Sébastien},
+           giveni={S\bibinitperiod}}}%
+        {{hash=bd7f0337a0a5a73e8dab8370e4deac89}{%
+           family={Mitra},
+           familyi={M\bibinitperiod},
+           given={Partha\bibnamedelima P.},
+           giveni={P\bibinitperiod\bibinitdelim P\bibinitperiod}}}%
+        {{hash=01246925b11ab04167024b56ea2a5eae}{%
+           family={Fehér},
+           familyi={F\bibinitperiod},
+           given={Olga},
+           giveni={O\bibinitperiod}}}%
+        {{hash=a879bee3fe3a36c8d0e38abdf56ac0b9}{%
+           family={Pytte},
+           familyi={P\bibinitperiod},
+           given={Carolyn},
+           giveni={C\bibinitperiod}}}%
+        {{hash=3754470c7cc48f63e8ad4ffdf6cb6e92}{%
+           family={Tchernichovski},
+           familyi={T\bibinitperiod},
+           given={Ofer},
+           giveni={O\bibinitperiod}}}%
+      }
+      \strng{namehash}{0a24957a772ba19a42c801c0d8dbed5e}
+      \strng{fullhash}{e0328fd1f96caf28a958dd85c5bd0f3c}
+      \strng{authornamehash}{0a24957a772ba19a42c801c0d8dbed5e}
+      \strng{authorfullhash}{e0328fd1f96caf28a958dd85c5bd0f3c}
+      \field{sortinit}{D}
+      \field{sortinithash}{78f7c4753a2004675f316a80bdb31742}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{day}{17}
+      \field{issn}{0028-0836, 1476-4679}
+      \field{journaltitle}{Nature}
+      \field{month}{2}
+      \field{number}{7027}
+      \field{title}{How sleep affects the developmental learning of bird song}
+      \field{urlday}{21}
+      \field{urlmonth}{9}
+      \field{urlyear}{2016}
+      \field{volume}{433}
+      \field{year}{2005}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{710\bibrangedash 716}
+      \range{pages}{7}
+      \verb{doi}
+      \verb 10.1038/nature03275
+      \endverb
+      \verb{file}
+      \verb Derégnaucourt et al. - 2005 - How sleep affects the developmental learning of bi.pdf:/home/ecoffet/.zotero/zotero/3z1dqxla.default/zotero/storage/86SVECVJ/Derégnaucourt et al. - 2005 - How sleep affects the developmental learning of bi.pdf:application/pdf
+      \endverb
+      \verb{url}
+      \verb http://www.nature.com/doifinder/10.1038/nature03275
+      \endverb
+    \endentry
+    \entry{liu_juvenile_2004}{article}{}
+      \name{author}{3}{}{%
+        {{hash=af08ea8be124ace41086c3bbb79c2f5f}{%
+           family={Liu},
+           familyi={L\bibinitperiod},
+           given={Wan-chun},
+           giveni={W\bibinithyphendelim c\bibinitperiod}}}%
+        {{hash=604c6ac40be0ace4c09dd3aeaebf9074}{%
+           family={Gardner},
+           familyi={G\bibinitperiod},
+           given={Timothy\bibnamedelima J.},
+           giveni={T\bibinitperiod\bibinitdelim J\bibinitperiod}}}%
+        {{hash=9cafa0cb4a8307b976c2561ba77e12e1}{%
+           family={Nottebohm},
+           familyi={N\bibinitperiod},
+           given={Fernando},
+           giveni={F\bibinitperiod}}}%
+      }
+      \strng{namehash}{218bb87788c258ceb0431a8408a75d59}
+      \strng{fullhash}{218bb87788c258ceb0431a8408a75d59}
+      \strng{authornamehash}{218bb87788c258ceb0431a8408a75d59}
+      \strng{authorfullhash}{218bb87788c258ceb0431a8408a75d59}
+      \field{sortinit}{L}
+      \field{sortinithash}{872351f18d0f736066eda0bf18bfa4f7}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{journaltitle}{Proceedings of the National Academy of Sciences}
+      \field{number}{52}
+      \field{title}{Juvenile zebra finches can use multiple strategies to learn the same song}
+      \field{urlday}{20}
+      \field{urlmonth}{10}
+      \field{urlyear}{2016}
+      \field{volume}{101}
+      \field{year}{2004}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{18177\bibrangedash 18182}
+      \range{pages}{6}
+      \verb{file}
+      \verb LiuetalPNAS2004.pdf:/home/ecoffet/.zotero/zotero/3z1dqxla.default/zotero/storage/6C8JUJMR/LiuetalPNAS2004.pdf:application/pdf
+      \endverb
+      \verb{url}
+      \verb http://www.pnas.org/content/101/52/18177.short
+      \endverb
+    \endentry
+  \endsortlist
+\endrefsection
+\endinput
+

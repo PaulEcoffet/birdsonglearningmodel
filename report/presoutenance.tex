@@ -1,0 +1,95 @@
+\documentclass[a4paper, 11pt]{article}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[american]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi)
+\usepackage{lipsum} %This package generates Lorem Ipsum filler text.
+\usepackage{fullpage} % changes the margin
+
+\usepackage[backend=biber,style=apa,bibstyle=authoryear]{biblatex}
+\addbibresource{SingingBirds.bib}
+\DeclareLanguageMapping{american}{american-apa}
+
+\usepackage{xifthen}
+\usepackage{soul}
+\sethlcolor{Apricot}
+\newcommand\bla[1]{\ifthenelse{\isempty{#1}}{\hl{**~bla~bla~**}}{\hl{**~#1~**}}}
+\usepackage[unicode=true]{hyperref}
+\usepackage[all]{hypcap} % ref link to the top of the figure
+
+\usepackage{csquotes} % Dependency for APA
+
+
+\hypersetup{breaklinks=true,
+            pdfauthor={Paul Ecoffet},
+            pdftitle={Rapport de stage},
+            colorlinks=true,
+            citecolor=blue,
+            urlcolor=blue,
+            linkcolor=magenta,
+            pdfborder={0 0 0}}
+\urlstyle{same} % don't use monospace font for urls
+
+
+\begin{document}
+%Header-Make sure you update this information!!!!
+\noindent
+\large\textbf{Présoutenance} \hfill \textbf{Paul Ecoffet} \\
+\normalsize Cogmaster M2 \hfill Encadrants: Benoît Girard, Stéphane  Doncieux \\
+Prof. Oruklu \hfill Lab Date: XX/XX/XX \\
+TA: Adam Sumner \hfill Due Date: XX/XX/XX
+
+\section*{Problem Statement}
+
+The Zebra Finches are songbirds which learn the song of their tutor. They learn
+it from 20 days post hatch (DPH) to 80 DPH \parencite{liu_juvenile_2004}.
+
+
+\ifx
+* \cite{deregnaucourt_how_2005} : sleep affects the development of learning
+  * The birds that lose the most their skill during sleep are the more skilled
+  at the end
+* Birds first babble, then they form protosyllables, and then sing
+* Can we model this learning, what can explain this two step learning phase, and
+  the different learning phase in songbirds?
+\fi
+
+\section*{Investigation/Research}
+
+\ifx
+* Synthesizer of bird songs and parameters finder from \cite{boari_automatic_2015}.
+* Gesture based architecture inferred from these parameters.
+* We can use this to have a physically plausible sound generation with ``low''
+  dimensional parameters.
+* 
+
+                            Tutor song ------+
+                                             V
+Parameters -> synth -> auditory system -> comparison
+   ^                                         |
+   +------------- Improve <------------------+
+
+\fi
+
+
+
+\section*{Proposed Solution}
+\lipsum[4]
+
+\section*{Construction/Implementation}
+\lipsum[5]
+
+\section*{Analysis \& Testing}
+\lipsum[6]
+
+\section*{Final Evaluation}
+\lipsum[7]
+
+
+\printbibliography{}
+
+\end{document}
