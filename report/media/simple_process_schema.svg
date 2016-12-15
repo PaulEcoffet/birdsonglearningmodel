@@ -15,7 +15,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="simple_process_schema.svg">
+   sodipodi:docname="simple_process_schema.pdf"
+   inkscape:export-filename="/home/ecoffet/Documents/birdsonglearningmodel/report/media/simple_process_schema.png"
+   inkscape:export-xdpi="150.11365"
+   inkscape:export-ydpi="150.11365">
   <defs
      id="defs4">
     <marker
@@ -242,7 +245,7 @@
        xml:space="preserve"
        id="flowRoot5025"
        style="font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Monospace;-inkscape-font-specification:Monospace"
-       transform="translate(1.6779823,3.4002535)"><flowRegion
+       transform="translate(14.535125,3.4002535)"><flowRegion
          id="flowRegion5027"><rect
            id="rect5029"
            width="113.64217"
@@ -250,10 +253,10 @@
            x="339.41125"
            y="433.13867"
            style="font-size:11px" /></flowRegion><flowPara
-         id="flowPara5031">[[0.15 0.65 0.1]</flowPara><flowPara
-         id="flowPara5033"> [1.5  1.12 1.1]</flowPara><flowPara
-         id="flowPara5035"> [0.01 2.31 2.1]]</flowPara></flowRoot>    <flowRoot
-       transform="translate(1.5267525,-102.08632)"
+         id="flowPara5031">0.15 0.65 0.1</flowPara><flowPara
+         id="flowPara5033">1.5  1.12 1.1</flowPara><flowPara
+         id="flowPara5035">0.01 2.31 2.1</flowPara></flowRoot>    <flowRoot
+       transform="translate(14.383895,-102.08632)"
        style="font-size:11px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Monospace;-inkscape-font-specification:Monospace"
        id="flowRoot5053"
        xml:space="preserve"><flowRegion
@@ -264,9 +267,9 @@
            height="57.57869"
            width="113.64217"
            id="rect5057" /></flowRegion><flowPara
-         id="flowPara5059">[[1.15 1.65 4.1]</flowPara><flowPara
-         id="flowPara5061"> [1.0  1.32 2.1]</flowPara><flowPara
-         id="flowPara5063"> [0.41 4.11 2.3]]</flowPara></flowRoot>    <g
+         id="flowPara5059">1.15 1.65 4.1</flowPara><flowPara
+         id="flowPara5061">1.0  1.32 2.1</flowPara><flowPara
+         id="flowPara5063">0.41 4.11 2.3</flowPara></flowRoot>    <g
        id="g5088"
        transform="translate(11.980292,2.5466949)">
       <text
@@ -279,7 +282,7 @@
            y="445.37354"
            x="22.223356"
            id="tspan5003"
-           sodipodi:role="line">α</tspan><tspan
+           sodipodi:role="line">$\alpha$</tspan><tspan
            id="tspan5005"
            y="465.37354"
            x="22.223356"
@@ -294,7 +297,7 @@
            y="473.33826"
            x="22.223356"
            id="tspan5009"
-           sodipodi:role="line">β</tspan></text>
+           sodipodi:role="line">$\beta$</tspan></text>
       <path
          inkscape:connector-curvature="0"
          id="path5015"
