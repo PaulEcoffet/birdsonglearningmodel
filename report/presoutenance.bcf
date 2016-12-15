@@ -2285,6 +2285,15 @@
   <bcf:section number="0">
     <bcf:citekey order="1">liu_juvenile_2004</bcf:citekey>
     <bcf:citekey order="2">deregnaucourt_how_2005</bcf:citekey>
+    <bcf:citekey order="3">dave_song_2000</bcf:citekey>
+    <bcf:citekey order="4">boari_automatic_2015</bcf:citekey>
+    <bcf:citekey order="5">amador_elemental_2013</bcf:citekey>
+    <bcf:citekey order="5">boari_automatic_2015</bcf:citekey>
+    <bcf:citekey order="6">amador_low_2014</bcf:citekey>
+    <bcf:citekey order="6">boari_automatic_2015</bcf:citekey>
+    <bcf:citekey order="7">amador_elemental_2013</bcf:citekey>
+    <bcf:citekey order="8">lynch_rhythmic_2016</bcf:citekey>
+    <bcf:citekey order="8">picardo_population-level_2016</bcf:citekey>
   </bcf:section>
   <bcf:sortlist section="0" name="nyt/global/" type="entry" sortscheme="nyt" sortnamekeyscheme="global" labelprefix="">
   <bcf:sorting>

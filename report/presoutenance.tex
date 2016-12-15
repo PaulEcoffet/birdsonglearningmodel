@@ -1,3 +1,4 @@
+%!TeX spellcheck = en-US
 \documentclass[a4paper, 11pt]{article}
 \usepackage[dvipsnames]{xcolor}
 \usepackage[american]{babel}
@@ -9,6 +10,8 @@
 \usepackage{comment} % enables the use of multi-line comments (\ifx \fi)
 \usepackage{lipsum} %This package generates Lorem Ipsum filler text.
 \usepackage{fullpage} % changes the margin
+\usepackage{todonotes}
+\usepackage{import}
 
 \usepackage[backend=biber,style=apa,bibstyle=authoryear]{biblatex}
 \addbibresource{SingingBirds.bib}
@@ -26,7 +29,7 @@
 
 \hypersetup{breaklinks=true,
             pdfauthor={Paul Ecoffet},
-            pdftitle={Rapport de stage},
+            pdftitle={Report},
             colorlinks=true,
             citecolor=blue,
             urlcolor=blue,
@@ -36,58 +39,126 @@
 
 
 \begin{document}
-%Header-Make sure you update this information!!!!
 \noindent
 \large\textbf{Présoutenance} \hfill \textbf{Paul Ecoffet} \\
-\normalsize Cogmaster M2 \hfill Encadrants: Benoît Girard, Stéphane  Doncieux \\
-Prof. Oruklu \hfill Lab Date: XX/XX/XX \\
-TA: Adam Sumner \hfill Due Date: XX/XX/XX
+\normalsize Cogmaster M2 \hfill Encadrants: Stéphane Doncieux, Benoît Girard \\
+Tuteur: Mehdi Khamassi \hfill 27/01/17
 
 \section*{Problem Statement}
 
 The Zebra Finches are songbirds which learn the song of their tutor. They learn
-it from 20 days post hatch (DPH) to 80 DPH \parencite{liu_juvenile_2004}.
+it from 20 days post hatch (DPH) to 80 DPH \parencite{liu_juvenile_2004}. Their
+learning can be split in three phases: i) they have a babbling phase from 20 DPH
+to 40 DPH, then ii) a plastic song in which protosyllables from the tutor song
+are produced then iii) a crystallized song at 80 DPH with a fixed song which is
+a copy of the tutor's song.\todo{check the days} Zebra finches are commonly used
+as a model of speech acquisition.
 
+\textcite{deregnaucourt_how_2005} showed that sleep plays an important role in
+the learning of tutor songs. Indeed, they showed that sleeping has a negative
+impact on song restitution by zebra finches in the short term but a positive
+impact on the long run. Indeed, song restitution is less complex and less
+similar to the tutor song from one morning to the previous day evening, but the
+greater this loss in performance was overall for one bird, the better this bird
+will reproduce the tutor song at the end of its learning.
+\textcite{dave_song_2000} has found replay sequences of neurones in the motor
+cortex which correspond to their activity pattern when the birds sing in adult
+zebra finches during their sleep. This shows that neurones that are highly
+correlated with bird's own song (BOS) are activated during the night.
 
-\ifx
-* \cite{deregnaucourt_how_2005} : sleep affects the development of learning
-  * The birds that lose the most their skill during sleep are the more skilled
-  at the end
-* Birds first babble, then they form protosyllables, and then sing
-* Can we model this learning, what can explain this two step learning phase, and
-  the different learning phase in songbirds?
-\fi
+Our hypothesis is that during its sleep, the zebra finch restructures the
+knowledge it has acquired so far. We hypothesize that this restructuring can
+account for the loss of performance in the short term and an improvement of
+performance in the long term.
+
+The goal of this internship is to propose a model of the zebra finch song
+learning which can explain different behavioral data observed such as the
+correlation between the loss of performance every night and the overall
+performance at the end of learning, and the different phases of bird song
+learning (babbling, protosyllables, crystallized song).
 
 \section*{Investigation/Research}
 
-\ifx
-* Synthesizer of bird songs and parameters finder from \cite{boari_automatic_2015}.
-* Gesture based architecture inferred from these parameters.
-* We can use this to have a physically plausible sound generation with ``low''
-  dimensional parameters.
-* 
+We want to build a model which is the most plausible in a real world environment
+and which is biological plausible. To do so, we will use a bird song synthesizer
+made by \textcite{boari_automatic_2015}. This synthesizer is a biophysical model
+of zebra finch vocal apparatus. This synthesizer has the advantage that it be
+parametrized with relatively few parameters to produce realistic bird songs. As
+it models the zebra finch vocal apparatus, it is likely that the parameters we
+send to this synthesizer must be similar to the instruction sent by the zebra
+finch motor cortex to the vocal apparatus muscles. Indeed, the parameters for
+this synthesizer is the the labia tension \(\alpha(t)\) and the air-sac pressure
+\(\beta(t)\) in the apparatus.\todo{check alpha and beta that I keep mixing up}
+\textcite{amador_elemental_2013,boari_automatic_2015} have managed to reproduce
+zebra finches song using this synthesizer. The synthetical songs they produced
+activated neurons in HVC which are highly selective to bird's own song (BOS).
+This shows that the synthesized songs are accurate reproduction of BOS.
 
-                            Tutor song ------+
-                                             V
-Parameters -> synth -> auditory system -> comparison
-   ^                                         |
-   +------------- Improve <------------------+
+\textcite{amador_low_2014,boari_automatic_2015} have already found interesting
+data by studying the parameters. Indeed, they have found that what can be seen
+as syllable in the sensory space can be seen as one or several gestures in the
+parameters space. Indeed, syllable are yield with continuous modification of the
+parameters. A new syllable will trigger a huge discontinuity in the parameter
+values.
 
-\fi
-
-
+\textcite{amador_elemental_2013} even claim to have found correlation with HVC
+neuron spikes in zebra finches and the gesture trajectory extrema (beginning,
+maximum, minimum and end) of these gestures. Though, very recent literature
+shows that these correlates might have been untrue
+\parencite{lynch_rhythmic_2016,picardo_population-level_2016}. Even though there
+is no neural correlate with gesture trajectory extrema (GTE), we hypothesize
+that GTE identification may play an important role in song learning, as they
+signal changes in the progression of the parameters through time.
 
 \section*{Proposed Solution}
-\lipsum[4]
 
-\section*{Construction/Implementation}
-\lipsum[5]
+Our goal is to design a simple hill climbing model (see Fig.~\ref{fig:topView})
+that fits one specific gesture.
+
+\begin{figure}[tb]
+\centering{
+\def\svgwidth{\linewidth}
+\import{media/}{simple_process_schema.pdf_tex}
+\caption{Simple hill climbing model \label{fig:simple_model}}
+\label{fig:topView}
+}
+\end{figure}
+
+\ifx
+* Babbling + goal oriented
+* segmentation of the syllables
+* hill climbing
+* Likely won't be enough:
+  * Different strategies are not taken into account
+  * Transition between syllable might not be doable: Bi-gram?
+\fi
+
+\section*{Expected Implementation}
+
+\ifx
+* Find good auditory and memory system
+  * Must be biologically plausible
+  --> Buenos Aires Synthesizer
+  --> MFCC seems good but we cannot do what we are looking for with it yet
+  --> Nearest-Neighbors
+  --> Interest model for babbling then socially imposed goal (tutor song)
+    \parencite{baranes_active_2013}
+* Use Explauto \parencite{moulin-frier_explauto:_2014}
+\fi
 
 \section*{Analysis \& Testing}
-\lipsum[6]
+
+
+\ifx
+* Can we observe protosyllable, syllable and song: as in clustering that happens
+*
+\fi
 
 \section*{Final Evaluation}
-\lipsum[7]
+\ifx
+* Design new hypotheses
+*
+\fi
 
 
 \printbibliography{}

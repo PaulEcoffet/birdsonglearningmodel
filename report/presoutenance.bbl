@@ -19,6 +19,216 @@
 
 \refsection{0}
   \sortlist[entry]{nyt/global/}
+    \entry{amador_low_2014}{article}{}
+      \name{author}{2}{}{%
+        {{hash=9d0019013a1ab1979ad27df0cb3f091c}{%
+           family={Amador},
+           familyi={A\bibinitperiod},
+           given={Ana},
+           giveni={A\bibinitperiod}}}%
+        {{hash=62e8607c498d8b3548d020a33041b141}{%
+           family={Mindlin},
+           familyi={M\bibinitperiod},
+           given={Gabriel\bibnamedelima B.},
+           giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+      }
+      \strng{namehash}{4111341983b8b354fe7d8aa7c18f4291}
+      \strng{fullhash}{4111341983b8b354fe7d8aa7c18f4291}
+      \strng{authornamehash}{4111341983b8b354fe7d8aa7c18f4291}
+      \strng{authorfullhash}{4111341983b8b354fe7d8aa7c18f4291}
+      \field{sortinit}{A}
+      \field{sortinithash}{b685c7856330eaee22789815b49de9bb}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{1434-6028, 1434-6036}
+      \field{journaltitle}{The European Physical Journal B}
+      \field{langid}{english}
+      \field{month}{12}
+      \field{number}{12}
+      \field{title}{Low dimensional dynamics in birdsong production}
+      \field{urlday}{3}
+      \field{urlmonth}{11}
+      \field{urlyear}{2016}
+      \field{volume}{87}
+      \field{year}{2014}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \verb{doi}
+      \verb 10.1140/epjb/e2014-50566-5
+      \endverb
+      \verb{file}
+      \verb Amador et Mindlin - 2014 - Low dimensional dynamics in birdsong production.pdf:/home/ecoffet/.zotero/zotero/3z1dqxla.default/zotero/storage/TCMVDPME/Amador et Mindlin - 2014 - Low dimensional dynamics in birdsong production.pdf:application/pdf
+      \endverb
+      \verb{url}
+      \verb http://link.springer.com/10.1140/epjb/e2014-50566-5
+      \endverb
+    \endentry
+    \entry{amador_elemental_2013}{article}{}
+      \name{author}{4}{}{%
+        {{hash=9d0019013a1ab1979ad27df0cb3f091c}{%
+           family={Amador},
+           familyi={A\bibinitperiod},
+           given={Ana},
+           giveni={A\bibinitperiod}}}%
+        {{hash=351cbc5b78f7443c3b6e5a1bca095eb8}{%
+           family={Perl},
+           familyi={P\bibinitperiod},
+           given={Yonatan\bibnamedelima Sanz},
+           giveni={Y\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=62e8607c498d8b3548d020a33041b141}{%
+           family={Mindlin},
+           familyi={M\bibinitperiod},
+           given={Gabriel\bibnamedelima B.},
+           giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+        {{hash=10d946490aa2c014969232f524e671bc}{%
+           family={Margoliash},
+           familyi={M\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+      }
+      \strng{namehash}{7fd627d19ce73846b0ce58f3e83e9e21}
+      \strng{fullhash}{491c4f78a88408e4d55aa95a67adac29}
+      \strng{authornamehash}{7fd627d19ce73846b0ce58f3e83e9e21}
+      \strng{authorfullhash}{491c4f78a88408e4d55aa95a67adac29}
+      \field{sortinit}{A}
+      \field{sortinithash}{b685c7856330eaee22789815b49de9bb}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{day}{27}
+      \field{issn}{0028-0836, 1476-4687}
+      \field{journaltitle}{Nature}
+      \field{month}{2}
+      \field{number}{7439}
+      \field{title}{Elemental gesture dynamics are encoded by song premotor cortical neurons}
+      \field{urlday}{20}
+      \field{urlmonth}{9}
+      \field{urlyear}{2016}
+      \field{volume}{495}
+      \field{year}{2013}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{59\bibrangedash 64}
+      \range{pages}{6}
+      \verb{doi}
+      \verb 10.1038/nature11967
+      \endverb
+      \verb{file}
+      \verb Amador et al. - 2013 - Elemental gesture dynamics are encoded by song pre.pdf:/home/ecoffet/.zotero/zotero/3z1dqxla.default/zotero/storage/8X9EQWEV/Amador et al. - 2013 - Elemental gesture dynamics are encoded by song pre.pdf:application/pdf
+      \endverb
+      \verb{url}
+      \verb http://www.nature.com/doifinder/10.1038/nature11967
+      \endverb
+      \keyw{{OutstandingInterest}}
+    \endentry
+    \entry{boari_automatic_2015}{article}{}
+      \name{author}{5}{}{%
+        {{hash=ff578a226a3d510c096ed5efbcbce233}{%
+           family={Boari},
+           familyi={B\bibinitperiod},
+           given={Santiago},
+           giveni={S\bibinitperiod}}}%
+        {{hash=351cbc5b78f7443c3b6e5a1bca095eb8}{%
+           family={Perl},
+           familyi={P\bibinitperiod},
+           given={Yonatan\bibnamedelima Sanz},
+           giveni={Y\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=9d0019013a1ab1979ad27df0cb3f091c}{%
+           family={Amador},
+           familyi={A\bibinitperiod},
+           given={Ana},
+           giveni={A\bibinitperiod}}}%
+        {{hash=10d946490aa2c014969232f524e671bc}{%
+           family={Margoliash},
+           familyi={M\bibinitperiod},
+           given={Daniel},
+           giveni={D\bibinitperiod}}}%
+        {{hash=62e8607c498d8b3548d020a33041b141}{%
+           family={Mindlin},
+           familyi={M\bibinitperiod},
+           given={Gabriel\bibnamedelima B.},
+           giveni={G\bibinitperiod\bibinitdelim B\bibinitperiod}}}%
+      }
+      \strng{namehash}{41fc5ab7acfabfd31f6ff3b9b66ef134}
+      \strng{fullhash}{3eb635a64f56f4adcf9e4fc2efa0e9c4}
+      \strng{authornamehash}{41fc5ab7acfabfd31f6ff3b9b66ef134}
+      \strng{authorfullhash}{3eb635a64f56f4adcf9e4fc2efa0e9c4}
+      \field{sortinit}{B}
+      \field{sortinithash}{4ecbea03efd0532989d3836d1a048c32}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{abstract}{Highly coordinated learned behaviors are key to understanding neural processes integrating the body and the environment. Birdsong production is a widely studied example of such behavior in which numerous thoracic muscles control respiratory inspiration and expiration: the muscles of the syrinx control syringeal membrane tension, while upper vocal tract morphology controls resonances that modulate the vocal system output. All these muscles have to be coordinated in precise sequences to generate the elaborate vocalizations that characterize an individual's song. Previously we used a low-dimensional description of the biomechanics of birdsong production to investigate the associated neural codes, an approach that complements traditional spectrographic analysis. The prior study used algorithmic yet manual procedures to model singing behavior. In the present work, we present an automatic procedure to extract low-dimensional motor gestures that could predict vocal behavior. We recorded zebra finch songs and generated synthetic copies automatically, using a biomechanical model for the vocal apparatus and vocal tract. This dynamical model described song as a sequence of physiological parameters the birds control during singing. To validate this procedure, we recorded electrophysiological activity of the telencephalic nucleus {HVC}. {HVC} neurons were highly selective to the auditory presentation of the bird's own song ({BOS}) and gave similar selective responses to the automatically generated synthetic model of song ({AUTO}). Our results demonstrate meaningful dimensionality reduction in terms of physiological parameters that individual birds could actually control. Furthermore, this methodology can be extended to other vocal systems to study fine motor control.}
+      \field{day}{15}
+      \field{issn}{0022-3077, 1522-1598}
+      \field{journaltitle}{Journal of Neurophysiology}
+      \field{langid}{english}
+      \field{month}{11}
+      \field{number}{5}
+      \field{title}{Automatic reconstruction of physiological gestures used in a model of birdsong production}
+      \field{urlday}{8}
+      \field{urlmonth}{12}
+      \field{urlyear}{2016}
+      \field{volume}{114}
+      \field{year}{2015}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{2912\bibrangedash 2922}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1152/jn.00385.2015
+      \endverb
+      \verb{file}
+      \verb Full Text PDF:/home/ecoffet/.zotero/zotero/3z1dqxla.default/zotero/storage/JR6VIJT7/Boari et al. - 2015 - Automatic reconstruction of physiological gestures.pdf:application/pdf;Snapshot:/home/ecoffet/.zotero/zotero/3z1dqxla.default/zotero/storage/EAB2KVRE/2912.html:text/html
+      \endverb
+      \verb{url}
+      \verb http://jn.physiology.org/content/114/5/2912
+      \endverb
+    \endentry
+    \entry{dave_song_2000}{article}{}
+      \name{author}{1}{}{%
+        {{hash=63e0e1aca08651e55c747247f37e2f63}{%
+           family={Dave},
+           familyi={D\bibinitperiod},
+           given={A.\bibnamedelimi S.},
+           giveni={A\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \strng{namehash}{63e0e1aca08651e55c747247f37e2f63}
+      \strng{fullhash}{63e0e1aca08651e55c747247f37e2f63}
+      \strng{authornamehash}{63e0e1aca08651e55c747247f37e2f63}
+      \strng{authorfullhash}{63e0e1aca08651e55c747247f37e2f63}
+      \field{sortinit}{D}
+      \field{sortinithash}{78f7c4753a2004675f316a80bdb31742}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{day}{27}
+      \field{issn}{00368075, 10959203}
+      \field{journaltitle}{Science}
+      \field{month}{10}
+      \field{number}{5492}
+      \field{title}{Song Replay During Sleep and Computational Rules for Sensorimotor Vocal Learning}
+      \field{urlday}{21}
+      \field{urlmonth}{9}
+      \field{urlyear}{2016}
+      \field{volume}{290}
+      \field{year}{2000}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{812\bibrangedash 816}
+      \range{pages}{5}
+      \verb{doi}
+      \verb 10.1126/science.290.5492.812
+      \endverb
+      \verb{file}
+      \verb Dave - 2000 - Song Replay During Sleep and Computational Rules f.pdf:/home/ecoffet/.zotero/zotero/3z1dqxla.default/zotero/storage/HC8MGXU7/Dave - 2000 - Song Replay During Sleep and Computational Rules f.pdf:application/pdf
+      \endverb
+      \verb{url}
+      \verb http://www.sciencemag.org/cgi/doi/10.1126/science.290.5492.812
+      \endverb
+      \keyw{{ToRead}}
+    \endentry
     \entry{deregnaucourt_how_2005}{article}{}
       \name{author}{5}{}{%
         {{hash=d77f14051997568772ade136cb2e76ce}{%
@@ -125,6 +335,155 @@
       \endverb
       \verb{url}
       \verb http://www.pnas.org/content/101/52/18177.short
+      \endverb
+    \endentry
+    \entry{lynch_rhythmic_2016}{article}{}
+      \name{author}{5}{}{%
+        {{hash=c6ec6ef337be35930c0aff459f80bd13}{%
+           family={Lynch},
+           familyi={L\bibinitperiod},
+           given={Galen\bibnamedelima F.},
+           giveni={G\bibinitperiod\bibinitdelim F\bibinitperiod}}}%
+        {{hash=3bd6c049e1365b92abba8a9eeb79a855}{%
+           family={Okubo},
+           familyi={O\bibinitperiod},
+           given={Tatsuo\bibnamedelima S.},
+           giveni={T\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+        {{hash=e023ce59b88afe67c01e92429f4e5095}{%
+           family={Hanuschkin},
+           familyi={H\bibinitperiod},
+           given={Alexander},
+           giveni={A\bibinitperiod}}}%
+        {{hash=1b90e04d08c3649eb6b94be9b17b8f62}{%
+           family={Hahnloser},
+           familyi={H\bibinitperiod},
+           given={Richard\bibnamedelima H.R.},
+           giveni={R\bibinitperiod\bibinitdelim H\bibinitperiod}}}%
+        {{hash=a29623bf6c40ef893bbb6d97858ee0dd}{%
+           family={Fee},
+           familyi={F\bibinitperiod},
+           given={Michale\bibnamedelima S.},
+           giveni={M\bibinitperiod\bibinitdelim S\bibinitperiod}}}%
+      }
+      \strng{namehash}{ceb6e40f2aeabf6ad915e9335a955815}
+      \strng{fullhash}{d6cdeede0d273d60ea97336b67e5b616}
+      \strng{authornamehash}{ceb6e40f2aeabf6ad915e9335a955815}
+      \strng{authorfullhash}{d6cdeede0d273d60ea97336b67e5b616}
+      \field{sortinit}{L}
+      \field{sortinithash}{872351f18d0f736066eda0bf18bfa4f7}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{08966273}
+      \field{journaltitle}{Neuron}
+      \field{langid}{english}
+      \field{month}{5}
+      \field{number}{4}
+      \field{title}{Rhythmic Continuous-Time Coding in the Songbird Analog of Vocal Motor Cortex}
+      \field{urlday}{8}
+      \field{urlmonth}{12}
+      \field{urlyear}{2016}
+      \field{volume}{90}
+      \field{year}{2016}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{877\bibrangedash 892}
+      \range{pages}{16}
+      \verb{doi}
+      \verb 10.1016/j.neuron.2016.04.021
+      \endverb
+      \verb{file}
+      \verb 1-s2.0-S0896627316301088-main.pdf:/home/ecoffet/.zotero/zotero/3z1dqxla.default/zotero/storage/V8INCI8E/1-s2.0-S0896627316301088-main.pdf:application/pdf
+      \endverb
+      \verb{url}
+      \verb http://linkinghub.elsevier.com/retrieve/pii/S0896627316301088
+      \endverb
+    \endentry
+    \entry{picardo_population-level_2016}{article}{}
+      \name{author}{10}{}{%
+        {{hash=493a28f96f400f33161d7ab8c244a2d1}{%
+           family={Picardo},
+           familyi={P\bibinitperiod},
+           given={Michel\bibnamedelima A.},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=ac49e241f88460f90f9f1ab5f88db248}{%
+           family={Merel},
+           familyi={M\bibinitperiod},
+           given={Josh},
+           giveni={J\bibinitperiod}}}%
+        {{hash=c456c7065a148cb4143d3c4660cb2ccd}{%
+           family={Katlowitz},
+           familyi={K\bibinitperiod},
+           given={Kalman\bibnamedelima A.},
+           giveni={K\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=ed07ce65f7e8a3ce8f4bee45fa271d27}{%
+           family={Vallentin},
+           familyi={V\bibinitperiod},
+           given={Daniela},
+           giveni={D\bibinitperiod}}}%
+        {{hash=b4182fe6815d947a52f18a793e7eca79}{%
+           family={Okobi},
+           familyi={O\bibinitperiod},
+           given={Daniel\bibnamedelima E.},
+           giveni={D\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=ae381594d49b3240724db6d79f44074b}{%
+           family={Benezra},
+           familyi={B\bibinitperiod},
+           given={Sam\bibnamedelima E.},
+           giveni={S\bibinitperiod\bibinitdelim E\bibinitperiod}}}%
+        {{hash=c59fc56de0812d57c2af48c148722a8b}{%
+           family={Clary},
+           familyi={C\bibinitperiod},
+           given={Rachel\bibnamedelima C.},
+           giveni={R\bibinitperiod\bibinitdelim C\bibinitperiod}}}%
+        {{hash=9d38b55b2a2e5879a37ac8e924c7f118}{%
+           family={Pnevmatikakis},
+           familyi={P\bibinitperiod},
+           given={Eftychios\bibnamedelima A.},
+           giveni={E\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+        {{hash=b5ff96deb16b77fe4a862b665ba9b0c9}{%
+           family={Paninski},
+           familyi={P\bibinitperiod},
+           given={Liam},
+           giveni={L\bibinitperiod}}}%
+        {{hash=379f87b548d062817a64cd2ee4ae6149}{%
+           family={Long},
+           familyi={L\bibinitperiod},
+           given={Michael\bibnamedelima A.},
+           giveni={M\bibinitperiod\bibinitdelim A\bibinitperiod}}}%
+      }
+      \strng{namehash}{a3fcf195593e0a59084ddbb9f20bf281}
+      \strng{fullhash}{e1cfe7ee0f64796362f582699a65f9b3}
+      \strng{authornamehash}{a3fcf195593e0a59084ddbb9f20bf281}
+      \strng{authorfullhash}{e1cfe7ee0f64796362f582699a65f9b3}
+      \field{sortinit}{P}
+      \field{sortinithash}{c0a4896d0e424f9ca4d7f14f2b3428e7}
+      \field{labeldatesource}{}
+      \field{labelnamesource}{author}
+      \field{labeltitlesource}{title}
+      \field{issn}{08966273}
+      \field{journaltitle}{Neuron}
+      \field{langid}{english}
+      \field{month}{5}
+      \field{number}{4}
+      \field{title}{Population-Level Representation of a Temporal Sequence Underlying Song Production in the Zebra Finch}
+      \field{urlday}{1}
+      \field{urlmonth}{12}
+      \field{urlyear}{2016}
+      \field{volume}{90}
+      \field{year}{2016}
+      \field{dateera}{ce}
+      \field{urldateera}{ce}
+      \field{pages}{866\bibrangedash 876}
+      \range{pages}{11}
+      \verb{doi}
+      \verb 10.1016/j.neuron.2016.02.016
+      \endverb
+      \verb{file}
+      \verb 1-s2.0-S0896627316001094-main.pdf:/home/ecoffet/.zotero/zotero/3z1dqxla.default/zotero/storage/FU2ABSNV/1-s2.0-S0896627316001094-main.pdf:application/pdf
+      \endverb
+      \verb{url}
+      \verb http://linkinghub.elsevier.com/retrieve/pii/S0896627316001094
       \endverb
     \endentry
   \endsortlist
