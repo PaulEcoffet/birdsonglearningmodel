@@ -23,3 +23,5 @@
 *.synctex.gz
 *.fdb_latexmk
 *.run.xml
+*.bcf
+*.fls
