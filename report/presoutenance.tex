@@ -51,8 +51,8 @@ it from 20 days post hatch (DPH) to 80 DPH \parencite{liu_juvenile_2004}. Their
 learning can be split in three phases: i) they have a babbling phase from 20 DPH
 to 40 DPH, then ii) a plastic song in which protosyllables from the tutor song
 are produced then iii) a crystallized song at 80 DPH with a fixed song which is
-a copy of the tutor's song.\todo{check the days} Zebra finches are commonly used
-as a model of speech acquisition.
+a copy of the tutor's song. Zebra finches are commonly used as a model of speech
+acquisition.
 
 \textcite{deregnaucourt_how_2005} showed that sleep plays an important role in
 the learning of tutor songs. Indeed, they showed that sleeping has a negative
@@ -61,6 +61,16 @@ impact on the long run. Indeed, song restitution is less complex and less
 similar to the tutor song from one morning to the previous day evening, but the
 greater this loss in performance was overall for one bird, the better this bird
 will reproduce the tutor song at the end of its learning.
+Figure~\ref{fig:sleep_performance} shows the negative impact on song similarity
+the night has.
+
+\begin{figure}[b]
+  \center
+  \includegraphics[width=0.5\linewidth]{media/deregnaucourt_sleep_performance.png}
+  \caption{Song similarity from \textcite{deregnaucourt_how_2005}}
+  \label{fig:sleep_performance}
+\end{figure}
+
 \textcite{dave_song_2000} has found replay sequences of neurones in the motor
 cortex which correspond to their activity pattern when the birds sing in adult
 zebra finches during their sleep. This shows that neurones that are highly
@@ -85,12 +95,12 @@ made by \textcite{boari_automatic_2015}. This synthesizer is a biophysical model
 of zebra finch vocal apparatus. This synthesizer has the advantage that it be
 parametrized with relatively few parameters to produce realistic bird songs. As
 it models the zebra finch vocal apparatus, it is likely that the parameters we
-send to this synthesizer must be similar to the instruction sent by the zebra
+send to this synthesizer must be similar to the instructions sent by the zebra
 finch motor cortex to the vocal apparatus muscles. Indeed, the parameters for
 this synthesizer is the the labia tension \(\alpha(t)\) and the air-sac pressure
 \(\beta(t)\) in the apparatus.\todo{check alpha and beta that I keep mixing up}
 \textcite{amador_elemental_2013, boari_automatic_2015} have managed to reproduce
-zebra finches song using this synthesizer. The synthetical songs they produced
+zebra finches song using this synthesizer. The synthetic songs they produced
 activated neurons in HVC which are highly selective to bird's own song (BOS).
 This shows that the synthesized songs are accurate reproduction of BOS.
 
@@ -123,7 +133,9 @@ So as to do a first gesture segmentation, we will use motor babbling so that the
 bird robot can explore its sensorimotor space and segment the tutor song based
 on its babbling. We will then use a interest model to choose which syllable to
 train \parencite{baranes_active_2013}. The overview of the whole algorithm is
-shown in Figure~\ref{fig:goal_def}.
+shown in Figure~\ref{fig:goal_def}. Our idea is that the maximization of the
+identified gestures occurs during the day and explain the overall advancement
+in performance.
 
 This part will only cover the learning of gesture, but not the linkage between
 these gestures. We have yet to find how to learn the pattern of the syllables
@@ -136,7 +148,7 @@ strategy, where it learn to reproduce the whole tutor song at every try.
 
 \begin{figure}[tb]
 \centering{
-\def\svgwidth{0.8\linewidth}
+\def\svgwidth{0.9\linewidth}
 \import{media/}{simple_process_schema.pdf_tex}
 \caption{Simple hill climbing model \label{fig:simple_model}}
 }
@@ -149,32 +161,22 @@ strategy, where it learn to reproduce the whole tutor song at every try.
 }
 \end{figure}
 
-\ifx
-* Babbling + goal oriented
-* segmentation of the syllables
-* hill climbing
-* Likely won't be enough:
-  * Different strategies are not taken into account
-  * Transition between syllable might not be doable: Bi-gram?
-\fi
-
 \section*{Expected Implementation}
 
 The learning algorithm that we want to suggest must be biologically plausible,
 therefore we will use the Song Synthesizer from \textcite{boari_automatic_2015}
 to generate real sound-waves. We have already implemented the Python binder to
-the compiled synthesizer.
-These sound-waves will then be processed by an
+the compiled synthesizer. These sound-waves will then be processed by an
 auditory system. We plan at first to use Mel-Frequency Cepstrum Coefficients
 (MFCC), which are used in speech recognition for Humans.
 \textcite{chou_studies_2008} showed that MFCC can be used to classify birdsongs.
 MFCC sums up audio signal in a few coefficients per time window. Though, we
-obtained strange results using MFCC squared error between the real song and
-our generated bird song. Indeed, even though our generated bird songs were
+obtained strange results using MFCC squared error between the real song and our
+generated bird song. Indeed, even though our generated bird songs were
 qualitatively very bad as they sound like white noise, the difference between
 their MFCC differences with the real song were lower than the generated song by
-\textcite{boari_automatic_2015} which sound qualitatively very similar.
-We are currently trying to fine tune the use we have of MFCC and get a better
+\textcite{boari_automatic_2015} which sound qualitatively very similar. We are
+currently trying to fine tune the use we have of MFCC and get a better
 understanding of their behavior. We may change for another sound representation.
 As the exact length of a syllable may vary from try to try, we plan to use
 Dynamic Time Warping (DTW) algorithm to avoid error accumulation for a slightly
@@ -186,32 +188,31 @@ algorithm defines and remember each try it makes so as to define more realizable
 goals. The Nearest-Neighbor algorithm and the interest model are available
 through the Explauto python module \parencite{moulin-frier_explauto:_2014}.
 
-\ifx
-* Find good auditory and memory system
-  * Must be biologically plausible
-  --> Buenos Aires Synthesizer
-  --> MFCC seems good but we cannot do what we are looking for with it yet
-  --> Nearest-Neighbors
-  --> Interest model for babbling then socially imposed goal (tutor song)
-    \parencite{baranes_active_2013}
-* Use Explauto \parencite{moulin-frier_explauto:_2014}
-\fi
-
 \section*{Analysis \& Testing}
 
+To assess the quality of our model, we have selected several criteria to meet.
+First, we want our algorithm to reproduce the results from
+\textcite{deregnaucourt_how_2005}. This include observing the increase of song
+similarity (a measure defined by \textcite{tchernichovski_procedure_2000}) over
+the development of the bird, that the song similarity decrease over night, but
+that this decrease is positively correlated with the song restitution at the end
+of the learning. To do that, we will use the same statistical test that
+\textcite{deregnaucourt_how_2005} have done on the same set of features. We will
+therefore use
 
-\ifx
-* Can we observe protosyllable, syllable and song: as in clustering that happens
-* Is the amount of GTE identified by our algorithm consistent with the amount of
-GTE identified by \textcite{boari_automatic_2015}
-\fi
+Then, we expect our model to yield at first protosyllables, then syllables and
+go into the crystallized song. \todo{look at how I can evaluate this by
+clustering}
+
+Finally, we want that our algorithm identify the same amount of GTE per second
+that are identified by \textcite{boari_automatic_2015}.
 
 \section*{Final Evaluation}
-\ifx
-* Design new hypotheses
-*
-\fi
 
+The goal of building this model is being able to build new hypotheses that can
+be tested in behavioral or neurobiological experiment on the zebra finch. Once
+the model is fully working and respond to our expectations in reproducing the
+literature, we will study its behaviors so as to design new hypotheses.
 
 \printbibliography{}
 
