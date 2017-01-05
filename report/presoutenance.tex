@@ -13,7 +13,7 @@
 \usepackage{todonotes}
 \usepackage{import}
 
-\usepackage[backend=biber,style=apa,bibstyle=authoryear]{biblatex}
+\usepackage[backend=biber,bibstyle=authoryear,style=ieee]{biblatex}
 \addbibresource{SingingBirds.bib}
 \DeclareLanguageMapping{american}{american-apa}
 
@@ -42,7 +42,7 @@
 \noindent
 \large\textbf{Présoutenance} \hfill \textbf{Paul Ecoffet} \\
 \normalsize Cogmaster M2 \hfill Encadrants: Stéphane Doncieux, Benoît Girard \\
-Tuteur: Mehdi Khamassi \hfill 27/01/17
+Tuteur: Mehdi Khamassi \hfill 20/01/17
 
 \section*{Problem Statement}
 
@@ -89,12 +89,12 @@ send to this synthesizer must be similar to the instruction sent by the zebra
 finch motor cortex to the vocal apparatus muscles. Indeed, the parameters for
 this synthesizer is the the labia tension \(\alpha(t)\) and the air-sac pressure
 \(\beta(t)\) in the apparatus.\todo{check alpha and beta that I keep mixing up}
-\textcite{amador_elemental_2013,boari_automatic_2015} have managed to reproduce
+\textcite{amador_elemental_2013, boari_automatic_2015} have managed to reproduce
 zebra finches song using this synthesizer. The synthetical songs they produced
 activated neurons in HVC which are highly selective to bird's own song (BOS).
 This shows that the synthesized songs are accurate reproduction of BOS.
 
-\textcite{amador_low_2014,boari_automatic_2015} have already found interesting
+\textcite{amador_low_2014, boari_automatic_2015} have already found interesting
 data by studying the parameters. Indeed, they have found that what can be seen
 as syllable in the sensory space can be seen as one or several gestures in the
 parameters space. Indeed, syllable are yield with continuous modification of the
@@ -105,22 +105,47 @@ values.
 neuron spikes in zebra finches and the gesture trajectory extrema (beginning,
 maximum, minimum and end) of these gestures. Though, very recent literature
 shows that these correlates might have been untrue
-\parencite{lynch_rhythmic_2016,picardo_population-level_2016}. Even though there
-is no neural correlate with gesture trajectory extrema (GTE), we hypothesize
-that GTE identification may play an important role in song learning, as they
-signal changes in the progression of the parameters through time.
+\parencite{lynch_rhythmic_2016, picardo_population-level_2016}. Even though
+there is no neural correlate with gesture trajectory extrema (GTE), we
+hypothesize that GTE identification may play an important role in song learning,
+as they signal changes in the progression of the parameters through time.
 
 \section*{Proposed Solution}
 
-Our goal is to design a simple hill climbing model (see Fig.~\ref{fig:topView})
-that fits one specific gesture.
+Our goal is to design a simple hill climbing model (see
+Fig.~\ref{fig:simple_model}) that fits one specific gesture and a gesture
+identification algorithm. The gesture identification algorithm will try to
+segment the tutor song in efficient gestures based on the bird current
+knowledge. This two step algorithm is similar in some points to an
+Expectation-Maximization algorithm \parencite{dempster_maximum_1977}.
+
+So as to do a first gesture segmentation, we will use motor babbling so that the
+bird robot can explore its sensorimotor space and segment the tutor song based
+on its babbling. We will then use a interest model to choose which syllable to
+train \parencite{baranes_active_2013}. The overview of the whole algorithm is
+shown in Figure~\ref{fig:goal_def}.
+
+This part will only cover the learning of gesture, but not the linkage between
+these gestures. We have yet to find how to learn the pattern of the syllables
+and the song. This algorithm should be able to use in a smart way the knowledge
+built by the gesture learning system. The algorithm that learn the syllable
+transition should also be able to reproduce the different learning strategies
+that a zebra finch can have. Indeed, the zebra finch can either have a serial
+strategy, where it only learn one specific syllable at a time, or have a motif
+strategy, where it learn to reproduce the whole tutor song at every try.
 
 \begin{figure}[tb]
 \centering{
-\def\svgwidth{\linewidth}
+\def\svgwidth{0.8\linewidth}
 \import{media/}{simple_process_schema.pdf_tex}
 \caption{Simple hill climbing model \label{fig:simple_model}}
-\label{fig:topView}
+}
+\end{figure}
+\begin{figure}[tb]
+\centering{
+\def\svgwidth{0.8\linewidth}
+\import{media/}{goal_def_schema.pdf_tex}
+\caption{Define goals based on knowledge \label{fig:goal_def}}
 }
 \end{figure}
 
@@ -134,6 +159,32 @@ that fits one specific gesture.
 \fi
 
 \section*{Expected Implementation}
+
+The learning algorithm that we want to suggest must be biologically plausible,
+therefore we will use the Song Synthesizer from \textcite{boari_automatic_2015}
+to generate real sound-waves. We have already implemented the Python binder to
+the compiled synthesizer.
+These sound-waves will then be processed by an
+auditory system. We plan at first to use Mel-Frequency Cepstrum Coefficients
+(MFCC), which are used in speech recognition for Humans.
+\textcite{chou_studies_2008} showed that MFCC can be used to classify birdsongs.
+MFCC sums up audio signal in a few coefficients per time window. Though, we
+obtained strange results using MFCC squared error between the real song and
+our generated bird song. Indeed, even though our generated bird songs were
+qualitatively very bad as they sound like white noise, the difference between
+their MFCC differences with the real song were lower than the generated song by
+\textcite{boari_automatic_2015} which sound qualitatively very similar.
+We are currently trying to fine tune the use we have of MFCC and get a better
+understanding of their behavior. We may change for another sound representation.
+As the exact length of a syllable may vary from try to try, we plan to use
+Dynamic Time Warping (DTW) algorithm to avoid error accumulation for a slightly
+off-time syllable. MFCC and DTW used together are powerful tools for speech
+recognition \parencite{muda_voice_2010}.
+
+We plan to use a Nearest-Neighbor algorithm to hill climb toward the goals the
+algorithm defines and remember each try it makes so as to define more realizable
+goals. The Nearest-Neighbor algorithm and the interest model are available
+through the Explauto python module \parencite{moulin-frier_explauto:_2014}.
 
 \ifx
 * Find good auditory and memory system
@@ -151,7 +202,8 @@ that fits one specific gesture.
 
 \ifx
 * Can we observe protosyllable, syllable and song: as in clustering that happens
-*
+* Is the amount of GTE identified by our algorithm consistent with the amount of
+GTE identified by \textcite{boari_automatic_2015}
 \fi
 
 \section*{Final Evaluation}
