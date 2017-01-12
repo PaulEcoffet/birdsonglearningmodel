@@ -28,12 +28,13 @@
 
 \hypersetup{breaklinks=true,
             pdfauthor={Paul Ecoffet},
-            pdftitle={Report},
+            pdftitle={Preregistration report},
             colorlinks=true,
             citecolor=blue,
             urlcolor=blue,
             linkcolor=magenta,
-            pdfborder={0 0 0}}
+            pdfborder={0 0 0}
+            }
 \urlstyle{same} % don't use monospace font for urls
 
 
@@ -43,7 +44,7 @@
 \normalsize Cogmaster M2 \hfill Supervisors: Stéphane Doncieux, Benoît Girard \\
 Tuteur: Mehdi Khamassi \hfill Institut de systèmes intelligents et robotique, UPMC\\
 Session: June \hfill Language: English\\
-Suggested reviewers: … \& … \hfill 2017-01-20\\
+Suggested reviewers: Arthur Leblois \& … \hfill 2017-01-20\\
 \href{https://osf.io/ja8k9/}{OSF project's page}
 
 
@@ -56,22 +57,22 @@ finches are commonly used as a model of speech acquisition.
 \textcite{deregnaucourt_how_2005} showed that sleep plays an important role in
 the learning of tutor songs. Indeed, they showed that sleeping has a negative
 impact on song restitution by zebra finches in the short term but a positive
-impact on the long run. Indeed, song restitution is less complex and less
-similar to the tutor song from one morning to the previous day evening, but the
-greater this loss in performance was overall for one bird, the better this bird
-was able to reproduce the tutor song at the end of its learning.
+impact on the long run. Song restitution is less complex and less similar to the
+tutor song from one morning to the previous day evening, but the greater this
+loss in performance was overall for one bird, the better this bird was able to
+reproduce the tutor song at the end of its learning.
 
 
-\textcite{dave_song_2000} have found replay sequences of neurones in the motor
-cortex which correspond to their activity pattern when the birds sing in adult
-zebra finches during their sleep. This shows that neurones that are highly
+\textcite{dave_song_2000} have found neurons in the motor cortex which fires
+sequences during sleep that correspond to their activity pattern when the birds
+sing in adult zebra finches. This shows that motor neurons that are highly
 correlated with bird's own song (BOS) are activated during the night. These
-findings suggest that some learning may be at play during sleep.
+identified replays suggest that some learning may occur during sleep.
 
 Our hypothesis is that during its sleep, the zebra finch restructures the
-knowledge it has acquired so far with replay. We hypothesize that this
-restructuring can account for the loss of performance in the short term and an
-improvement of performance in the long term.
+knowledge it has acquired so far thanks to replay mechanisms. We hypothesize
+that this restructuring can account for the loss of performance in the short
+term and an improvement of performance in the long term.
 
 The goal of this internship is to offer a model of the zebra finch song
 learning which can explain different behavioral data observed such as the
@@ -83,7 +84,7 @@ learning (babbling, protosyllables, crystallized song).
 
 Our goal is to build a biological plausible model. We will use a bird song
 synthesizer made by \textcite{boari_automatic_2015}. This synthesizer is a
-biophysical model of zebra finch vocal apparatus. It can be parametrized with
+biophysical model of zebra finch vocal apparatus. It can be parameterized with
 relatively few values to produce realistic bird songs. As it models the zebra
 finch vocal apparatus, it is likely that the parameters we send to this
 synthesizer are similar to the instructions sent by the zebra finch motor cortex
@@ -95,8 +96,9 @@ accurate reproductions of BOS.
 
 The authors of the synthesizer have found that what can be seen as syllable in
 the sensory space can be seen as one or several ``gestures'' in this parameters
-space \parencite{amador_low_2014, boari_automatic_2015}. These gestures can
-represent the real motor representation of the song. We hypothesize that GTE
+space \parencite{amador_low_2014, boari_automatic_2015}. Gestures are continuous
+and monotonous variations in the parameter space. These gestures can represent
+the real motor representation of the song. We hypothesize that GTE
 identification may play an important role in song learning, as they signal
 changes in the progression of the parameters through time.
 
@@ -105,23 +107,24 @@ changes in the progression of the parameters through time.
 Our goal is to design a simple optimization algorithm that fits one specific
 gesture and a gesture identification algorithm. The gesture identification
 algorithm will try to segment the tutor song in efficient gestures based on the
-bird current knowledge acquired by the optimization algorithm. This two step
+bird current knowledge acquired by the optimization algorithm. This two-step
 algorithm is similar in some points to an Expectation-Maximization algorithm
 \parencite{dempster_maximum_1977}.
 
 Our idea is that the maximization of the identified gestures occurs during the
 day and explains the overall advancement in performance. The segmentation
-algorithm will have a short term negative impact but will choose more and more
-adaptive segmentation that lead to an overall better performance.
+algorithm will have a short term negative impact in the short term as the
+optimization algorithm will have to reach new goals but will choose more and
+more adaptive segmentation that lead to an overall better performance.
 
-This part will only cover the learning of gesture, but not the link between
-these gestures. We have yet to find how to learn the pattern of the syllables
-and the song. This algorithm should be able to use in a smart way the knowledge
-built by the gesture learning system. The algorithm that learn the syllable
+This part will only cover the learning of gestures, but not the transitions
+between these gestures. We have yet to find how to learn the pattern of the
+syllables and the song. This new algorithm should be able to use the knowledge
+built by the gesture learning system. The algorithm that learns the syllable
 transition should also be able to reproduce the different learning strategies
-that a zebra finch can have: a serial strategy, where it only learn one specific
-syllable at a time, or have a motif strategy, where it learn to reproduce the
-whole tutor song at every try.
+that a zebra finch can have: a serial strategy, where it only learns one
+specific syllable at a time, or a motif strategy, where it tries to reproduce
+the whole tutor song at every try.
 
 
 \section*{Expected Implementation}
@@ -137,7 +140,8 @@ MFCC have already been used to classify birdsongs \parencite{chou_studies_2008}.
 We plan to use a Nearest-Neighbor algorithm to hill climb toward the goals the
 algorithm defines and remember each try it makes for the segmentation algorithm.
 The segmentation algorithm will try to do cuts in the tutor song so that each
-cut is the closest to a sound the bird can already make.
+cut is the closest possible to a sound the bird can already make according to
+its previous tries.
 
 \section*{Analysis \& Testing}
 
@@ -145,7 +149,7 @@ To assess the quality of our model, we have selected several criteria to meet.
 First, we want our algorithm to reproduce the results from
 \textcite{deregnaucourt_how_2005}. This include observing the increase of song
 similarity \parencite{tchernichovski_procedure_2000} over the development of the
-bird, that the song similarity decrease over night, but that this decrease is
+bird, that the song similarity decrease overnight, but that this decrease is
 positively correlated with the song restitution at the end of the learning. To
 do that, we will use the same statistical tests that
 \textcite{deregnaucourt_how_2005} have done on the same set of features.
@@ -167,7 +171,7 @@ inferred by our algorithm and Boari's algorithm to be equal.
 The goal of building this model is being able to build new hypotheses that can
 be tested in behavioral or neurobiological experiment on the zebra finch. Once
 the model is fully working and respond to our expectations in reproducing the
-literature, we will study its behaviors so as to design new hypotheses that can
+literature, we will study its behaviors to design new hypotheses that can
 be tested on real zebra finches.
 
 \section*{Contributions}
