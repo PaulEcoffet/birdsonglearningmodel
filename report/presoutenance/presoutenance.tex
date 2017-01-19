@@ -11,10 +11,11 @@
 \usepackage{fullpage} % changes the margin
 \usepackage{todonotes}
 \usepackage{import}
+\usepackage{multicol}
 
 \usepackage[backend=biber,bibstyle=authoryear,url=false, isbn=false]{biblatex}
 \addbibresource{SingingBirds.bib}
-\DeclareLanguageMapping{american}{american-apa}
+%\DeclareLanguageMapping{american}{american-apa}
 
 \usepackage{xifthen}
 \usepackage{soul}
@@ -37,6 +38,12 @@
             }
 \urlstyle{same} % don't use monospace font for urls
 
+%\AtEveryBibitem{\clearfield{title}}
+\AtEveryBibitem{\clearfield{journaltitle}}
+\AtEveryBibitem{\clearfield{volume}}
+\AtEveryBibitem{\clearfield{pages}}
+\AtEveryBibitem{\clearfield{number}}
+\renewbibmacro{in:}{}
 
 \begin{document}
 \noindent
@@ -46,8 +53,7 @@ Tuteur: Mehdi Khamassi \hfill Institut de systèmes intelligents et robotique, U
 Session: June \hfill Language: English\\
 Suggested reviewers: Arthur Leblois \& … \hfill 2017-01-20\\
 \href{https://osf.io/ja8k9/}{OSF project's page}
-
-
+\begin{multicols}{1}
 \section*{Problem Statement}
 
 The Zebra Finches are songbirds which learn the song of their tutor. They learn
@@ -78,8 +84,7 @@ term and an improvement of performance in the long term.
 The goal of this internship is to offer a model of the zebra finch song
 learning which can explain different behavioral data observed such as the
 correlation between the loss of performance every night and the overall
-performance at the end of learning, as well as the different phases of bird song
-learning (babbling, protosyllables, crystallized song).
+performance at the end of learning.
 
 \section*{Investigation/Research}
 
@@ -99,9 +104,23 @@ The authors of the synthesizer have found that what can be seen as syllable in
 the sensory space can be seen as one or several ``gestures'' in this parameters
 space \parencite{amador_low_2014, boari_automatic_2015}. Gestures are continuous
 and monotonous variations in the parameter space. These gestures can represent
-the real motor representation of the song. We hypothesize that GTE
-identification may play an important role in song learning, as they signal
-changes in the progression of the parameters through time.
+the real motor representation of the song. They define the notion of gesture
+trajectory extrema (GTE), which are the period in which the bird switch from a
+gesture to another. We hypothesize that gesture and therefore GTE identification
+may play an important role in song learning, as they signal changes in the
+progression of the parameters through time.
+
+Our hypothese is that during the day, the bird is optimizing its sound
+reproduction toward subparts of the song. During the night, it uses the
+knowledge acquired during the day to restructure its song decomposition which
+will determine its new goals. The song decomposition will be the one for which
+the bird knows the gestures that yield the closest sound for each part. It
+suggests the presence of replays of already known gestures during sleep.
+
+The segmentation algorithm during the night will have a short term negative
+impact in the short term as the bird will have to optimize to new goals but will
+choose more and more adaptive segmentation that lead to an overall better
+performance.
 
 \section*{Proposed Solution}
 
@@ -111,12 +130,6 @@ algorithm will try to segment the tutor song in efficient gestures based on the
 bird current knowledge acquired by the optimization algorithm. This two-step
 algorithm is similar in some points to an Expectation-Maximization algorithm
 \parencite{dempster_maximum_1977}.
-
-Our idea is that the maximization of the identified gestures occurs during the
-day and explains the overall advancement in performance. The segmentation
-algorithm will have a short term negative impact in the short term as the
-optimization algorithm will have to reach new goals but will choose more and
-more adaptive segmentation that lead to an overall better performance.
 
 This part will only cover the learning of gestures, but not the transitions
 between these gestures. We have yet to find how to learn the pattern of the
@@ -130,13 +143,11 @@ the whole tutor song at every try.
 
 \section*{Expected Implementation}
 
-The learning algorithm that we want to suggest must be biologically plausible,
-therefore we will use the Song Synthesizer from \textcite{boari_automatic_2015}
-to generate real sound-waves. We have already implemented the Python binder to
-the compiled synthesizer. These sound-waves will then be processed by an
-auditory system. We plan to use Mel-Frequency Cepstrum Coefficients
-(MFCC), which are used in speech recognition for Humans.
-MFCC have already been used to classify birdsongs \parencite{chou_studies_2008}.
+We have already implemented the Python binder to the compiled synthesizer by
+\textcite{boari_automatic_2015}. These sound-waves will then be processed by an
+auditory system. We plan to use Mel-Frequency Cepstrum Coefficients (MFCC),
+which are used in speech recognition for Humans. MFCC have already been used to
+classify birdsongs \parencite{chou_studies_2008}.
 
 We plan to use a Nearest-Neighbor algorithm to hill climb toward the goals the
 algorithm defines and remember each try it makes for the segmentation algorithm.
@@ -153,16 +164,15 @@ similarity \parencite{tchernichovski_procedure_2000} over the development of the
 bird, that the song similarity decrease overnight, but that this decrease is
 positively correlated with the song restitution at the end of the learning. To
 do that, we will use the same statistical tests that
-\textcite{deregnaucourt_how_2005} have done on the same set of features.
+\textcite{deregnaucourt_how_2005} have done on the same set of features: Amongst
+other tests, we will measure the signed song similarity between the last 100
+songs produced and the first 100 songs produced the next day, and see if the
+difference is negative (going against overall developpement). We will then do a
+correlation of pearson test between the overall magnitude of post-sleep
+deterioration and the eventual similarity to the model song, we expect to see a
+positive correlation between the two.
 
-Then, we expect our model to yield at first protosyllables, then syllables and
-go into the crystallized song. This can be measured by more and more consistent
-syllable production, with less variance for a syllable production for several
-features (duration, pitch, frequency modulation, Wiener entropy, goodness of
-pitch and continuity).\todo{less variance seems good but i have not found
-the same idea in other paper}
-
-Finally, we want that our algorithm identifies similar GTE distribution as the
+Then, we want that our algorithm identifies similar GTE distribution as the
 identified ones by the automatic GTE extractor made by
 \textcite{boari_automatic_2015}. We expect the mean amount of GTE per syllable
 inferred by our algorithm and Boari's algorithm to be equal.
@@ -176,13 +186,16 @@ literature, we will study its behaviors to design new hypotheses that can
 be tested on real zebra finches.
 
 \section*{Contributions}
-S. Derégnaucourt provides us behavioral data for model comparison\\
+
+S. Derégnaucourt provided us behavioral data for model comparison and will help
+us reproducing his analyses.\\
 S. Boari and his colleagues built the song synthesizer and a GTE detection
 algorithm.\\
 I will code the model and the analysis with the supervision of Stéphane Doncieux
 and Benoît Girard.\\
 
-\clearpage%
 \printbibliography{}
+
+\end{multicols}
 
 \end{document}
