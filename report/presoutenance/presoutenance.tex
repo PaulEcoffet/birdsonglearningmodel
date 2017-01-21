@@ -13,7 +13,7 @@
 \usepackage{import}
 \usepackage{multicol}
 
-\usepackage[backend=biber,bibstyle=authoryear,url=false, isbn=false]{biblatex}
+\usepackage[backend=bibtex,bibstyle=authoryear,url=false, isbn=false]{biblatex}
 \addbibresource{SingingBirds.bib}
 %\DeclareLanguageMapping{american}{american-apa}
 
@@ -53,7 +53,7 @@ Tuteur: Mehdi Khamassi \hfill Institut de systèmes intelligents et robotique, U
 Session: June \hfill Language: English\\
 Suggested reviewers: Arthur Leblois \& … \hfill 2017-01-20\\
 \href{https://osf.io/ja8k9/}{OSF project's page}
-\begin{multicols}{1}
+\begin{multicols}{2}
 \section*{Problem Statement}
 
 The Zebra Finches are songbirds which learn the song of their tutor. They learn
@@ -118,7 +118,7 @@ the bird knows the gestures that yield the closest sound for each part. It
 suggests the presence of replays of already known gestures during sleep.
 
 The segmentation algorithm during the night will have a short term negative
-impact in the short term as the bird will have to optimize to new goals but will
+impact as the bird will have to optimize to new goals but will
 choose more and more adaptive segmentation that lead to an overall better
 performance.
 
@@ -157,7 +157,7 @@ its previous tries.
 
 \section*{Analysis \& Testing}
 
-To assess the quality of our model, we have selected several criteria to meet.
+To assess the quality of our model, we have selected two criteria to meet.
 First, we want our algorithm to reproduce the results from
 \textcite{deregnaucourt_how_2005}. This include observing the increase of song
 similarity \parencite{tchernichovski_procedure_2000} over the development of the
