@@ -51,7 +51,7 @@
 \normalsize Cogmaster M2 \hfill Supervisors: Stéphane Doncieux, Benoît Girard \\
 Tuteur: Mehdi Khamassi \hfill Institut de systèmes intelligents et robotique, UPMC\\
 Session: June \hfill Language: English\\
-Suggested reviewers: Arthur Leblois \& … \hfill 2017-01-20\\
+Suggested reviewers: Arthur~Leblois \& Jean-Pierre~Nadal \hfill 2017-01-20\\
 \href{https://osf.io/ja8k9/}{OSF project's page}
 \begin{multicols}{2}
 \section*{Problem Statement}
@@ -94,7 +94,7 @@ biophysical model of zebra finch vocal apparatus. It can be parameterized with
 relatively few values to produce realistic bird songs. As it models the zebra
 finch vocal apparatus, it is likely that the parameters we send to this
 synthesizer are similar to the instructions sent by the zebra finch motor cortex
-to the vocal apparatus muscles. Zebra finches song have already been reproduced
+to vocal apparatus muscles. Zebra finches song have already been reproduced
 using this synthesizer and a look up table \parencite{boari_automatic_2015}. The
 synthetic songs they produced activated neurons in HVC which are highly
 selective to bird's own song (BOS). This shows that the synthesized songs are
@@ -117,8 +117,8 @@ will determine its new goals. The song decomposition will be the one for which
 the bird knows the gestures that yield the closest sound for each part. It
 suggests the presence of replays of already known gestures during sleep.
 
-The segmentation algorithm during the night will have a short term negative
-impact as the bird will have to optimize to new goals but will
+The restructuration of the song decomposition during the night will have a short
+term negative impact as the bird will have to optimize new goals but will
 choose more and more adaptive segmentation that lead to an overall better
 performance.
 
@@ -159,9 +159,9 @@ its previous tries.
 
 To assess the quality of our model, we have selected two criteria to meet.
 First, we want our algorithm to reproduce the results from
-\textcite{deregnaucourt_how_2005}. This include observing the increase of song
+\textcite{deregnaucourt_how_2005}. This includes observing the increase of song
 similarity \parencite{tchernichovski_procedure_2000} over the development of the
-bird, that the song similarity decrease overnight, but that this decrease is
+bird, that the song similarity decreases overnight, but that this decrease is
 positively correlated with the song restitution at the end of the learning. To
 do that, we will use the same statistical tests that
 \textcite{deregnaucourt_how_2005} have done on the same set of features: Amongst
@@ -179,11 +179,11 @@ inferred by our algorithm and Boari's algorithm to be equal.
 
 \section*{Final Evaluation}
 
-The goal of building this model is being able to build new hypotheses that can
-be tested in behavioral or neurobiological experiment on the zebra finch. Once
-the model is fully working and respond to our expectations in reproducing the
-literature, we will study its behaviors to design new hypotheses that can
-be tested on real zebra finches.
+Once the model is fully working and respond to our expectations in reproducing
+the literature, we will study its behaviors to design new hypotheses that can be
+tested on real zebra finches. For instance, we can make postulates about the
+replay neural pattern in the night during its development. We can also make the
+hypothesis that the bird use the same song decomposition through out the day.
 
 \section*{Contributions}
 
