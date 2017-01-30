@@ -5,11 +5,10 @@ from hill_climbing import hill_climbing
 from fastdtw import fastdtw
 
 
-def fit_syllable(syllable, samplerate=44100):
+def fit_gesture(gesture, samplerate=44100):
     best_score = np.inf
     best = None
-    goal = mfcc(syllable, samplerate=samplerate, winstep=0.005, numcep=26, nfilt=52, nfft=1024)[..., 1:]
-    #
+    goal = mfcc(gesture, samplerate=samplerate, winstep=0.005, numcep=26, nfilt=52, nfft=1024)[..., 1:]
     i = 1
     j = 3
     prior = []

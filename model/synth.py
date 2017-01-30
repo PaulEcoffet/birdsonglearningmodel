@@ -4,16 +4,22 @@ from io import BytesIO
 
 def f(x, p, nb_exp=2, nb_sin=2):
     ip = np.nditer(p)
-    return np.sum([next(ip) * np.exp(-np.abs(next(ip)) * x) for i in range(nb_exp)]
-                + [next(ip) * np.sin((next(ip) + 2*np.pi * x) * next(ip)) for i in range(nb_sin)] + [next(ip)], axis=0)
+    return np.sum([next(ip) * np.exp(-np.abs(next(ip)) * x)
+                   for i in range(nb_exp)]
+                + [next(ip) * np.sin((next(ip) + 2*np.pi * x) * next(ip))
+                   for i in range(nb_sin)] + [next(ip)], axis=0)
 
 def f_str(p, nb_exp=2, nb_sin=2, x='x'):
     ip = np.nditer(p)
     out = ''
     for i in range(nb_exp):
-        out += '{:.2} exp({:.2} {}) + '.format(float(next(ip)), -np.abs(float(next(ip))), x)
+        out += '{:.2} exp({:.2} {}) + '.format(float(next(ip)),
+                                               -np.abs(float(next(ip))), x)
     for i in range(nb_sin):
-        out += '{:.2f} sin(({:.2f} + 2π {})/{:.2f}) + '.format(float(next(ip)), float(next(ip)), x, float(next(ip)))
+        out += '{:.2f} sin(({:.2f} + 2π {})/{:.2f}) + '.format(float(next(ip)),
+                                                               float(next(ip)),
+                                                               x,
+                                                               float(next(ip)))
     out += '{:.2f}'.format(float(next(ip)))
     return out
 
@@ -53,5 +59,6 @@ def dat2wav(dat):
         scalingFactor = 1
     else:
         scalingFactor = 65535 / (ampMax - ampMin)
-    wav = np.clip(np.round((dat - ampMin) * scalingFactor) - 32768, -32768, 32767).astype(np.dtype('int16'))
+    wav = np.clip(np.round((dat - ampMin) * scalingFactor) - 32768, -32768,
+                  32767).astype(np.dtype('int16'))
     return wav
