@@ -6,7 +6,7 @@ def f(x, p, nb_exp=2, nb_sin=2):
     ip = np.nditer(p)
     return np.sum([next(ip) * np.exp(-np.abs(next(ip)) * x)
                    for i in range(nb_exp)]
-                + [next(ip) * np.sin((next(ip) + 2*np.pi * x) * next(ip))
+                + [next(ip) * np.sin((next(ip) + 2*np.pi * x) * 100 * next(ip))
                    for i in range(nb_sin)] + [next(ip)], axis=0)
 
 def f_str(p, nb_exp=2, nb_sin=2, x='x'):
