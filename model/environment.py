@@ -56,23 +56,26 @@ class BirdSongEnvironment(Environment):
     def compute_sensori_effect(self, m):
         duration = m[0]
         commands = m[1:]
-        winstep = duration / (self.nb_win + 1)
-        winlen = winstep * 2
         try:
-            m = mfcc(
-                gen_sound(commands, duration * self.samplerate,
-                          alphaf_shape=self.alphaf_shape,
-                          betaf_shape=self.betaf_shape),
-                self.samplerate,
-                winstep=winstep,
-                winlen=winlen,
-                numcep=self.nb_ceps+1
-            )[:self.nb_win, 1:].flatten()
-            res = np.concatenate((
-                    np.array([duration]),
-                    m)
-                )
+            res = self.listen(gen_sound(commands, duration * self.samplerate,
+                                 alphaf_shape=self.alphaf_shape,
+                                 betaf_shape=self.betaf_shape))
         except IndexError: # can happen with bad parameters in signal
             res = np.zeros((len(self.conf.s_maxs),))
         assert res.shape == np.array([len(self.conf.s_maxs)])
         return res
+
+    def listen(self, sound):
+        duration = len(sound) / self.samplerate
+        winstep = duration / (self.nb_win + 1)
+        winlen = winstep * 2
+        return np.concatenate(
+            (
+                np.array([duration]),
+                mfcc(sound,
+                     self.samplerate,
+                     winstep=winstep,
+                     winlen=winlen,
+                     numcep=self.nb_ceps+1
+                     )[:self.nb_win, 1:].flatten()
+            ))
