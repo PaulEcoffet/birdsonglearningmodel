@@ -8,6 +8,22 @@ from explauto import SensorimotorModel, Agent, InterestModel
 from explauto import Experiment
 
 from environment import BirdSongEnvironment
+from agent import BirdAgent
+
+class BirdExperiment(Experiment):
+    def __init__(self, environment, agent, tutor_song, babble_until=100, dream_every=50):
+        super().__init__(environment, agent)
+        self.babble_until = babble_until
+        self.dream_every = dream_every
+        self.tutor_song = tutor_song
+
+    def _step(self):
+        super()._step()
+        if self.current_step != 0 and self.current_step % self.dream_every == 0:
+            self.ag.define_goals(self.tutor_song, 5, self.env)
+
+fname = '../data/ba_example.wav'
+sr, signal = wavfile.read(fname)
 
 environment = BirdSongEnvironment()
 sm_model = SensorimotorModel.from_configuration(environment.conf,
@@ -15,13 +31,11 @@ sm_model = SensorimotorModel.from_configuration(environment.conf,
 im_model = InterestModel.from_configuration(environment.conf,
                                             environment.conf.s_dims,
                                             'random')
-agent = Agent(environment.conf, sm_model, im_model)
-expe = Experiment(environment, agent)
+agent = BirdAgent(environment.conf, sm_model, im_model)
+expe = BirdExperiment(environment, agent, signal)
 
 
 def testcase():
-    fname = '../data/ba_example.wav'
-    sr, signal = wavfile.read(fname)
     gtes = np.concatenate((np.array([0]),
                            extract_gte(fname),
                            np.array([len(signal)-1])))
