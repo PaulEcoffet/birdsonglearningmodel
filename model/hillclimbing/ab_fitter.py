@@ -6,23 +6,25 @@ import copy
 import matplotlib.pyplot as plt
 import seaborn as sns
 import itertools
+from synth import f, f_str
 from fastdtw import fastdtw
 
 from hill_climbing import hill_climbing
 
-def fit_func(goal, f, params, dev):
+
+def fit_func(goal, f, params, dev, mins, maxs):
     """
+    Fit params of so that f(i) is the closest to goal[i].
+
     Find the params so that the function f fits the best the goal by
     minimizing square error, return the best params.
 
-    argmin_{params} (f(t, params) - y(t))^2, t=0..len(goal)
-
     goal - An array of the value that the function must fit.
-        Assumes f(i) = goal[i]
+           Assume f(i) = goal[i]
     f - The function to fit. must be of the signature f(i, params) with params
         being an ndarray.
-    params - Either guesses for the params as an ndarray, or the number of params
-             to fit.
+    params - Either guesses for the params as an ndarray, or the number of
+             params to fit.
     returns best_params, sq_error
     """
     try:
@@ -34,47 +36,50 @@ def fit_func(goal, f, params, dev):
     params_out, y, score = hill_climbing(
         lambda param: f(np.arange(len(goal)), param),
         goal, guess, guess_deviation=dev,
-        comparison_method=lambda g, c: fastdtw(g, c)[0],
-        max_iter=100000)
+        comparison_method=lambda g, c: fastdtw(g, c, dist=2)[0],
+        max_iter=10000,
+        guess_min=np.array(mins),
+        guess_max=np.array(maxs),
+        temp_max=2)
     return params_out, score
 
 
 if __name__ == "__main__":
-    def f(x, p, nb_exp=2, nb_sin=2):
-        ip = np.nditer(p)
-        x = x/22500
-        return np.sum([next(ip) * np.exp(-next(ip) * x) for i in range(nb_exp)]
-                    + [next(ip) * np.sin((next(ip) + 2*np.pi * x) * next(ip)) for i in range(nb_sin)] + [next(ip)], axis=0)
+    def _alphaf(x, p):
+        x = x/44100
+        return f(x, p, 1, 3)
 
-    for compt in range(10):
-        print('-'*40)
-        print(compt)
-        print('*-*')
-        for syb in ['a', 'b']:
-            goal = np.loadtxt('../data/ba_syllable_{}_ab.dat'.format(syb))[:, 0]
-            print(goal)
-            print("*"*80)
-            i = 1
-            j = 4
-            print(i, j)
-            prior = []
-            dev = []
-            for k in range(1,i+1):  # prior on exponential
-                prior.extend([1/k, 1/k])
-                dev.extend([0.05, 0.05])
-            for k in range(1,j+1):
-                prior.extend([10/k, 0, 50*k**2])
-                dev.extend([0.1, 0.05, 5*k])
-            prior.append(0)
-            dev.append(0.05)
-            params, score = fit_func(goal, lambda x, p: f(x, p, i, j), np.array(prior),
-                                     dev=np.diag(dev))
-            print(score)
-            print(params)
-            plt.figure(i*10 + j)
-            plt.plot(np.arange(len(goal))/22500, goal)
-            plt.plot(np.arange(len(goal))/22500, f(np.arange(len(goal)), params, i, j))
-            plt.title('exp : {}, sin : {}'.format(i, j))
-            plt.savefig('res/{}_{}.svg'.format(syb, compt), format='svg')
-            plt.savefig('res/{}_{}.png'.format(syb, compt), format='png')
-            plt.show()
+    goal = np.loadtxt('../../data/ba_syllable_a_end_ab.dat')
+    i = 1
+    j = 3
+    prior = []
+    dev = []
+    mins = []
+    maxs = []
+    for k in range(1, i + 1):  # prior on exponential
+        prior.extend([2/k, 100/k])
+        dev.extend([0.05, 0.05])
+        mins.extend([-10, 0])
+        maxs.extend([10, 5000])
+    for k in range(1, j + 1):  # prior on sin
+        prior.extend([1/k, 0, 200*k**2])
+        dev.extend([0.1/k, 0.005, 5*k])
+        mins.extend([0, -np.pi, 0])
+        maxs.extend([10, np.pi, 8000])
+    prior.append(4)
+    mins.append(0)
+    maxs.append(10)
+    dev.append(0.5)
+
+    bprior = [0, 0, 0, 1, 100, -0.028]  # beta prior
+    bdev = [0.01, 0.01, 0.01, 0.01, 10, 0.001]
+    bmins = [-10, 0, 0, -np.pi, 0, -3]
+    bmaxs = [10, 10, 3, np.pi, 1000, 0]
+
+    pout, score = fit_func(goal[:, 0], _alphaf, np.array(prior), np.diag(dev),
+                           mins, maxs)
+
+    plt.plot(goal[:, 0])
+    plt.plot(_alphaf(np.arange(goal.shape[0]), pout))
+    plt.show()
+    print(f_str(pout, 1, 3, 't'))
