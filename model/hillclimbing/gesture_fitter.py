@@ -8,9 +8,9 @@ import birdsonganalysis as bsa
 
 
 def _calc_res(sig, sr):
-    fnames = ['fm', 'pitch', 'goodness', 'entropy']
+    fnames = ['fm', 'pitch', 'am', 'entropy', 'goodness', 'amplitude']
     features = bsa.normalize_features(
-        bsa.all_song_features(sig, sr, without="amplitude"))
+        bsa.all_song_features(sig, sr))
     out = []
     for key in fnames:
         out.append(features[key])
@@ -20,8 +20,7 @@ def _calc_res(sig, sr):
 def fit_gesture(gesture, samplerate=44100):
     """Find the parameters to fit to a gesture."""
     size = len(gesture)
-    #goal = _calc_res(gesture, samplerate)
-    goal = np.copy(gesture)
+    goal = _calc_res(gesture, samplerate)
     i = 1
     j = 3
     prior = []
@@ -52,16 +51,16 @@ def fit_gesture(gesture, samplerate=44100):
     mins.extend([-10, 0, 0, -np.pi, 0, -3])
     maxs.extend([10, 1000, 3, np.pi, 1000, 0])
     x, y, score = hill_climbing(
-        # function=lambda x: _calc_res(gen_sound(x, size), samplerate),
-        function=lambda x: gen_sound(x, size),
+        function=lambda x: _calc_res(gen_sound(x, size), samplerate),
+        # function=lambda x: gen_sound(x, size),
         goal=goal,
         guess=np.array(prior),
         guess_min=mins,
         guess_max=maxs,
         guess_deviation=np.diag(dev),
-        max_iter=5000,
-        comparison_method=lambda g, c: np.linalg.norm(g - c),
-        temp_max=100,
+        max_iter=1000,
+        comparison_method=lambda g, c: fastdtw(g, c, dist=2, radius=3)[0],
+        temp_max=0.00000000000001,
         verbose=False)
     return x, score
 
@@ -88,12 +87,9 @@ if __name__ == "__main__":
     true_params = np.loadtxt('../../data/ba_syllable_a_end_ab.dat')
     plt.plot(true_params)
     plt.savefig('res/{}/ref_params.svg'.format(run_name))
-    #g = _calc_res(tutor_syllable, sr)
-    #c = _calc_res(synth_syllable, sr)
-    g = tutor_syllable
-    c = synth_syllable
-    #score = fastdtw(g, c)[0]
-    score = np.linalg.norm(g - c)
+    g = _calc_res(tutor_syllable, sr)
+    c = _calc_res(synth_syllable, sr)
+    score = fastdtw(c, g, dist=2, radius=3)[0]
     print('score between real and synth: {}'.format(score))
     for i in range(1):
         try:
