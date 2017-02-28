@@ -34,7 +34,7 @@ import numpy as np
 alpha = np.loadtxt('env_gabwtmp_prep.dat')[:, 2]
 beta = np.loadtxt('gabwtmp_out.dat')[:, 1]
 out = np.stack((alpha[:beta.shape[0]], beta), axis=-1)
-np.savetxt('gabwtmp_ab.dat', out[1000:-1000])
+np.savetxt('gabwtmp_ab.dat', out[1000:])
 
 EOF
 echo $(cat gabwtmp_ab.dat | wc -l) | cat - gabwtmp_ab.dat > gabwtmp_ab_num.dat
