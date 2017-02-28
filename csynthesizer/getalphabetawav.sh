@@ -70,4 +70,4 @@ mv song_gabwtmp_out_t.dat "$first_dir/${fname}_out.dat"
 mv gabwtmp_ab_num.dat "$first_dir/${fname}_out_num.dat"
 mv gabwtmp_out.wav "$first_dir/${fname}_out.wav"
 
-#rm *gabwtmp*
+rm *gabwtmp*
