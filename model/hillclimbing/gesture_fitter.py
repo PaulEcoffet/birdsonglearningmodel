@@ -25,7 +25,8 @@ def _calc_res(sig, sr):
 def _calc_res_(sig, sr):
     out = mfcc(sig, sr, numcep=8, appendEnergy=True, winstep=40/sr,
                winlen=1024/sr)
-    out[:, 0] = bsa.song_amplitude(sig, fft_step=40, fft_size=1024)[:out.shape[0]]
+    out[:, 0] = bsa.song_amplitude(
+        sig, fft_step=40, fft_size=1024)[:out.shape[0]]
     return out
 
 
@@ -113,16 +114,18 @@ if __name__ == "__main__":
             x, score = fit_gesture(tutor_syllable, samplerate=sr)
             print("*"*80)
             plt.figure(figsize=(16, 5))
-            plt.plot(gen_sound(x, len(tutor_syllable),
-                               falpha=lambda x, p: only_sin(x, p, nb_sin=3),
-                               fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                               falpha_nb_args=13))
+            plt.plot(gen_sound(
+                x, len(tutor_syllable),
+                falpha=lambda x, p: only_sin(x, p, nb_sin=3),
+                fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
+                falpha_nb_args=13))
             plt.savefig('res/{}/{}_song.svg'.format(run_name, i))
             print(x)
-            alpha_beta = gen_alphabeta(x, len(tutor_syllable),
-                                       falpha=lambda x, p: only_sin(x, p, nb_sin=3),
-                                       fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                                       falpha_nb_args=13)
+            alpha_beta = gen_alphabeta(
+                x, len(tutor_syllable),
+                falpha=lambda x, p: only_sin(x, p, nb_sin=3),
+                fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
+                falpha_nb_args=13)
             fig, axs = plt.subplots(2, 1, figsize=(16, 5))
             axs[0].plot(alpha_beta[:, 0], label='a')
             axs[1].plot(alpha_beta[:, 1], color='g', label='b')
@@ -134,17 +137,20 @@ if __name__ == "__main__":
                 best_score = score
             print('{}: {} (best: {})'.format(i, score, best_score))
             wavfile.write('res/{}/out_{}_{}.wav'.format(run_name, i, score),
-                          sr, gen_sound(x, len(tutor_syllable),
-                                        falpha=lambda x, p: only_sin(x, p, nb_sin=3),
-                                        fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                                        falpha_nb_args=13))
+                          sr,
+                          gen_sound(
+                              x, len(tutor_syllable),
+                              falpha=lambda x, p: only_sin(x, p, nb_sin=3),
+                              fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
+                              falpha_nb_args=13))
         except KeyboardInterrupt:
             break
 
     print(best_x)
     print('score', best_score)
-    wavfile.write('out.wav', sr, gen_sound(best_x,
-                                           len(tutor_syllable),
-                                           falpha=lambda x, p: only_sin(x, p, nb_sin=3),
-                                           fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                                           falpha_nb_args=13))
+    wavfile.write('out.wav', sr,
+                  gen_sound(
+                      best_x, len(tutor_syllable),
+                      falpha=lambda x, p: only_sin(x, p, nb_sin=3),
+                      fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
+                      falpha_nb_args=13))
