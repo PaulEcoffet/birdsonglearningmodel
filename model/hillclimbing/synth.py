@@ -51,8 +51,16 @@ def gen_alphabeta(params, length, falpha, fbeta,
 
 
 def synthesize(alpha_beta):
+    """Return the song signal given the alpha beta parameters.
+
+    alpha_beta - A 2d numpy.array of shape (length, 2)
+                 with alpha on the alpha_beta[:, 0] elements
+                 and beta on the alpha_beta[:, 1] elements
+
+    Returns - 1D numpy.array with the normalized signal between -1 and 1
+    """
     input_bytes = BytesIO()
-    input_bytes.write(bytes(str(len(alpha_beta)) + "\n", 'utf-8'))
+    input_bytes.write(bytes(str(alpha_beta.shape[0]) + "\n", 'utf-8'))
     np.savetxt(input_bytes, alpha_beta)
     out_raw_call = subprocess.Popen(
         ["../../csynthesizer/alphabeta2dat"],
@@ -61,5 +69,6 @@ def synthesize(alpha_beta):
     out_raw = out_raw_call.communicate(input=input_bytes.getvalue())[0]
     input_bytes.close()
     out = np.fromstring(out_raw, dtype=float, sep="\n")
-    out = 2 * (out - np.min(out)) / (np.max(out) - np.min(out)) - 1
+    out = 2 * (out - np.nanmin(out)) / (np.nanmax(out) - np.nanmin(out)) - 1
+    out[np.isnan(out)] = 0
     return out

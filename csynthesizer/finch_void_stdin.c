@@ -152,13 +152,47 @@ atenua=1;
   to=size*20;
 
   a=(double*) calloc(to,sizeof(double));
+	if (a == NULL)
+	{
+		fprintf(stderr, "Allocation error, impossible to alloc %ld bytes for a", to*sizeof(double));
+		exit(-1);
+	}
   bf=(double*) calloc(to,sizeof(double));
+	if (bf == NULL)
+	{
+		fprintf(stderr, "Allocation error, impossible to alloc %ld bytes for bf", to*sizeof(double));
+		exit(-1);
+	}
   bb=(double*) calloc(to,sizeof(double));
+	if (bb == NULL)
+	{
+		fprintf(stderr, "Allocation error, impossible to alloc %ld bytes for bb", to*sizeof(double));
+		exit(-1);
+	}
   cf=(double*) calloc(to,sizeof(double));
+	if (cf == NULL)
+	{
+		fprintf(stderr, "Allocation error, impossible to alloc %ld bytes for cf", to*sizeof(double));
+		exit(-1);
+	}
   cb=(double*) calloc(to,sizeof(double));
-
+	if (cb == NULL)
+	{
+		fprintf(stderr, "Allocation error, impossible to alloc %ld bytes for cb", to*sizeof(double));
+		exit(-1);
+	}
   db=(double*) calloc(to,sizeof(double));
+	if (db == NULL)
+	{
+		fprintf(stderr, "Allocation error, impossible to alloc %ld bytes for db", to*sizeof(double));
+		exit(-1);
+	}
   df=(double*) calloc(to,sizeof(double));
+	if (cf == NULL)
+	{
+		fprintf(stderr, "Allocation error, impossible to alloc %ld bytes for a", to*sizeof(double));
+		exit(-1);
+	}
 
 
 aa.Ancho1=0.2; aa.Ancho2=.2; aa.Ancho3=0.2;
