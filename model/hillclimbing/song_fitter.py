@@ -59,7 +59,7 @@ def rank(array):
 class SongModel:
     """Song model structure."""
 
-    def __init__(self, gestures=None, song=None):
+    def __init__(self, gestures=None, song=None, nb_split=20):
         """
         Initialize the song model structure.
 
@@ -67,8 +67,8 @@ class SongModel:
         priors - list of the priors of the song for a gesture
         """
         if gestures is None:
-            gestures = [[(i * len(song)) // 10, default_priors()]
-                        for i in range(10)]
+            gestures = [[(i * len(song)) // nb_split, default_priors()]
+                        for i in range(nb_split)]
         self.gestures = deepcopy(gestures)
 
     def mutate(self):
@@ -119,7 +119,7 @@ class SongModel:
 
 
 def fit_song(tutor_song, sr, train_per_day=10, nb_day=5, nb_conc_song=3,
-             nb_replay=3):
+             nb_replay=3, nb_iter_per_train=5):
     """Fit a song with a day and a night phase."""
     songs = [SongModel(song=tutor_song) for i in range(nb_conc_song)]
 
@@ -142,7 +142,7 @@ def fit_song(tutor_song, sr, train_per_day=10, nb_day=5, nb_conc_song=3,
             prior = deepcopy(song.gestures[ig][1])
             res, score = fit_gesture(
                 tutor_song[start:end], start_prior=prior,
-                nb_iter=5)
+                nb_iter=nb_iter_per_train)
             assert np.any(res != songs[isong].gestures[ig][1])
             songs[isong].gestures[ig][1] = deepcopy(res)
             assert np.all(songs[isong].gestures[ig][1] == res)
@@ -211,6 +211,8 @@ if __name__ == '__main__':
     parser.add_argument('-r', '--replay', type=int, default=3,
                         help='number of passes for new generations during'
                         ' night')
+    parser.add_argument('-i', '--iter-per-train', type=int, default=20,
+                        help='number of iteration when training a gesture')
 
     args = parser.parse_args()
     if args.seed is None:
@@ -230,11 +232,13 @@ if __name__ == '__main__':
             'concurrent': args.concurrent,
             'name': args.name,
             'seed': seed,
-            'replay': args.replay}
+            'replay': args.replay,
+            'iter_per_train': args.iter_per_train}
     with open(os.path.join(path, 'params.pkl'), 'wb') as f:
         pickle.dump(data, f)
     songs = fit_song(tsong, sr, train_per_day=args.train_per_day,
-                     nb_day=args.days, nb_conc_song=args.concurrent)
+                     nb_day=args.days, nb_conc_song=args.concurrent,
+                     nb_iter_per_train=args.iter_per_train)
     logi('!!!! Learning over !!!!')
     logi('Logging the songs')
     with open(os.path.join(path, 'songs.pkl'), 'wb') as f:
