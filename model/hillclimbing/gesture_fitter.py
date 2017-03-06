@@ -13,7 +13,7 @@ from synth import gen_sound, only_sin
 def _calc_res(sig, sr):
     out = []
     fnames = ['fm', 'am', 'entropy', 'goodness', 'amplitude', 'pitch']
-    coefs = {'fm': 1, 'am': 1, 'entropy': 1, 'goodness': 1, 'amplitude': 30,
+    coefs = {'fm': 1, 'am': 1, 'entropy': 1, 'goodness': 1, 'amplitude': 50,
              'pitch': 1}
     features = bsa.normalize_features(
         bsa.all_song_features(sig, sr, 256, 40, 1024))
