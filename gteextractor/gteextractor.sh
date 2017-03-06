@@ -13,7 +13,7 @@ cd "$(dirname "$(realpath "$0")")";
 ./gtes_example workon.dat > /dev/null 2>&1
 
 
-cat gtes1.workon.dat gtes2.workon.dat gtes3.workon.dat gtes4.workon.dat | sort -n | sed /^0/d
+cat gtes1.workon.dat gtes2.workon.dat gtes3.workon.dat gtes4.workon.dat | sort -n | uniq | sed /^0/d
 
 
 
