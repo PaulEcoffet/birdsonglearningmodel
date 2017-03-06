@@ -4,13 +4,14 @@ Fit a whole song.
 This module fits a whole song!
 """
 
-import numpy as np
-from copy import deepcopy
-from fastdtw import fastdtw
 import argparse as ap
+from copy import deepcopy
+
+import numpy as np
+from fastdtw import fastdtw
 from scipy.io import wavfile
 
-from gesture_fitter import fit_gesture, _calc_res
+from gesture_fitter import _calc_res, fit_gesture
 from synth import gen_sound, only_sin
 
 rng = np.random.RandomState()
@@ -59,13 +60,14 @@ def rank(array):
 class SongModel:
     """Song model structure."""
 
-    def __init__(self, gestures=None, song=None, nb_split=20):
+    def __init__(self, song, gestures=None, nb_split=20):
         """
         Initialize the song model structure.
 
         GTE - list of the GTE of the song
         priors - list of the priors of the song for a gesture
         """
+        self.song = song
         if gestures is None:
             gestures = [[(i * len(song)) // nb_split, default_priors()]
                         for i in range(nb_split)]
@@ -75,30 +77,49 @@ class SongModel:
         """Give a new song model with new GTEs."""
         act = rng.uniform()
         gestures = deepcopy(self.gestures)
-        if act < 0.1 and len(gestures) > 2:  # Delete a gesture
+        if act < 0.02 and len(gestures) > 2:  # Delete a gesture
+            logi('deleted')
             to_del = rng.randint(1, len(gestures))
             del gestures[to_del]
-        elif act < 0.2:  # Add a new gesture
+        elif act < 0.12:  # Add a new gesture
+            logi('added')
             to_add = rng.randint(0, gestures[-1][0])
             gestures.append([to_add, default_priors()])
-        elif act < 0.3:  # Take a gesture and put it in another gesture
-            from_, dest = rng.randint(1, len(gestures), size=2)
+        elif act < 0.5:  # Take a gesture and put it in another gesture
+            logi('copied')
+            from_, dest = rng.randint(len(gestures), size=2)
             gestures[dest][1] = deepcopy(gestures[from_][1])
         else:  # Move where the gesture start
-            # FIXME: Can go over the song length
+            logi('moved')
             to_move = rng.randint(1, len(gestures))
-            gestures[to_move][0] += rng.randint(-500, 500)
+            min_pos = self.gestures[to_move - 1][0] + 100
+            try:
+                max_pos = self.gestures[to_move + 1][0] - 100
+            except IndexError:  # Perhaps we have picked the last gesture
+                logd('last gesture picked')
+                max_pos = len(self.song) - 100
+            new_pos = rng.normal(loc=gestures[to_move][0],
+                                 scale=(max_pos-min_pos)/2)
+            try:
+                logd(self.gestures[to_move - 1][0], '|',
+                     self.gestures[to_move][0], '->',
+                     new_pos, '|',
+                     self.gestures[to_move + 1][0])
+            except IndexError:
+                pass
+            gestures[to_move][0] = int(np.clip(new_pos, min_pos, max_pos))
         # clean GTEs
         gestures.sort(key=lambda x: x[0])
         for i in range(1, len(gestures) - 1):
             # FIXME: Last gesture can be really close to song length
-            if gestures[i][0] - gestures[i - 1][0] < 400:
+            if gestures[i][0] - gestures[i - 1][0] < 100:
                 del gestures[i]
-        return SongModel(gestures)
+        return SongModel(self.song, gestures)
 
-    def gen_sound(self, length):
+    def gen_sound(self):
         """Generate the full song."""
         sounds = []
+        length = len(self.song)
         for i, gesture in enumerate(self.gestures):
             start = gesture[0]
             param = gesture[1]
@@ -119,12 +140,15 @@ class SongModel:
 
 
 def fit_song(tutor_song, sr, train_per_day=10, nb_day=5, nb_conc_song=3,
-             nb_replay=3, nb_iter_per_train=5):
+             nb_replay=3, nb_iter_per_train=5, nb_split=10):
     """Fit a song with a day and a night phase."""
-    songs = [SongModel(song=tutor_song) for i in range(nb_conc_song)]
+    songs = [SongModel(song=tutor_song, nb_split=nb_split)
+             for i in range(nb_conc_song)]
+    songlog = []
 
     for iday in range(nb_day):
         logi('☀️️\t☀️️\t☀️️\tDay {} of {}\t☀️️\t☀️️\t☀️'.format(iday+1, nb_day)) #noqa
+        songlog.append(('BeforeDay', deepcopy(songs)))
         #######
         # Day #
         #######
@@ -143,34 +167,32 @@ def fit_song(tutor_song, sr, train_per_day=10, nb_day=5, nb_conc_song=3,
             res, score = fit_gesture(
                 tutor_song[start:end], start_prior=prior,
                 nb_iter=nb_iter_per_train)
-            assert np.any(res != songs[isong].gestures[ig][1])
             songs[isong].gestures[ig][1] = deepcopy(res)
-            assert np.all(songs[isong].gestures[ig][1] == res)
 
         #########
         # Night #
         #########
+        songlog.append(('BeforeNight', deepcopy(songs)))
         night_songs = deepcopy(songs)
         nb_conc_night = nb_conc_song * 2
         if iday + 1 != nb_day:
             logi('💤\t💤\t💤\tNight\t💤\t💤\t💤')
+            score = get_scores(tutor_song, night_songs, sr)
+            logi('scores:', score.astype(int))
+            logi('ranks:', rank(score))
+            fitness = (len(night_songs)) - rank(score)
+            night_songs = np.random.choice(night_songs, size=nb_conc_night,
+                                           p=fitness/np.sum(fitness))
             for ireplay in range(nb_replay):
-                logi('Replay {} out of {}'.format(ireplay + 1, nb_replay))
-                score = get_scores(tutor_song, night_songs)
-                logi('scores:', score)
-                logi('ranks:', rank(score))
-                fitness = (len(night_songs)) - rank(score)
-                nsongs = np.random.choice(night_songs, size=nb_conc_night,
-                                          p=fitness/np.sum(fitness))
-                night_songs = [song.mutate() for song in nsongs]
-            score = get_scores(tutor_song, night_songs)
-            songs = []
-            for i in np.argsort(score)[:nb_conc_song]:
-                songs.append(night_songs[i])
-    return songs
+                print('mutation {} out of {}'.format(ireplay, nb_replay))
+                night_songs = [song.mutate() for song in night_songs]
+            songs = rng.choice(night_songs, size=nb_conc_song, replace=False)
+            songs = songs.tolist()
+    songlog.append(('End', songs))
+    return songs, songlog
 
 
-def get_scores(tutor_song, song_models):
+def get_scores(tutor_song, song_models, sr):
     """
     Get the score of each model compared to the tutor song.
 
@@ -181,16 +203,18 @@ def get_scores(tutor_song, song_models):
     scores = np.zeros(len(song_models))
 
     for i in range(len(song_models)):
-        sig = song_models[i].gen_sound(len(tutor_song))
+        sig = song_models[i].gen_sound()
         c = deepcopy(_calc_res(sig, sr))
         scores[i] = fastdtw(g, c, radius=3, dist=2)[0]
     return scores
 
 
-if __name__ == '__main__':
+def main():
+    """Main function for this module, called if not imported."""
     import os
     import datetime
     import pickle
+    start = datetime.datetime.now()
     parser = ap.ArgumentParser(
         description="""
         reproduce the learning of a zebra finch for a given tutor song.
@@ -213,7 +237,6 @@ if __name__ == '__main__':
                         ' night')
     parser.add_argument('-i', '--iter-per-train', type=int, default=20,
                         help='number of iteration when training a gesture')
-
     args = parser.parse_args()
     if args.seed is None:
         seed = int(datetime.datetime.now().timestamp())
@@ -221,7 +244,7 @@ if __name__ == '__main__':
         seed = args.seed
     rng.seed(seed)
     sr, tsong = wavfile.read(args.tutor)
-    date = datetime.datetime.now().strftime('%y%m%d_%H%M%s')
+    date = datetime.datetime.now().strftime('%y%m%d_%H%M%S')
     path = 'res/{}_{}'.format(date, args.name)
     os.makedirs(path)
     wavfile.write(os.path.join(path, 'tutor.wav'), sr, tsong)
@@ -236,14 +259,30 @@ if __name__ == '__main__':
             'iter_per_train': args.iter_per_train}
     with open(os.path.join(path, 'params.pkl'), 'wb') as f:
         pickle.dump(data, f)
-    songs = fit_song(tsong, sr, train_per_day=args.train_per_day,
-                     nb_day=args.days, nb_conc_song=args.concurrent,
-                     nb_iter_per_train=args.iter_per_train)
+    try:
+        songs, song_log = fit_song(tsong, sr, train_per_day=args.train_per_day,
+                                   nb_day=args.days, nb_conc_song=args.concurrent,
+                                   nb_iter_per_train=args.iter_per_train,
+                                   nb_split=30,
+                                   nb_replay=args.replay)
+    except KeyboardInterrupt as e:
+        f = open(os.path.join(path, 'aborted.txt'), 'a')
+        f.write('aborted')
+        f.close()
+        raise e
     logi('!!!! Learning over !!!!')
     logi('Logging the songs')
     with open(os.path.join(path, 'songs.pkl'), 'wb') as f:
         pickle.dump(songs, f)
+    with open(os.path.join(path, 'songlog.pkl'), 'wb') as f:
+        pickle.dump(song_log, f)
     logi('Generating the waves')
     for i, song in enumerate(songs):
         wavfile.write(os.path.join(path, 'out_{}.wav'.format(i)),
-                      44100, song.gen_sound(len(tsong)))
+                      44100, song.gen_sound())
+    logi('run {}_{} is finished'.format(date, args.name))
+    logi('took {}'.format((datetime.datetime.now() - start)))
+
+
+if __name__ == '__main__':
+    main()
