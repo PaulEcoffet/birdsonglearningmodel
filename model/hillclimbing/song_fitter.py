@@ -38,7 +38,7 @@ def default_priors(nb_sin=3):
     """Give the default priors for a gesture fit."""
     prior = []
     for k in range(1, nb_sin + 1):  # prior on sin
-            prior.extend([1/k, 1/k, np.pi/(k**2), 10*3**k])
+            prior.extend([0, 0, np.pi/(k**2), 10*3**k])
     prior.append(0)
     prior.extend([0, 0, 0, 0, -0.002])  # beta prior
     return np.array(prior)
@@ -99,14 +99,7 @@ class SongModel:
                 logd('last gesture picked')
                 max_pos = len(self.song) - 100
             new_pos = rng.normal(loc=gestures[to_move][0],
-                                 scale=(max_pos-min_pos)/2)
-            try:
-                logd(self.gestures[to_move - 1][0], '|',
-                     self.gestures[to_move][0], '->',
-                     new_pos, '|',
-                     self.gestures[to_move + 1][0])
-            except IndexError:
-                pass
+                                 scale=(max_pos-min_pos)/4)
             gestures[to_move][0] = int(np.clip(new_pos, min_pos, max_pos))
         # clean GTEs
         gestures.sort(key=lambda x: x[0])
@@ -145,10 +138,10 @@ def fit_song(tutor_song, sr, train_per_day=10, nb_day=5, nb_conc_song=3,
     songs = [SongModel(song=tutor_song, nb_split=nb_split)
              for i in range(nb_conc_song)]
     songlog = []
+    songlog.append(('Start', songs, get_scores(tutor_song, songs, sr)))
 
     for iday in range(nb_day):
         logi('☀️️\t☀️️\t☀️️\tDay {} of {}\t☀️️\t☀️️\t☀️'.format(iday+1, nb_day)) #noqa
-        songlog.append(('BeforeDay', deepcopy(songs)))
         #######
         # Day #
         #######
@@ -167,28 +160,37 @@ def fit_song(tutor_song, sr, train_per_day=10, nb_day=5, nb_conc_song=3,
             res, score = fit_gesture(
                 tutor_song[start:end], start_prior=prior,
                 nb_iter=nb_iter_per_train)
+            print(score)
             songs[isong].gestures[ig][1] = deepcopy(res)
 
         #########
         # Night #
         #########
-        songlog.append(('BeforeNight', deepcopy(songs)))
-        night_songs = deepcopy(songs)
+        night_songs = np.array(songs)
+        score = get_scores(tutor_song, night_songs, sr)
+        songlog.append(('BeforeNight', deepcopy(night_songs), deepcopy(score)))
         nb_conc_night = nb_conc_song * 2
         if iday + 1 != nb_day:
             logi('💤\t💤\t💤\tNight\t💤\t💤\t💤')
-            score = get_scores(tutor_song, night_songs, sr)
             logi('scores:', score.astype(int))
             logi('ranks:', rank(score))
-            fitness = (len(night_songs)) - rank(score)
+            fitness = len(night_songs) - rank(score)
             night_songs = np.random.choice(night_songs, size=nb_conc_night,
                                            p=fitness/np.sum(fitness))
             for ireplay in range(nb_replay):
                 print('mutation {} out of {}'.format(ireplay, nb_replay))
-                night_songs = [song.mutate() for song in night_songs]
-            songs = rng.choice(night_songs, size=nb_conc_song, replace=False)
-            songs = songs.tolist()
-    songlog.append(('End', songs))
+                night_songs = np.array([song.mutate() for song in night_songs])
+            score = get_scores(tutor_song, night_songs, sr)
+            fitness = (len(night_songs)) - rank(score)
+            isongs = rng.choice(len(night_songs),
+                                size=nb_conc_song, replace=False,
+                                p=fitness/np.sum(fitness))
+            print(score[isongs])
+            songs = night_songs[isongs]
+            songs = deepcopy(songs.tolist())
+            songlog.append(('AfterNight', deepcopy(songs),
+                            deepcopy(score[isongs])))
+    songlog.append(('End', songs, get_scores(tutor_song, songs, sr)))
     return songs, songlog
 
 

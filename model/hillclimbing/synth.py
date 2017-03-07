@@ -8,6 +8,8 @@ beta given.
 import subprocess
 import numpy as np
 from io import BytesIO
+import os
+dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
 def exp_sin(x, p, nb_exp=2, nb_sin=2):
@@ -115,7 +117,7 @@ def synthesize(alpha_beta):
     input_bytes.write(bytes(str(alpha_beta.shape[0]) + "\n", 'utf-8'))
     np.savetxt(input_bytes, alpha_beta)
     out_raw_call = subprocess.Popen(
-        ["../../csynthesizer/alphabeta2dat"],
+        [os.path.join(dir_path, "../../csynthesizer/alphabeta2dat")],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE)
     out_raw = out_raw_call.communicate(input=input_bytes.getvalue())[0]

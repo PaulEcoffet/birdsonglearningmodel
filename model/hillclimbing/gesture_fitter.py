@@ -18,7 +18,9 @@ def _calc_res(sig, sr):
     features = bsa.normalize_features(
         bsa.all_song_features(sig, sr, 256, 40, 1024))
     for key in fnames:
-        out.append(coefs[key] * features[key])
+        coef = coefs[key]
+        feat = features[key]  # Verbose affectation to catch rare error
+        out.append(coef * feat)
     return np.array(out).T
 
 
@@ -30,7 +32,8 @@ def _calc_res_(sig, sr):
     return out
 
 
-def fit_gesture(gesture, samplerate=44100, start_prior=None, nb_iter=100):
+def fit_gesture(gesture, samplerate=44100, start_prior=None, nb_iter=300,
+                logger=None, temp=10):
     """Find the parameters to fit to a gesture."""
     size = len(gesture)
     goal = _calc_res(gesture, samplerate)
@@ -56,6 +59,7 @@ def fit_gesture(gesture, samplerate=44100, start_prior=None, nb_iter=100):
     dev.extend([0.1, 0.1, 0.1, 50, 0.0001])
     mins.extend([-100, 0, -np.pi, 0, -3])
     maxs.extend([100, 3, np.pi, 1000, 0])
+    print('cc')
     x, y, score = hill_climbing(
         function=lambda x: _calc_res(gen_sound(
             x, size,
@@ -70,8 +74,9 @@ def fit_gesture(gesture, samplerate=44100, start_prior=None, nb_iter=100):
         max_iter=nb_iter,
         comparison_method=lambda g, c: fastdtw(g, c, dist=2, radius=3)[0],
         # comparison_method=lambda g, c: np.linalg.norm(g - c),
-        temp_max=20,
-        verbose=False)
+        temp_max=temp,
+        verbose=False,
+        logger=logger)
     return x, score
 
 
@@ -83,6 +88,7 @@ if __name__ == "__main__":
     import seaborn as sns
     sns.set_context('paper')
     from synth import gen_alphabeta
+    import pickle
 
     fname = 'ba_syllable_a'
     sr, tutor_syllable = wavfile.read('../../data/{}.wav'.format(fname))
@@ -90,7 +96,7 @@ if __name__ == "__main__":
     true_params = np.loadtxt('../../data/{}_ab.dat'.format(fname))
     best_x = None
     best_score = np.inf
-    run_name = datetime.datetime.now().strftime('%y%m%d_%H%M')
+    run_name = datetime.datetime.now().strftime('gesture_%y%m%d_%H%M%S')
     try:
         name = sys.argv[1]
     except IndexError:
@@ -111,7 +117,11 @@ if __name__ == "__main__":
     print('score between real and synth: {}'.format(score))
     for i in range(1):
         try:
-            x, score = fit_gesture(tutor_syllable, samplerate=sr)
+            logger = []
+            x, score = fit_gesture(tutor_syllable, samplerate=sr,
+                                   logger=logger)
+            with open('res/{}/log.pkl'.format(run_name), 'wb') as f:
+                pickle.dump(logger, f)
             print("*"*80)
             plt.figure(figsize=(16, 5))
             plt.plot(gen_sound(

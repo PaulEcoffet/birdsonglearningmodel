@@ -5,7 +5,7 @@ def hill_climbing(function, goal, guess,
                   guess_deviation=0.01, goal_delta=0.01, temp_max=5,
                   comparison_method=None,
                   max_iter=100000, seed=None, verbose=False,
-                  guess_min=None, guess_max=None):
+                  guess_min=None, guess_max=None, logger=None):
     """
     Do a hill climbing algorithm to find which is the best value x so that
     function(x) = goal
@@ -54,6 +54,8 @@ def hill_climbing(function, goal, guess,
             best_score = cur_score
             best_res = cur_res
             best_guess = cur_guess
+            if logger is not None:
+                logger.append((i, best_guess, best_score))
             if verbose and i % 100 == 0:
                 print(best_score, '(', i, ')')
         i += 1
