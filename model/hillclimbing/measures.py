@@ -31,18 +31,18 @@ def mfcc_measure(sig, sr):
     return out
 
 
-def get_scores(tutor_song, song_models, sr):
+def get_scores(tutor_song, song_models, measure, comp):
     """
     Get the score of each model compared to the tutor song.
 
     tutor_song - The signal of the tutor song
     song_models - A list of all the song models
     """
-    g = bsa_measure(tutor_song, sr)
+    g = measure(tutor_song)
     scores = np.zeros(len(song_models))
 
     for i in range(len(song_models)):
         sig = song_models[i].gen_sound()
-        c = bsa_measure(sig, sr)
-        scores[i] = fastdtw(g, c, radius=3, dist=2)[0]
+        c = measure(sig)
+        scores[i] = comp(g, c)
     return scores

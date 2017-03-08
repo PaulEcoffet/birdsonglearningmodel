@@ -19,28 +19,35 @@ import logging
 
 rng = np.random.RandomState()
 
-logging.basicConfig(level=logging.INFO)
-
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('root')
 
-def fit_song(tutor_song, sr, day_optimisation, night_optimisation,
+
+def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
              day_conf, night_conf, nb_day=5, nb_conc_song=3, nb_split=10):
     """Fit a song with a day and a night phase."""
     songs = [SongModel(song=tutor_song, nb_split=nb_split, rng=rng)
              for i in range(nb_conc_song)]
     songlog = []
-    songlog.append(('Start', songs, get_scores(tutor_song, songs, sr)))
+    songlog.append(('Start', songs,
+                    get_scores(tutor_song, songs, measure, comp)))
 
     for iday in range(nb_day):
-        logger.info('☀️️\t☀️️\t☀️️\tDay {} of {}\t☀️️\t☀️️\t☀️'.format(iday+1, nb_day)) #noqa
-        songs = day_optimisation(songs, tutor_song, **day_conf)
-        score = get_scores(tutor_song, songs, sr)
+        logger.info('☀️️\t☀️️\t☀️️\tDay {} of {}\t☀️️\t☀️️\t☀️'.format(iday+1, nb_day)) # noqa
+        songs = day_optimisation(deepcopy(songs),
+                                 tutor_song, measure, comp, **day_conf)
+        score = get_scores(tutor_song, songs, measure, comp)
         if iday + 1 != nb_day:
+            logger.debug(score)
             songlog.append(('BeforeNight', deepcopy(songs), deepcopy(score)))
             logger.info('💤\t💤\t💤\tNight\t💤\t💤\t💤')
-            songs = night_optimisation(songs, tutor_song, **night_conf)
+            songs = night_optimisation(deepcopy(songs),
+                                       tutor_song, measure, comp,
+                                       **night_conf)
+            score = get_scores(tutor_song, songs, measure, comp)
             songlog.append(('AfterNight', deepcopy(songs), deepcopy(score)))
-    songlog.append(('End', songs, get_scores(tutor_song, songs, sr)))
+    songlog.append(('End', songs, get_scores(tutor_song, songs, measure,
+                                             comp)))
     return songs, songlog
 
 
@@ -95,21 +102,20 @@ def main():
     with open(os.path.join(path, 'params.pkl'), 'wb') as f:
         pickle.dump(data, f)
     day_conf = {'nb_iter_per_train': args.iter_per_train,
-                'train_per_day': args.train_per_day,
-                'measure': bsa_measure,
-                'comp': lambda g, c: fastdtw(g, c, dist=2, radius=3)[0]}
-    night_conf = {'nb_replay': args.replay,
-                  'sr': sr}
+                'train_per_day': args.train_per_day}
+    night_conf = {'nb_replay': args.replay}
     try:
         songs, song_log = fit_song(
-            tsong, sr,
+            tsong,
+            measure=lambda x: bsa_measure(x, sr),
+            comp=lambda g, c: np.linalg.norm(g - c),
             day_optimisation=optimise_gesture_dummy,
             night_optimisation=mutate_best_models_dummy,
             day_conf=day_conf,
             night_conf=night_conf,
             nb_day=args.days,
             nb_conc_song=args.concurrent,
-            nb_split=30,)
+            nb_split=30)
     except KeyboardInterrupt as e:
         with open(os.path.join(path, 'aborted.txt'), 'a') as f:
             f.write('aborted')

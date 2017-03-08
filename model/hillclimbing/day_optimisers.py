@@ -31,3 +31,7 @@ def optimise_gesture_dummy(songs, tutor_song, measure, comp, train_per_day=10,
             nb_iter=nb_iter_per_train)
         songs[isong].gestures[ig][1] = deepcopy(res)
     return songs
+
+
+def optimise_gesture_cmaes(songs, tutor_song, measure, comp):
+    pass

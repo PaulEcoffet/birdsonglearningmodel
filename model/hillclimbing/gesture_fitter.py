@@ -14,7 +14,7 @@ def fit_gesture_hill(gesture, measure, comp,
                      logger=None, temp=10):
     """Find the parameters to fit to a gesture."""
     size = len(gesture)
-    goal = measure(gesture, samplerate)
+    goal = measure(gesture)
     j = 3
     prior = []
     dev = []
@@ -42,7 +42,7 @@ def fit_gesture_hill(gesture, measure, comp,
             x, size,
             falpha=lambda x, p: only_sin(x, p, nb_sin=3),
             fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-            falpha_nb_args=13), samplerate),
+            falpha_nb_args=13)),
         goal=goal,
         guess=np.array(prior),
         guess_min=mins,
