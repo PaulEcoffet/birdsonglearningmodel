@@ -2,41 +2,19 @@
 import sys
 
 import numpy as np
+from measures import bsa_measure
 from fastdtw import fastdtw
 
-import birdsonganalysis as bsa
-from python_speech_features import mfcc
 from hill_climbing import hill_climbing
 from synth import gen_sound, only_sin
 
 
-def _calc_res(sig, sr):
-    out = []
-    fnames = ['fm', 'am', 'entropy', 'goodness', 'amplitude', 'pitch']
-    coefs = {'fm': 1, 'am': 1, 'entropy': 1, 'goodness': 1, 'amplitude': 50,
-             'pitch': 1}
-    features = bsa.normalize_features(
-        bsa.all_song_features(sig, sr, 256, 40, 1024))
-    for key in fnames:
-        coef = coefs[key]
-        feat = features[key]  # Verbose affectation to catch rare error
-        out.append(coef * feat)
-    return np.array(out).T
-
-
-def _calc_res_(sig, sr):
-    out = mfcc(sig, sr, numcep=8, appendEnergy=True, winstep=40/sr,
-               winlen=1024/sr)
-    out[:, 0] = bsa.song_amplitude(
-        sig, fft_step=40, fft_size=1024)[:out.shape[0]]
-    return out
-
-
-def fit_gesture(gesture, samplerate=44100, start_prior=None, nb_iter=300,
-                logger=None, temp=10):
+def fit_gesture_hill(gesture, measure, comp,
+                     samplerate=44100, start_prior=None, nb_iter=300,
+                     logger=None, temp=10):
     """Find the parameters to fit to a gesture."""
     size = len(gesture)
-    goal = _calc_res(gesture, samplerate)
+    goal = measure(gesture, samplerate)
     j = 3
     prior = []
     dev = []
@@ -59,9 +37,8 @@ def fit_gesture(gesture, samplerate=44100, start_prior=None, nb_iter=300,
     dev.extend([0.1, 0.1, 0.1, 50, 0.0001])
     mins.extend([-100, 0, -np.pi, 0, -3])
     maxs.extend([100, 3, np.pi, 1000, 0])
-    print('cc')
     x, y, score = hill_climbing(
-        function=lambda x: _calc_res(gen_sound(
+        function=lambda x: measure(gen_sound(
             x, size,
             falpha=lambda x, p: only_sin(x, p, nb_sin=3),
             fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
@@ -72,8 +49,7 @@ def fit_gesture(gesture, samplerate=44100, start_prior=None, nb_iter=300,
         guess_max=maxs,
         guess_deviation=np.diag(dev),
         max_iter=nb_iter,
-        comparison_method=lambda g, c: fastdtw(g, c, dist=2, radius=3)[0],
-        # comparison_method=lambda g, c: np.linalg.norm(g - c),
+        comparison_method=lambda g, c: comp(g, c),
         temp_max=temp,
         verbose=False,
         logger=logger)
@@ -110,15 +86,15 @@ if __name__ == "__main__":
     plt.figure(figsize=(16, 5))
     plt.plot(true_params)
     plt.savefig('res/{}/ref_params.svg'.format(run_name))
-    g = _calc_res(tutor_syllable, sr)
-    c = _calc_res(synth_syllable, sr)
+    g = bsa_measure(tutor_syllable, sr)
+    c = bsa_measure(synth_syllable, sr)
     score = fastdtw(c, g, dist=2, radius=3)[0]
     # score = np.linalg.norm(g - c)
     print('score between real and synth: {}'.format(score))
     for i in range(1):
         try:
             logger = []
-            x, score = fit_gesture(tutor_syllable, samplerate=sr,
+            x, score = fit_gesture_hill(tutor_syllable, samplerate=sr,
                                    logger=logger)
             with open('res/{}/log.pkl'.format(run_name), 'wb') as f:
                 pickle.dump(logger, f)

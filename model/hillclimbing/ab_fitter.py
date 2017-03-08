@@ -1,15 +1,15 @@
-"""
-Module that fit an equation to alpha and beta raw data
-"""
+"""Module that fit an equation to alpha and beta raw data."""
+
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
 import seaborn as sns
-import itertools
 from synth import f, f_str
 from fastdtw import fastdtw
 
 from hill_climbing import hill_climbing
+
+sns.set_context('colorblind')
 
 
 def fit_func(goal, f, params, dev, mins, maxs):

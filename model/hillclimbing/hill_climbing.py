@@ -7,8 +7,7 @@ def hill_climbing(function, goal, guess,
                   max_iter=100000, seed=None, verbose=False,
                   guess_min=None, guess_max=None, logger=None):
     """
-    Do a hill climbing algorithm to find which is the best value x so that
-    function(x) = goal
+    Hill climb to find which is the best value x so that function(x) = goal.
 
     It is a Simulated Annealing algorithm to avoid getting stuck in local max
 
@@ -48,9 +47,11 @@ def hill_climbing(function, goal, guess,
         np.clip(cur_guess, guess_min, guess_max, out=cur_guess)
         cur_res = function(cur_guess)
         cur_score = comparison_method(goal, cur_res)
-        temp = temp_max - temp_max*(i/max_iter)
-        if (cur_score < best_score
-                or rng.uniform() < np.exp(-(cur_score - best_score)/temp)):
+        if temp_max is not None:
+            temp = temp_max - temp_max*(i/max_iter)
+        if cur_score < best_score \
+                or (temp_max is not None
+                    and rng.uniform() < np.exp(-(cur_score - best_score)/temp)):
             best_score = cur_score
             best_res = cur_res
             best_guess = cur_guess
