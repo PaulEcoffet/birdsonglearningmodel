@@ -3,7 +3,7 @@
 import numpy as np
 from copy import deepcopy
 import logging
-from synth import gen_sound, only_sin
+from synth import gen_sound, only_sin, gen_alphabeta
 
 
 logger = logging.getLogger('songmodel')
@@ -15,7 +15,7 @@ def default_priors(nb_sin=3):
     for k in range(1, nb_sin + 1):  # prior on sin
             prior.extend([0, 0, np.pi/(k**2), 10*3**k])
     prior.append(0)
-    prior.extend([0, 0, 0, 0, -0.002])  # beta prior
+    prior.extend([0, 0, 0, 0, 0.15])  # beta prior
     return np.array(prior)
 
 
@@ -90,12 +90,38 @@ class SongModel:
             except IndexError:
                 end = length
             size = end - start
-            sounds.append(gen_sound(
+            sound = gen_sound(
                 param, size,
                 falpha=lambda x, p: only_sin(x, p, nb_sin=3),
                 fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                falpha_nb_args=13))
+                falpha_nb_args=13)
+            assert np.isclose(np.nanmean(sound), 0)
+            sounds.append(sound)
             assert not np.all(np.isnan(sounds[-1])), \
                 'only nan in output with p {}'.format(param)
         out = np.concatenate(sounds)
+        assert len(out) == len(self.song)
         return out
+
+    def gen_alphabeta(self, pad=False):
+        """Compute alpha and beta for the whole song."""
+        length = len(self.song)
+        ab = np.zeros((length, 2))
+        for i, gesture in enumerate(self.gestures):
+            start = gesture[0]
+            params = gesture[1]
+            try:
+                end = self.gestures[i+1][0]
+            except IndexError:
+                end = length
+            size = end - start
+            assert size != 0
+            ab[start:end] = gen_alphabeta(
+                params, size,
+                falpha=lambda x, p: only_sin(x, p, nb_sin=3),
+                fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
+                falpha_nb_args=13, pad=pad)
+            if i == 23:
+                print(params, start, end)
+                print(ab[start:end])
+        return ab

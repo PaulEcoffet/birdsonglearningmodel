@@ -72,7 +72,7 @@ def gen_sound(params, length, falpha, fbeta, falpha_nb_args):
 
 
 def gen_alphabeta(params, length, falpha, fbeta,
-                  falpha_nb_args):
+                  falpha_nb_args, pad=True):
     """Generate a alpha_beta 2D array.
 
     params - The parameters for falpha and fbeta, concatenated
@@ -85,6 +85,7 @@ def gen_alphabeta(params, length, falpha, fbeta,
                 np.array[t]
     falpha_nb_args - Number of params falpha needs. It will be used for
                      the slicing of `params`. Indeed, in the code, we do
+    pad            - Should we add the padding to correct the csynth bug or not
 
     ```
     falpha(t, params[:falpha_nb_args])
@@ -94,8 +95,12 @@ def gen_alphabeta(params, length, falpha, fbeta,
     Returns - A 2D numpy.array of shape (length, 2) with in the first column
     the alpha parameters and in the second the beta parameters.
     """
+    if pad:
+        padding = 2
+    else:
+        padding = 0
     # + 2 padding is necessary with ba synth.
-    t = np.linspace(0, (length+2)/44100, length+2)
+    t = np.linspace(0, (length+2)/44100, length + padding)
     alpha_beta = np.stack(
         (
             falpha(t, params[:falpha_nb_args]),
@@ -125,4 +130,5 @@ def synthesize(alpha_beta):
     out = np.fromstring(out_raw, dtype=float, sep="\n")
     out = 2 * (out - np.nanmin(out)) / (np.nanmax(out) - np.nanmin(out)) - 1
     out[np.isnan(out)] = 0
+    out = out - np.mean(out)
     return out

@@ -35,11 +35,12 @@ def optimise_gesture_dummy(songs, tutor_song, measure, comp, train_per_day=10,
             tutor_song[start:end],
             [SongModel(tutor_song[start:end].copy(), [(0, prior)])],
             measure, comp)[0]
-        res, score = fit_gesture_hill(
+        res, hill_score = fit_gesture_hill(
             tutor_song[start:end].copy(), measure, comp, start_prior=prior,
-            nb_iter=nb_iter_per_train)
-        datasaver.add(prior=prior, pre_score=pre_score,
-                      res=res, new_score=score)
+            nb_iter=nb_iter_per_train, temp=None)
+
+        datasaver.add(prior=prior, pre_score=pre_score, res=res,
+                      new_score=hill_score, song=song, isong=isong, ig=ig)
         songs[isong].gestures[ig][1] = deepcopy(res)
     return songs
 

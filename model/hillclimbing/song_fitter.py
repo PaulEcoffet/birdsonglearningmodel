@@ -66,7 +66,7 @@ def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
 def get_git_revision_hash():
     try:
         return str(subprocess.check_output(['git', 'rev-parse', 'HEAD']),
-                   'utf8')[:-1]
+                   'utf8').strip()
     except OSError:
         return None
 
