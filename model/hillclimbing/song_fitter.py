@@ -124,7 +124,7 @@ def main():
         songs = fit_song(
             tsong,
             measure=lambda x: bsa_measure(x, sr),
-            comp=lambda g, c: np.linalg.norm(g - c),
+            comp=lambda g, c: fastdtw(g - c, radius=10),
             day_optimisation=optimise_gesture_dummy,
             night_optimisation=mutate_best_models_dummy,
             day_conf=day_conf,
