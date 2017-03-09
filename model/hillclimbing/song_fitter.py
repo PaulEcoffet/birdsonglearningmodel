@@ -5,17 +5,23 @@ This module fits a whole song!
 """
 
 import argparse as ap
+import logging
 from copy import deepcopy
+import os
+import datetime
+import pickle
+import json
+import subprocess
 
 import numpy as np
 from fastdtw import fastdtw
 from scipy.io import wavfile
+from datasaver import DataSaver, QuietDataSaver
 
 from day_optimisers import optimise_gesture_dummy
+from measures import bsa_measure, get_scores
 from night_optimisers import mutate_best_models_dummy
-from measures import get_scores, bsa_measure
 from song_model import SongModel
-import logging
 
 rng = np.random.RandomState()
 
@@ -24,38 +30,48 @@ logger = logging.getLogger('root')
 
 
 def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
-             day_conf, night_conf, nb_day=5, nb_conc_song=3, nb_split=10):
+             day_conf, night_conf, nb_day=5, nb_conc_song=3, nb_split=10,
+             datasaver=None):
     """Fit a song with a day and a night phase."""
     songs = [SongModel(song=tutor_song, nb_split=nb_split, rng=rng)
              for i in range(nb_conc_song)]
-    songlog = []
-    songlog.append(('Start', songs,
-                    get_scores(tutor_song, songs, measure, comp)))
+    if datasaver is None:
+        datasaver = QuietDataSaver()
+    datasaver.add(moment='Start', songs=songs,
+                  scores=get_scores(tutor_song, songs, measure, comp))
 
     for iday in range(nb_day):
         logger.info('☀️️\t☀️️\t☀️️\tDay {} of {}\t☀️️\t☀️️\t☀️'.format(iday+1, nb_day)) # noqa
-        songs = day_optimisation(deepcopy(songs),
-                                 tutor_song, measure, comp, **day_conf)
+        with datasaver.set_context('day_optim'):
+            songs = day_optimisation(deepcopy(songs),
+                                     tutor_song, measure, comp,
+                                     datasaver=datasaver, **day_conf)
         score = get_scores(tutor_song, songs, measure, comp)
         if iday + 1 != nb_day:
             logger.debug(score)
-            songlog.append(('BeforeNight', deepcopy(songs), deepcopy(score)))
+            datasaver.add(moment='BeforeNight',
+                          songs=deepcopy(songs), scores=deepcopy(score))
             logger.info('💤\t💤\t💤\tNight\t💤\t💤\t💤')
-            songs = night_optimisation(deepcopy(songs),
-                                       tutor_song, measure, comp,
-                                       **night_conf)
+            with datasaver.set_context('night_optim'):
+                songs = night_optimisation(deepcopy(songs),
+                                           tutor_song, measure, comp,
+                                           datasaver=datasaver, **night_conf)
             score = get_scores(tutor_song, songs, measure, comp)
-            songlog.append(('AfterNight', deepcopy(songs), deepcopy(score)))
-    songlog.append(('End', songs, get_scores(tutor_song, songs, measure,
-                                             comp)))
-    return songs, songlog
+            datasaver.add(moment='AfterNight', songs=songs, scores=score)
+    datasaver.add(moment='End', songs=songs,
+                  scores=get_scores(tutor_song, songs, measure, comp))
+    return songs
 
+
+def get_git_revision_hash():
+    try:
+        return str(subprocess.check_output(['git', 'rev-parse', 'HEAD']),
+                   'utf8')[:-1]
+    except OSError:
+        return None
 
 def main():
     """Main function for this module, called if not imported."""
-    import os
-    import datetime
-    import pickle
     start = datetime.datetime.now()
     parser = ap.ArgumentParser(
         description="""
@@ -90,22 +106,22 @@ def main():
     path = 'res/{}_{}'.format(date, args.name)
     os.makedirs(path)
     wavfile.write(os.path.join(path, 'tutor.wav'), sr, tsong)
-    data = {'tutor': tsong,
-            'sr': sr,
-            'days': args.days,
+    data = {'days': args.days,
             'train_per_day': args.train_per_day,
             'concurrent': args.concurrent,
             'name': args.name,
             'seed': seed,
             'replay': args.replay,
-            'iter_per_train': args.iter_per_train}
-    with open(os.path.join(path, 'params.pkl'), 'wb') as f:
-        pickle.dump(data, f)
+            'iter_per_train': args.iter_per_train,
+            'commit': get_git_revision_hash()}
+    with open(os.path.join(path, 'params.json'), 'w') as f:
+        json.dump(data, f, indent=4)  # human readable parameters
     day_conf = {'nb_iter_per_train': args.iter_per_train,
                 'train_per_day': args.train_per_day}
     night_conf = {'nb_replay': args.replay}
+    datasaver = DataSaver()
     try:
-        songs, song_log = fit_song(
+        songs = fit_song(
             tsong,
             measure=lambda x: bsa_measure(x, sr),
             comp=lambda g, c: np.linalg.norm(g - c),
@@ -115,17 +131,19 @@ def main():
             night_conf=night_conf,
             nb_day=args.days,
             nb_conc_song=args.concurrent,
-            nb_split=30)
+            nb_split=30,
+            datasaver=datasaver)
     except KeyboardInterrupt as e:
+        logger.warning('Aborted')
         with open(os.path.join(path, 'aborted.txt'), 'a') as f:
             f.write('aborted')
-        raise e
+    finally:
+        logger.info('Saving the data.')
+        datasaver.write(os.path.join(path, 'data.pkl'))
     logger.info('!!!! Learning over !!!!')
     logger.info('Logging the songs')
     with open(os.path.join(path, 'songs.pkl'), 'wb') as f:
         pickle.dump(songs, f)
-    with open(os.path.join(path, 'songlog.pkl'), 'wb') as f:
-        pickle.dump(song_log, f)
     logger.info('Generating the waves')
     for i, song in enumerate(songs):
         wavfile.write(os.path.join(path, 'out_{}.wav'.format(i)),

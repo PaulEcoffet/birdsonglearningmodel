@@ -3,10 +3,13 @@ Collection of functions to optimise songs during the night.
 
 These algorithms are mainly restructuring algorithms.
 """
-import numpy as np
-from measures import get_scores
 import logging
 from copy import deepcopy
+
+import numpy as np
+
+from datasaver import QuietDataSaver
+from measures import get_scores
 
 logger = logging.getLogger('night_optimisers')
 
@@ -14,11 +17,12 @@ rng = np.random.RandomState()
 
 
 def rank(array):
-    """Give rank of an array.
+    """Give the rank of each element of an array.
 
-    [3 5 2 6]
+    >>> rank([3 5 2 6])
     [2 3 1 4]
-    Indeed, 2 is the 1st smallest element of the array
+    Indeed, 2 is the 1st smallest element of the array, 3 is the 2nd smallest,
+    and so on.
     """
     temp = np.argsort(array)
     ranks = np.empty(len(array), int)
@@ -26,24 +30,25 @@ def rank(array):
     return ranks
 
 
-def mutate_best_models_dummy(songs, tutor_song, measure, comp, nb_replay):
+def mutate_best_models_dummy(songs, tutor_song, measure, comp, nb_replay,
+                             datasaver=None):
     """Dummy selection and mutation of the best models."""
+    if datasaver is None:
+        datasaver = QuietDataSaver()
     nb_conc_song = len(songs)
     night_songs = np.array(songs)
-    score = get_scores(tutor_song, songs, measure, comp)
+    pscore = get_scores(tutor_song, songs, measure, comp)
     nb_conc_night = nb_conc_song * 2
-    fitness = len(night_songs) - rank(score)
+    fitness = len(night_songs) - rank(pscore)
     night_songs = np.random.choice(night_songs, size=nb_conc_night,
                                    p=fitness/np.sum(fitness))
-    for ireplay in range(nb_replay):
-        logger.info('mutation {} out of {}'.format(ireplay, nb_replay))
-        night_songs = np.array([song.mutate() for song in night_songs])
+    night_songs = np.array([song.mutate(nb_replay) for song in night_songs])
     score = get_scores(tutor_song, night_songs, measure, comp)
-    fitness = (len(night_songs)) - rank(score)
+    fitness = len(night_songs) - rank(score)
     isongs = rng.choice(len(night_songs),
                         size=nb_conc_song, replace=False,
                         p=fitness/np.sum(fitness))
-    logger.debug(score[isongs])
-    songs = deepcopy(night_songs[isongs])
-    songs = songs.tolist()
-    return songs
+    nsongs = deepcopy(night_songs[isongs]).tolist()
+    datasaver.add(prev_songs=songs, prev_scores=pscore, new_songs=nsongs,
+                  new_scores=score[isongs])
+    return nsongs
