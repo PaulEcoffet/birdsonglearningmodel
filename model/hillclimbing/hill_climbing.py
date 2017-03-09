@@ -37,9 +37,9 @@ def hill_climbing(function, goal, guess,
     elif isinstance(guess_deviation, list):
         guess_deviation = np.diag(guess_deviation)
 
-    best_res = function(guess)
     best_guess = np.clip(guess, guess_min, guess_max)
-    best_score = np.inf
+    best_res = function(best_guess)
+    best_score = comparison_method(goal, best_res)
     rng = np.random.RandomState(seed)
     i = 0
     while comparison_method(goal, best_res) > goal_delta and i < max_iter:
