@@ -12,6 +12,7 @@ import datetime
 import pickle
 import json
 import subprocess
+from pprint import pformat
 
 import numpy as np
 from fastdtw import fastdtw
@@ -32,7 +33,33 @@ logger = logging.getLogger('root')
 def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
              day_conf, night_conf, nb_day=5, nb_conc_song=3, nb_split=10,
              datasaver=None):
-    """Fit a song with a day and a night phase."""
+    """
+    Fit a song with a day and a night phase.
+
+    tutor_song - Format: 1D np.array
+                 The tutor song that the algorithm will try to reproduce.
+                 It will be normalized between -1 and +1 internally.
+                 You don't need to do it yourself.
+    measure - Format: a function taking a song or a gesture as argument.
+              signature : measure(1D-np.array) -> `comp` argument.
+              The function to measure the features of the tutor songs
+              and the generated songs. The module `measures` contains
+              several measures that can be used. The classical ones are
+              `lambda x: birdsonganalysis.all_song_features(x, samplerate)` and
+              `lambda x: python_speech_features.mfcc(x, ...)`.
+    comp - Format: a function taking the tutor song measure and a generated
+           song measure and return a real score.
+           Signature : comp(goal_measure, cur_measure) -> float
+           `lambda g, c: np.linalg.norm(g - c)` and
+           `lambda g, c: fastdtw.fastdtw(g, c)[0]` are common comparison
+           function.
+    day_optimisation - Format: function taking a list of SongModel and returns
+                       a list of SongModel.
+                       Signature: day_optimisation(list(SongModel), **day_conf)
+                                        ->list(SongModel)
+                       This function does the optimisations that are supposed
+                       to occur during the day.
+    """
     songs = [SongModel(song=tutor_song, nb_split=nb_split, rng=rng)
              for i in range(nb_conc_song)]
     if datasaver is None:
@@ -64,11 +91,17 @@ def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
 
 
 def get_git_revision_hash():
+    """Get the git commit/revision hash.
+
+    Knowing the git revision hash is helpful to reproduce a result with
+    the code corresponding to a specific run.
+    """
     try:
         return str(subprocess.check_output(['git', 'rev-parse', 'HEAD']),
                    'utf8').strip()
     except OSError:
         return None
+
 
 def main():
     """Main function for this module, called if not imported."""
@@ -78,6 +111,8 @@ def main():
         reproduce the learning of a zebra finch for a given tutor song.
         """
     )
+    comp_methods = {'linalg': lambda g, c: np.linalg.norm(g - c),
+                    'fastdtw': lambda g, c: fastdtw(g, c, radius=10)[0]}
     parser.add_argument('tutor', type=ap.FileType('rb'),
                         help='The targeted song to learn')
     parser.add_argument('-d', '--days', type=int, default=45,
@@ -95,12 +130,16 @@ def main():
                         ' night')
     parser.add_argument('-i', '--iter-per-train', type=int, default=20,
                         help='number of iteration when training a gesture')
+    parser.add_argument('--comp', type=str, default="fastdtw",
+                        choices=comp_methods,
+                        help='comparison method to use')
     args = parser.parse_args()
     if args.seed is None:
         seed = int(datetime.datetime.now().timestamp())
     else:
         seed = args.seed
     rng.seed(seed)
+
     sr, tsong = wavfile.read(args.tutor)
     date = datetime.datetime.now().strftime('%y%m%d_%H%M%S')
     path = 'res/{}_{}'.format(date, args.name)
@@ -113,7 +152,9 @@ def main():
             'seed': seed,
             'replay': args.replay,
             'iter_per_train': args.iter_per_train,
-            'commit': get_git_revision_hash()}
+            'commit': get_git_revision_hash(),
+            'comp': args.comp}
+    logger.info(pformat(data))
     with open(os.path.join(path, 'params.json'), 'w') as f:
         json.dump(data, f, indent=4)  # human readable parameters
     day_conf = {'nb_iter_per_train': args.iter_per_train,
@@ -124,7 +165,7 @@ def main():
         songs = fit_song(
             tsong,
             measure=lambda x: bsa_measure(x, sr),
-            comp=lambda g, c: fastdtw(g - c, radius=10),
+            comp=comp_methods[args.comp],
             day_optimisation=optimise_gesture_dummy,
             night_optimisation=mutate_best_models_dummy,
             day_conf=day_conf,

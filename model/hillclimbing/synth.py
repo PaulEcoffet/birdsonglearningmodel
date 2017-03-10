@@ -9,6 +9,8 @@ import subprocess
 import numpy as np
 from io import BytesIO
 import os
+
+
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
@@ -37,10 +39,8 @@ def exp_sin_str(p, nb_exp=2, nb_sin=2, x='x'):
         out += '{:.2} exp({:.2} {}) + '.format(float(next(ip)),
                                                -np.abs(float(next(ip))), x)
     for i in range(nb_sin):
-        out += '{:.2f} sin(({:.2f} + 2π {})/{:.2f}) + '.format(float(next(ip)),
-                                                               float(next(ip)),
-                                                               x,
-                                                               float(next(ip)))
+        out += '{:.2f} sin(({:.2f} + 2π {})/{:.2f}) + '.format(
+            float(next(ip)), float(next(ip)), x, float(next(ip)))
     out += '{:.2f}'.format(float(next(ip)))
     return out
 
@@ -66,8 +66,10 @@ def gen_sound(params, length, falpha, fbeta, falpha_nb_args):
 
     Returns - 1D numpy.array with the normalized signal between -1 and 1
     """
-    alpha_beta = gen_alphabeta(params, length, falpha, fbeta, falpha_nb_args)
+    alpha_beta = gen_alphabeta(params, length, falpha, fbeta, falpha_nb_args,
+                               pad=True)
     out = synthesize(alpha_beta)
+    assert len(out) == length
     return out
 
 
@@ -85,7 +87,7 @@ def gen_alphabeta(params, length, falpha, fbeta,
                 np.array[t]
     falpha_nb_args - Number of params falpha needs. It will be used for
                      the slicing of `params`. Indeed, in the code, we do
-    pad            - Should we add the padding to correct the csynth bug or not
+    pad - Should we add the padding to correct the csynth bug or not
 
     ```
     falpha(t, params[:falpha_nb_args])
@@ -106,6 +108,7 @@ def gen_alphabeta(params, length, falpha, fbeta,
             falpha(t, params[:falpha_nb_args]),
             fbeta(t, params[falpha_nb_args:])
         ), axis=-1)
+    alpha_beta[:, 0] = np.where(alpha_beta[:, 0] < 0, 0, alpha_beta[:, 0])
     return alpha_beta
 
 
@@ -129,6 +132,6 @@ def synthesize(alpha_beta):
     input_bytes.close()
     out = np.fromstring(out_raw, dtype=float, sep="\n")
     out = 2 * (out - np.nanmin(out)) / (np.nanmax(out) - np.nanmin(out)) - 1
-    out[np.isnan(out)] = 0
-    out = out - np.mean(out)
+    assert not np.any(np.isnan(out))
+    out = out - np.nanmean(out)
     return out

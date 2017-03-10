@@ -9,8 +9,7 @@ from hill_climbing import hill_climbing
 from synth import gen_sound, only_sin
 
 
-def fit_gesture_hill(gesture, measure, comp,
-                     samplerate=44100, start_prior=None, nb_iter=300,
+def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
                      logger=None, temp=10):
     """Find the parameters to fit to a gesture."""
     size = len(gesture)
@@ -36,7 +35,7 @@ def fit_gesture_hill(gesture, measure, comp,
         prior.extend([0, 0, 0, 0, -0.002])  # beta prior
     dev.extend([0.1, 0.1, 0.1, 50, 0.0001])
     mins.extend([-100, 0, -np.pi, 0, -3])
-    maxs.extend([100, 3, np.pi, 1000, 0])
+    maxs.extend([100, 3, np.pi, 1000, 2])
     x, y, score = hill_climbing(
         function=lambda x: measure(gen_sound(
             x, size,
@@ -49,7 +48,7 @@ def fit_gesture_hill(gesture, measure, comp,
         guess_max=maxs,
         guess_deviation=np.diag(dev),
         max_iter=nb_iter,
-        comparison_method=lambda g, c: comp(g, c),
+        comparison_method=comp,
         temp_max=temp,
         verbose=False,
         logger=logger)
@@ -94,8 +93,8 @@ if __name__ == "__main__":
     for i in range(1):
         try:
             logger = []
-            x, score = fit_gesture_hill(tutor_syllable, samplerate=sr,
-                                   logger=logger)
+            x, score = fit_gesture_hill(tutor_syllable,
+                                        logger=logger)
             with open('res/{}/log.pkl'.format(run_name), 'wb') as f:
                 pickle.dump(logger, f)
             print("*"*80)

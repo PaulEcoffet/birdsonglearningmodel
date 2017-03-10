@@ -3,7 +3,7 @@
 import numpy as np
 from copy import deepcopy
 import logging
-from synth import gen_sound, only_sin, gen_alphabeta
+from synth import only_sin, gen_alphabeta, synthesize
 
 
 logger = logging.getLogger('songmodel')
@@ -50,62 +50,58 @@ class SongModel:
                 logger.info('deleted')
                 to_del = self.rng.randint(1, len(gestures))
                 del gestures[to_del]
-            elif act < 0.12:  # Add a new gesture
+            elif act < 0.3:  # Add a new gesture
                 logger.info('added')
-                to_add = self.rng.randint(0, gestures[-1][0])
+                to_add = self.rng.randint(0, gestures[-1][0] - 100)
                 gestures.append([to_add, default_priors()])
             elif act < 0.5:  # Take a gesture and put it in another gesture
                 logger.info('copied')
                 from_, dest = self.rng.randint(len(gestures), size=2)
                 gestures[dest][1] = deepcopy(gestures[from_][1])
-            else:  # Move where the gesture start
+            elif act < 0.8:  # Move where the gesture start
                 logger.info('moved')
                 to_move = self.rng.randint(1, len(gestures))
-                min_pos = self.gestures[to_move - 1][0] + 100
+                min_pos = gestures[to_move - 1][0] + 100
                 try:
-                    max_pos = self.gestures[to_move + 1][0] - 100
+                    max_pos = gestures[to_move + 1][0] - 100
                 except IndexError:  # Perhaps we have picked the last gesture
                     logger.debug('last gesture picked')
                     max_pos = len(self.song) - 100
                 new_pos = self.rng.normal(loc=gestures[to_move][0],
                                           scale=(max_pos-min_pos)/4)
                 gestures[to_move][0] = int(np.clip(new_pos, min_pos, max_pos))
+            else:  # Do not mutate
+                pass
             # clean GTEs
             gestures.sort(key=lambda x: x[0])
-            for i in range(1, len(gestures) - 1):
-                # FIXME: Last gesture can be really close to song length
-                if gestures[i][0] - gestures[i - 1][0] < 100:
-                    del gestures[i]
+            clean = False
+            while not clean:
+                for i in range(1, len(gestures)):
+                    if gestures[i][0] - gestures[i - 1][0] < 100:
+                        del gestures[i]
+                        break
+                else:  # If there is no break (for/else python syntax)
+                    clean = True
+            if len(self.song) - gestures[-1][0] < 100:
+                del gestures[-1]
         return SongModel(self.song, gestures, parent=self)
 
     def gen_sound(self):
         """Generate the full song."""
-        sounds = []
-        length = len(self.song)
-        for i, gesture in enumerate(self.gestures):
-            start = gesture[0]
-            param = gesture[1]
-            try:
-                end = self.gestures[i+1][0]
-            except IndexError:
-                end = length
-            size = end - start
-            sound = gen_sound(
-                param, size,
-                falpha=lambda x, p: only_sin(x, p, nb_sin=3),
-                fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                falpha_nb_args=13)
-            assert np.isclose(np.nanmean(sound), 0)
-            sounds.append(sound)
-            assert not np.all(np.isnan(sounds[-1])), \
-                'only nan in output with p {}'.format(param)
-        out = np.concatenate(sounds)
+        ab = self.gen_alphabeta('last')
+        out = synthesize(ab)
+        assert np.isclose(np.nanmean(out), 0)
         assert len(out) == len(self.song)
         return out
 
     def gen_alphabeta(self, pad=False):
         """Compute alpha and beta for the whole song."""
-        length = len(self.song)
+        if pad == 'last':
+            length = len(self.song) + 2
+            pad = False
+        else:
+            length = len(self.song)
+
         ab = np.zeros((length, 2))
         for i, gesture in enumerate(self.gestures):
             start = gesture[0]
@@ -121,7 +117,5 @@ class SongModel:
                 falpha=lambda x, p: only_sin(x, p, nb_sin=3),
                 fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
                 falpha_nb_args=13, pad=pad)
-            if i == 23:
-                print(params, start, end)
-                print(ab[start:end])
+        assert np.all(ab[:, 0] >= 0)
         return ab

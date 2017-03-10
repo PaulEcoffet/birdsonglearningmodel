@@ -3,7 +3,6 @@
 import numpy as np
 import birdsonganalysis as bsa
 from python_speech_features import mfcc
-from fastdtw import fastdtw
 
 
 def bsa_measure(sig, sr, coefs=None):
@@ -19,7 +18,8 @@ def bsa_measure(sig, sr, coefs=None):
         coef = coefs[key]
         feat = features[key]  # Verbose affectation to catch rare error
         out.append(coef * feat)
-    return np.array(out).T
+    out = np.array(out).T
+    return out
 
 
 def mfcc_measure(sig, sr):
@@ -40,7 +40,6 @@ def get_scores(tutor_song, song_models, measure, comp):
     """
     g = measure(tutor_song)
     scores = np.zeros(len(song_models))
-
     for i in range(len(song_models)):
         sig = song_models[i].gen_sound()
         c = measure(sig)

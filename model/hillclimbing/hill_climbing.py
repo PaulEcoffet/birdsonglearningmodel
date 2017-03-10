@@ -1,3 +1,5 @@
+"""Module implementing a simple hillclimbing / Simulated Annealing."""
+
 import numpy as np
 
 
@@ -19,13 +21,12 @@ def hill_climbing(function, goal, guess,
     if goal_delta < 0:
         raise ValueError("The goal error margin (goal_delta) "
                          "should be a positive number")
-    if max_iter < 1:
+    if max_iter < 0:
         raise ValueError("The max number of iteration without progress should "
-                         "be at least 1")
+                         "be at least 0")
 
     if comparison_method is None:
         comparison_method = lambda g, c: np.linalg.norm(g - c, 2)  # noqa
-        # noqa is to avoid `pylama` warnings
     if guess_min is None:
         guess_min = -np.inf
     if guess_max is None:
@@ -49,9 +50,10 @@ def hill_climbing(function, goal, guess,
         cur_score = comparison_method(goal, cur_res)
         if temp_max is not None:
             temp = temp_max - temp_max*(i/max_iter)
+            simann_bound = np.exp(-(cur_score - best_score)/temp)
         if cur_score < best_score \
                 or (temp_max is not None
-                    and rng.uniform() < np.exp(-(cur_score - best_score)/temp)):
+                    and rng.uniform() < simann_bound):
             best_score = cur_score
             best_res = cur_res
             best_guess = cur_guess
