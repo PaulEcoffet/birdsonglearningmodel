@@ -146,8 +146,15 @@ def main():
     sr, tsong = wavfile.read(args.tutor)
     date = datetime.datetime.now().strftime('%y%m%d_%H%M%S')
     if args.config:
-        logger.warning('Loading from config, other args are ignored.')
+        logger.info('Loading from config, other args are ignored.')
         data = json.load(args.config)
+        try:  # Warning if reproduction (with commit key) and different commits
+            if data['commit'] != get_git_revision_hash():
+                logger.warning('Commit recommended for the data is different'
+                               ' from the current commit.')
+        except KeyError:
+            pass
+        data['commit'] = get_git_revision_hash()
     else:
         data = {'days': args.days,
                 'train_per_day': args.train_per_day,
