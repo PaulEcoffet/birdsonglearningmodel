@@ -24,7 +24,6 @@ from measures import bsa_measure, get_scores
 from night_optimisers import mutate_best_models_dummy
 from song_model import SongModel
 
-rng = np.random.RandomState()
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('root')
@@ -32,7 +31,7 @@ logger = logging.getLogger('root')
 
 def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
              day_conf, night_conf, nb_day=5, nb_conc_song=3, nb_split=10,
-             datasaver=None):
+             datasaver=None, rng=None):
     """
     Fit a song with a day and a night phase.
 
@@ -72,7 +71,7 @@ def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
         with datasaver.set_context('day_optim'):
             songs = day_optimisation(deepcopy(songs),
                                      tutor_song, measure, comp,
-                                     datasaver=datasaver, **day_conf)
+                                     datasaver=datasaver, rng=rng, **day_conf)
         score = get_scores(tutor_song, songs, measure, comp)
         if iday + 1 != nb_day:
             logger.debug(score)
@@ -82,9 +81,11 @@ def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
             with datasaver.set_context('night_optim'):
                 songs = night_optimisation(deepcopy(songs),
                                            tutor_song, measure, comp,
-                                           datasaver=datasaver, **night_conf)
+                                           datasaver=datasaver, rng=rng,
+                                           **night_conf)
             score = get_scores(tutor_song, songs, measure, comp)
             datasaver.add(moment='AfterNight', songs=songs, scores=score)
+        datasaver.write()
     datasaver.add(moment='End', songs=songs,
                   scores=get_scores(tutor_song, songs, measure, comp))
     return songs
@@ -115,6 +116,8 @@ def main():
                     'fastdtw': lambda g, c: fastdtw(g, c, radius=10)[0]}
     parser.add_argument('tutor', type=ap.FileType('rb'),
                         help='The targeted song to learn')
+    parser.add_argument('--config', type=ap.FileType('r'), required=False,
+                        help='The config file to take the parameters from.')
     parser.add_argument('-d', '--days', type=int, default=45,
                         help='number of days')
     parser.add_argument('-t', '--train-per-day', type=int, default=100,
@@ -138,42 +141,47 @@ def main():
         seed = int(datetime.datetime.now().timestamp())
     else:
         seed = args.seed
-    rng.seed(seed)
+    rng = np.random.RandomState(seed)
 
     sr, tsong = wavfile.read(args.tutor)
     date = datetime.datetime.now().strftime('%y%m%d_%H%M%S')
-    path = 'res/{}_{}'.format(date, args.name)
+    if args.config:
+        logger.warning('Loading from config, other args are ignored.')
+        data = json.load(args.config)
+    else:
+        data = {'days': args.days,
+                'train_per_day': args.train_per_day,
+                'concurrent': args.concurrent,
+                'name': args.name,
+                'seed': seed,
+                'replay': args.replay,
+                'iter_per_train': args.iter_per_train,
+                'commit': get_git_revision_hash(),
+                'comp': args.comp}
+    path = 'res/{}_{}'.format(date, data['name'])
     os.makedirs(path)
     wavfile.write(os.path.join(path, 'tutor.wav'), sr, tsong)
-    data = {'days': args.days,
-            'train_per_day': args.train_per_day,
-            'concurrent': args.concurrent,
-            'name': args.name,
-            'seed': seed,
-            'replay': args.replay,
-            'iter_per_train': args.iter_per_train,
-            'commit': get_git_revision_hash(),
-            'comp': args.comp}
     logger.info(pformat(data))
     with open(os.path.join(path, 'params.json'), 'w') as f:
         json.dump(data, f, indent=4)  # human readable parameters
-    day_conf = {'nb_iter_per_train': args.iter_per_train,
-                'train_per_day': args.train_per_day}
-    night_conf = {'nb_replay': args.replay}
-    datasaver = DataSaver()
+    day_conf = {'nb_iter_per_train': data['iter_per_train'],
+                'train_per_day': data['train_per_day']}
+    night_conf = {'nb_replay': data['replay']}
+    datasaver = DataSaver(defaultdest=os.path.join(path, 'data_cur.pkl'))
     try:
         songs = fit_song(
             tsong,
             measure=lambda x: bsa_measure(x, sr),
-            comp=comp_methods[args.comp],
+            comp=comp_methods[data['comp']],
             day_optimisation=optimise_gesture_dummy,
             night_optimisation=mutate_best_models_dummy,
             day_conf=day_conf,
             night_conf=night_conf,
-            nb_day=args.days,
-            nb_conc_song=args.concurrent,
+            nb_day=data['days'],
+            nb_conc_song=data['concurrent'],
             nb_split=30,
-            datasaver=datasaver)
+            datasaver=datasaver,
+            rng=rng)
     except KeyboardInterrupt as e:
         logger.warning('Aborted')
         with open(os.path.join(path, 'aborted.txt'), 'a') as f:
@@ -189,7 +197,7 @@ def main():
     for i, song in enumerate(songs):
         wavfile.write(os.path.join(path, 'out_{}.wav'.format(i)),
                       44100, song.gen_sound())
-    logger.info('run {}_{} is finished'.format(date, args.name))
+    logger.info('run {}_{} is finished'.format(date, data['name']))
     logger.info('took {}'.format((datetime.datetime.now() - start)))
 
 

@@ -10,7 +10,7 @@ from synth import gen_sound, only_sin
 
 
 def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
-                     logger=None, temp=10):
+                     logger=None, temp=10, rng=None):
     """Find the parameters to fit to a gesture."""
     size = len(gesture)
     goal = measure(gesture)
@@ -51,7 +51,8 @@ def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
         comparison_method=comp,
         temp_max=temp,
         verbose=False,
-        logger=logger)
+        logger=logger,
+        rng=rng)
     return x, score
 
 

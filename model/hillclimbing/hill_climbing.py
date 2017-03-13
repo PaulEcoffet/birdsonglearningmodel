@@ -6,7 +6,7 @@ import numpy as np
 def hill_climbing(function, goal, guess,
                   guess_deviation=0.01, goal_delta=0.01, temp_max=5,
                   comparison_method=None,
-                  max_iter=100000, seed=None, verbose=False,
+                  max_iter=100000, rng=None, verbose=False,
                   guess_min=None, guess_max=None, logger=None):
     """
     Hill climb to find which is the best value x so that function(x) = goal.
@@ -37,11 +37,14 @@ def hill_climbing(function, goal, guess,
         guess_deviation = guess_deviation * np.eye(guess.size)
     elif isinstance(guess_deviation, list):
         guess_deviation = np.diag(guess_deviation)
+    if isinstance(rng, int):
+        rng = np.random.RandomState(rng)
+    elif rng is None:
+        rng = np.random.RandomState()
 
     best_guess = np.clip(guess, guess_min, guess_max)
     best_res = function(best_guess)
     best_score = comparison_method(goal, best_res)
-    rng = np.random.RandomState(seed)
     i = 0
     while comparison_method(goal, best_res) > goal_delta and i < max_iter:
         cur_guess = rng.multivariate_normal(best_guess, guess_deviation)

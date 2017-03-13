@@ -13,8 +13,6 @@ from measures import get_scores
 
 logger = logging.getLogger('night_optimisers')
 
-rng = np.random.RandomState()
-
 
 def rank(array):
     """Give the rank of each element of an array.
@@ -31,10 +29,12 @@ def rank(array):
 
 
 def mutate_best_models_dummy(songs, tutor_song, measure, comp, nb_replay,
-                             datasaver=None):
+                             datasaver=None, rng=None):
     """Dummy selection and mutation of the best models."""
     if datasaver is None:
         datasaver = QuietDataSaver()
+    if rng is None:
+        rng = np.random.RandomState()
     nb_conc_song = len(songs)
     night_songs = np.array(songs)
     pscore = get_scores(tutor_song, songs, measure, comp)

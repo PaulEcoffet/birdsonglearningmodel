@@ -10,14 +10,15 @@ from gesture_fitter import fit_gesture_hill
 from synth import gen_sound, only_sin
 
 logger = logging.getLogger('DayOptim')
-rng = np.random.RandomState()
 
 
 def optimise_gesture_dummy(songs, tutor_song, measure, comp, train_per_day=10,
-                           nb_iter_per_train=10, datasaver=None):
+                           nb_iter_per_train=10, datasaver=None, rng=None):
     """Optimise gestures randomly from the song models with dummy algorithm."""
     if datasaver is None:
         datasaver = QuietDataSaver()
+    if rng is None:
+        rng = np.random.RandomState()
     for itrain in range(train_per_day):
         isong = rng.randint(len(songs))
         song = songs[isong]
@@ -40,7 +41,7 @@ def optimise_gesture_dummy(songs, tutor_song, measure, comp, train_per_day=10,
         pre_score = comp(g, c)
         res,  hill_score = fit_gesture_hill(
             tutor_song[start:end].copy(), measure, comp, start_prior=prior,
-            nb_iter=nb_iter_per_train, temp=None)
+            nb_iter=nb_iter_per_train, temp=None, rng=rng)
         datasaver.add(prior=prior, pre_score=pre_score, res=res,
                       new_score=hill_score, song=song, isong=isong, ig=ig)
         songs[isong].gestures[ig][1] = deepcopy(res)

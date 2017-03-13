@@ -7,11 +7,12 @@ from contextlib import contextmanager
 class DataSaver():
     """Save data for analysis."""
 
-    def __init__(self, label=None):
+    def __init__(self, defaultdest=None, label=None):
         """Initialize the DataSaver."""
         self.data = []
         if label is None:
             label = 'root'
+        self.defaultdest = defaultdest
         self.labels = [label]
 
     def add(self, label=None, **kwargs):
@@ -20,8 +21,13 @@ class DataSaver():
             label = self.labels[-1]
         self.data.append((label, deepcopy(kwargs)))
 
-    def write(self, path):
+    def write(self, path=None):
         """Write the data into a file."""
+        if path is None and self.defaultdest is not None:
+            path = self.defaultdest
+        elif path is None and self.defaultdest is None:
+            raise ValueError('No destination file given and no default'
+                             ' destination set.')
         with open(path, 'wb') as f:
             pickle.dump(self.data, f)
 
