@@ -15,7 +15,8 @@ logger = logging.getLogger('night_optimisers')
 
 
 def rank(array):
-    """Give the rank of each element of an array.
+    """
+    Give the rank of each element of an array.
 
     >>> rank([3 5 2 6])
     [2 3 1 4]
@@ -49,6 +50,41 @@ def mutate_best_models_dummy(songs, tutor_song, measure, comp, nb_replay,
                         size=nb_conc_song, replace=False,
                         p=fitness/np.sum(fitness))
     nsongs = deepcopy(night_songs[isongs]).tolist()
+    datasaver.add(prev_songs=songs, prev_scores=pscore, new_songs=nsongs,
+                  new_scores=score[isongs])
+    return nsongs
+
+
+def mutate_best_models_elite(songs, tutor_song, measure, comp, nb_replay,
+                             datasaver=None, rng=None):
+    """
+    Elite selection and mutation of the best models.
+
+    Keep the best mutations after each replay, parents are present in the
+    selection.
+    """
+    if datasaver is None:
+        datasaver = QuietDataSaver()
+    if rng is None:
+        rng = np.random.RandomState()
+    nb_conc_song = len(songs)
+    pscore = get_scores(tutor_song, songs, measure, comp)
+    score = pscore
+    nb_conc_night = nb_conc_song * 2
+    # make night_songs an array to do list indexes.
+    night_songs = np.array(songs)
+    for i in range(nb_replay):
+        fitness = len(night_songs) - rank(score)
+        night_songs = np.random.choice(night_songs, size=nb_conc_night,
+                                       p=fitness/np.sum(fitness))
+        night_songs = np.array([song.mutate() for song in night_songs])
+        score = get_scores(tutor_song, night_songs, measure, comp)
+        fitness = len(night_songs) - rank(score)
+        isongs = rng.choice(len(night_songs),
+                            size=nb_conc_song, replace=False,
+                            p=fitness/np.sum(fitness))
+        night_songs = np.concatenate((night_songs[isongs], songs))
+    nsongs = night_songs[isongs].tolist()
     datasaver.add(prev_songs=songs, prev_scores=pscore, new_songs=nsongs,
                   new_scores=score[isongs])
     return nsongs

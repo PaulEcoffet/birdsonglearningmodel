@@ -21,7 +21,7 @@ from datasaver import DataSaver, QuietDataSaver
 
 from day_optimisers import optimise_gesture_dummy
 from measures import bsa_measure, get_scores
-from night_optimisers import mutate_best_models_dummy
+from night_optimisers import mutate_best_models_dummy, mutate_best_models_elite
 from song_model import SongModel
 
 
@@ -191,7 +191,7 @@ def main():
             measure=lambda x: bsa_measure(x, sr),
             comp=comp_methods[data['comp']],
             day_optimisation=optimise_gesture_dummy,
-            night_optimisation=mutate_best_models_dummy,
+            night_optimisation=mutate_best_models_elite,
             day_conf=day_conf,
             night_conf=night_conf,
             nb_day=data['days'],

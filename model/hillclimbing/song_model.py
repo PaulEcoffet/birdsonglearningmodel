@@ -13,7 +13,7 @@ def default_priors(nb_sin=3):
     """Give the default priors for a gesture fit."""
     prior = []
     for k in range(1, nb_sin + 1):  # prior on sin
-            prior.extend([0, 0, np.pi/(k**2), 10*3**k])
+        prior.extend([0, 0, np.pi/(k**2), 5*3**k])
     prior.append(0)
     prior.extend([0, 0, 0, 0, 0.15])  # beta prior
     return np.array(prior)
