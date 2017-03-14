@@ -216,6 +216,11 @@ def main():
                       44100, song.gen_sound())
     logger.info('run {}_{} is finished'.format(date, data['name']))
     logger.info('took {}'.format((datetime.datetime.now() - start)))
+    try:
+        subprocess.Popen(['notify-send',
+                          '{}_{} is finished'.format(date, data['name'])])
+    except OSError:
+        pass
 
 
 if __name__ == '__main__':
