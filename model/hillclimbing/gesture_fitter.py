@@ -20,8 +20,8 @@ def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
     mins = []
     maxs = []
     for k in range(1, j + 1):  # prior on sin
-        prior.extend([1/k, 3/k, np.pi/(k**2), 10*3**k])
-        dev.extend([0.05/k, 0.1/k, 0.05, 5*(k**2)])
+        prior.extend([0/k, 0/k, np.pi/(k**2), 10*3**k])
+        dev.extend([0.005/k, 0.001/k, 0.005, 5*(k**2)])
         mins.extend([-50, 0, -np.pi, 0])
         maxs.extend([50, 2, np.pi, 8000])
     prior.append(4)
@@ -33,7 +33,7 @@ def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
         prior = start_prior
     else:
         prior.extend([0, 0, 0, 0, -0.002])  # beta prior
-    dev.extend([0.1, 0.1, 0.1, 50, 0.0001])
+    dev.extend([0.005, 0.005, 0.005, 10, 0.0001])
     mins.extend([-100, 0, -np.pi, 0, -3])
     maxs.extend([100, 3, np.pi, 1000, 2])
     x, dummy_y, score = hill_climbing(
