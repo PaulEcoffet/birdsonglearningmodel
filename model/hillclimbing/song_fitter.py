@@ -92,7 +92,8 @@ def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
 
 
 def get_git_revision_hash():
-    """Get the git commit/revision hash.
+    """
+    Get the git commit/revision hash.
 
     Knowing the git revision hash is helpful to reproduce a result with
     the code corresponding to a specific run.
@@ -107,6 +108,7 @@ def get_git_revision_hash():
 def main():
     """Main function for this module, called if not imported."""
     start = datetime.datetime.now()
+    tsong = None
     parser = ap.ArgumentParser(
         description="""
         reproduce the learning of a zebra finch for a given tutor song.
@@ -114,26 +116,26 @@ def main():
     )
     comp_methods = {'linalg': lambda g, c: np.linalg.norm(g - c),
                     'fastdtw': lambda g, c: fastdtw(g, c, radius=10)[0]}
-    parser.add_argument('tutor', type=ap.FileType('rb'),
+    parser.add_argument('tutor', type=ap.FileType('rb'), nargs='?',
                         help='The targeted song to learn')
     parser.add_argument('--config', type=ap.FileType('r'), required=False,
                         help='The config file to take the parameters from.')
-    parser.add_argument('-d', '--days', type=int, default=45,
+    parser.add_argument('-d', '--days', type=int, required=None,
                         help='number of days')
-    parser.add_argument('-t', '--train-per-day', type=int, default=100,
+    parser.add_argument('-t', '--train-per-day', type=int, required=False,
                         help='number of training for a gesture per day')
-    parser.add_argument('-c', '--concurrent', type=int, default=3,
+    parser.add_argument('-c', '--concurrent', type=int, required=False,
                         help='number of concurrent model for the song')
-    parser.add_argument('-n', '--name', type=str, default='noname',
+    parser.add_argument('-n', '--name', type=str, required=False,
                         help='name of the trial for logging')
-    parser.add_argument('-s', '--seed', type=int, default=None,
+    parser.add_argument('-s', '--seed', type=int, required=False,
                         help='seed for the random number generator')
-    parser.add_argument('-r', '--replay', type=int, default=3,
+    parser.add_argument('-r', '--replay', type=int, required=False,
                         help='number of passes for new generations during'
                         ' night')
-    parser.add_argument('-i', '--iter-per-train', type=int, default=20,
+    parser.add_argument('-i', '--iter-per-train', type=int, required=False,
                         help='number of iteration when training a gesture')
-    parser.add_argument('--comp', type=str, default="fastdtw",
+    parser.add_argument('--comp', type=str, required=False,
                         choices=comp_methods,
                         help='comparison method to use')
     args = parser.parse_args()
@@ -143,28 +145,36 @@ def main():
         seed = args.seed
     rng = np.random.RandomState(seed)
 
-    sr, tsong = wavfile.read(args.tutor)
     date = datetime.datetime.now().strftime('%y%m%d_%H%M%S')
+    data = {}
     if args.config:
-        logger.info('Loading from config, other args are ignored.')
-        data = json.load(args.config)
+        data.update(json.load(args.config))
         try:  # Warning if reproduction (with commit key) and different commits
             if data['commit'] != get_git_revision_hash():
                 logger.warning('Commit recommended for the data is different'
                                ' from the current commit.')
         except KeyError:
             pass
+        try:
+            sr, tsong = wavfile.read(data['tutor'])
+        except KeyError:
+            pass
         data['commit'] = get_git_revision_hash()
-    else:
-        data = {'days': args.days,
-                'train_per_day': args.train_per_day,
-                'concurrent': args.concurrent,
-                'name': args.name,
-                'seed': seed,
-                'replay': args.replay,
-                'iter_per_train': args.iter_per_train,
-                'commit': get_git_revision_hash(),
-                'comp': args.comp}
+    argdata = {'days': args.days,
+               'train_per_day': args.train_per_day,
+               'concurrent': args.concurrent,
+               'name': args.name,
+               'seed': seed,
+               'replay': args.replay,
+               'iter_per_train': args.iter_per_train,
+               'commit': get_git_revision_hash(),
+               'comp': args.comp}
+    if args.tutor is not None:
+        argdata['tutor'] = args.tutor.name
+    data.update({k: v for k, v in argdata.items() if v is not None})
+    if tsong is None:
+        sr, tsong = wavfile.read(args.tutor)
+
     path = 'res/{}_{}'.format(date, data['name'])
     os.makedirs(path)
     wavfile.write(os.path.join(path, 'tutor.wav'), sr, tsong)
