@@ -21,13 +21,13 @@ def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
     maxs = []
     for k in range(1, j + 1):  # prior on sin
         prior.extend([0/k, 0/k, np.pi/(k**2), 10*3**k])
-        dev.extend([0.005/k, 0.001/k, 0.005, 5*(k**2)])
+        dev.extend([0.01/k, 0.005/k, 0.005, 5*(k**2)])
         mins.extend([-50, 0, -np.pi, 0])
         maxs.extend([50, 2, np.pi, 8000])
-    prior.append(4)
+    prior.append(0)
     mins.append(0)
     maxs.append(10)
-    dev.append(0.5)
+    dev.append(0.005)
 
     if start_prior is not None:
         prior = start_prior
