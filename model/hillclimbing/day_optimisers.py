@@ -39,7 +39,7 @@ def optimise_gesture_dummy(songs, tutor_song, measure, comp, train_per_day=10,
             falpha_nb_args=13)
         c = measure(s)
         pre_score = comp(g, c)
-        res,  hill_score = fit_gesture_hill(
+        res, hill_score = fit_gesture_hill(
             tutor_song[start:end].copy(), measure, comp, start_prior=prior,
             nb_iter=nb_iter_per_train, temp=None, rng=rng)
         # datasaver.add(pre_score=pre_score,

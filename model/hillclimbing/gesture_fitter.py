@@ -33,6 +33,7 @@ def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
         prior = start_prior
     else:
         prior.extend([0, 0, 0, 0, -0.002])  # beta prior
+
     dev.extend([0.005, 0.005, 0.005, 10, 0.0001])
     mins.extend([-100, 0, -np.pi, 0, -3])
     maxs.extend([100, 3, np.pi, 1000, 2])

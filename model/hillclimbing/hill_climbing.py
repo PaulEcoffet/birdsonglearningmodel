@@ -45,6 +45,7 @@ def hill_climbing(function, goal, guess,
     best_guess = np.clip(guess, guess_min, guess_max)
     best_res = function(best_guess)
     best_score = comparison_method(goal, best_res)
+    init_score = best_score
     i = 0
     while comparison_method(goal, best_res) > goal_delta and i < max_iter:
         cur_guess = rng.multivariate_normal(best_guess, guess_deviation)
@@ -65,4 +66,5 @@ def hill_climbing(function, goal, guess,
             if verbose and i % 100 == 0:
                 print(best_score, '(', i, ')')
         i += 1
+        assert init_score >= best_score
     return best_guess, best_res, best_score

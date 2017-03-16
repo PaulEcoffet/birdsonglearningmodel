@@ -73,7 +73,7 @@ def mutate_best_models_elite(songs, tutor_song, measure, comp, nb_replay,
     nb_conc_night = nb_conc_song * 2
     # make night_songs an array to do list indexes.
     night_songs = np.array(songs)
-    for i in range(nb_replay):
+    for dummy_i in range(nb_replay):
         fitness = len(night_songs) - rank(score)
         night_songs = np.random.choice(night_songs, size=nb_conc_night,
                                        p=fitness/np.sum(fitness))
