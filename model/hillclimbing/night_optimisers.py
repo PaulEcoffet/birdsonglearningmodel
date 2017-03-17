@@ -4,7 +4,6 @@ Collection of functions to optimise songs during the night.
 These algorithms are mainly restructuring algorithms.
 """
 import logging
-from copy import deepcopy
 
 import numpy as np
 
@@ -49,7 +48,7 @@ def mutate_best_models_dummy(songs, tutor_song, measure, comp, nb_replay,
     isongs = rng.choice(len(night_songs),
                         size=nb_conc_song, replace=False,
                         p=fitness/np.sum(fitness))
-    nsongs = deepcopy(night_songs[isongs]).tolist()
+    nsongs = night_songs[isongs].tolist()
     datasaver.add(prev_songs=songs, prev_scores=pscore, new_songs=nsongs,
                   new_scores=score[isongs])
     return nsongs
@@ -83,8 +82,8 @@ def mutate_best_models_elite(songs, tutor_song, measure, comp, nb_replay,
         isongs = rng.choice(len(night_songs),
                             size=nb_conc_song, replace=False,
                             p=fitness/np.sum(fitness))
-        night_songs = night_songs[isongs].copy()
-        score = score[isongs].copy()
+        night_songs = night_songs[isongs]
+        score = score[isongs]
 
     nsongs = night_songs.tolist()
     datasaver.add(prev_songs=songs, prev_scores=pscore, new_songs=nsongs,

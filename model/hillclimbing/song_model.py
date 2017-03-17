@@ -39,7 +39,8 @@ class SongModel:
             gestures = [[(i * len(song)) // nb_split, default_priors()]
                         for i in range(nb_split)]
         self.gestures = deepcopy(gestures)
-        self.parent = parent
+        # Do not keep track of parent for now, avoid blow up in copy
+        self.parent = None
 
     def mutate(self, n=1):
         """Give a new song model with new GTEs."""

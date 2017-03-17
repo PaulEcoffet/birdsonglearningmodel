@@ -6,7 +6,6 @@ This module fits a whole song!
 
 import argparse as ap
 import logging
-from copy import deepcopy
 import os
 import datetime
 import pickle
@@ -69,17 +68,17 @@ def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
     for iday in range(nb_day):
         logger.info('☀️️\t☀️️\t☀️️\tDay {} of {}\t☀️️\t☀️️\t☀️'.format(iday+1, nb_day)) # noqa
         with datasaver.set_context('day_optim'):
-            songs = day_optimisation(deepcopy(songs),
+            songs = day_optimisation(songs,
                                      tutor_song, measure, comp,
                                      datasaver=datasaver, rng=rng, **day_conf)
         score = get_scores(tutor_song, songs, measure, comp)
         if iday + 1 != nb_day:
             logger.debug(score)
             datasaver.add(moment='BeforeNight',
-                          songs=deepcopy(songs), scores=deepcopy(score))
+                          songs=songs, scores=score)
             logger.info('💤\t💤\t💤\tNight\t💤\t💤\t💤')
             with datasaver.set_context('night_optim'):
-                songs = night_optimisation(deepcopy(songs),
+                songs = night_optimisation(songs,
                                            tutor_song, measure, comp,
                                            datasaver=datasaver, rng=rng,
                                            **night_conf)
