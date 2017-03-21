@@ -114,7 +114,7 @@ def main():
         """
     )
     comp_methods = {'linalg': lambda g, c: np.linalg.norm(g - c),
-                    'fastdtw': lambda g, c: fastdtw(g, c, dist=2, radius=10)[0]}
+                    'fastdtw': lambda g, c: fastdtw(g, c, dist=2, radius=1)[0]}
     parser.add_argument('tutor', type=ap.FileType('rb'), nargs='?',
                         help='The targeted song to learn')
     parser.add_argument('--config', type=ap.FileType('r'), required=False,
