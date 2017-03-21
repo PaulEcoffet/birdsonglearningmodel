@@ -55,8 +55,11 @@ class SongModel:
                 del gestures[to_del]
             elif act < 0.3:  # Add a new gesture
                 logger.info('added')
-                to_add = self.rng.randint(0, gestures[-1][0] - 100)
-                gestures.append([to_add, default_priors()])
+                add_after = np.random.randint(len(gestures) - 1)
+                add_at = np.random.randint(gestures[add_after][0] + 100,
+                                           gestures[add_after + 1][0] - 100)
+                gestures.insert(add_after + 1,
+                                [add_at, deepcopy(gestures[add_after][1])])
             elif act < 0.5:  # Take a gesture and put it in another gesture
                 logger.info('copied')
                 from_, dest = self.rng.randint(len(gestures), size=2)
