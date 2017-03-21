@@ -6,7 +6,7 @@ from copy import deepcopy
 import numpy as np
 
 from datasaver import QuietDataSaver
-from gesture_fitter import fit_gesture_hill
+from gesture_fitter import fit_gesture_hill, fit_gesture_padded
 from synth import gen_sound, only_sin
 
 logger = logging.getLogger('DayOptim')
@@ -49,6 +49,45 @@ def optimise_gesture_dummy(songs, tutor_song, measure, comp, train_per_day=10,
     return songs
 
 
+def optimise_gesture_padded(songs, tutor_song, measure, comp, train_per_day=10,
+                            nb_iter_per_train=10, datasaver=None, rng=None):
+    """Optimise gestures randomly from the song models with dummy algorithm.
+
+    Include the previous and next gesture in the evaluation to remove
+    border issues.
+    """
+    if datasaver is None:
+        datasaver = QuietDataSaver()
+    if rng is None:
+        rng = np.random.RandomState()
+    for itrain in range(train_per_day):
+        isong = rng.randint(len(songs))
+        song = songs[isong]
+        ig = rng.randint(len(song.gestures))
+        if ig-1 >= 0:
+            start = song.gestures[ig - 1][0]
+        else:
+            start = 0
+        end = song.gesture_end(ig + 1)
+        logger.info('{}/{}: fit gesture {} of song {} (length {})'.format(
+            itrain+1, train_per_day, ig, isong, end-start))
+        g = measure(tutor_song[start:end])
+        range_ = range(max(0, ig-1), min(len(song.gestures)-1, ig+1)+1)
+        s = song.gen_sound(range_)
+        assert len(tutor_song[start:end]) == len(s), "%d %d" % (end - start, len(s))
+        c = measure(s)
+        pre_score = comp(g, c)
+        res, hill_score = fit_gesture_padded(
+            tutor_song, song, ig, measure, comp,
+            nb_iter=nb_iter_per_train, temp=None, rng=rng)
+        # datasaver.add(pre_score=pre_score,
+        #               new_score=hill_score, isong=isong, ig=ig)
+        songs[isong].gestures[ig][1] = deepcopy(res)
+        assert pre_score >= hill_score, "{} >= {} est faux".format(
+            pre_score, hill_score)
+    return songs
+
+
 def optimise_gesture_cmaes(songs, tutor_song, measure, comp):
     """Optimise gestures guided with a CMA-ES algorithm."""
-    raise NotImplemented
+    raise NotImplementedError()

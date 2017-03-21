@@ -47,6 +47,6 @@ class QuietDataSaver(DataSaver):
         """Do nothing on add."""
         pass
 
-    def write(self, path):
+    def write(self, path=None):
         """Do not write anything."""
         pass

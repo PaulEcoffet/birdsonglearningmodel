@@ -1,9 +1,11 @@
 """Define the SongModel class."""
 
-import numpy as np
 from copy import deepcopy
+
+import numpy as np
 import logging
 from synth import only_sin, gen_alphabeta, synthesize
+from gesture_fitter import _padded_gen_sound
 
 
 logger = logging.getLogger('songmodel')
@@ -13,7 +15,7 @@ def default_priors(nb_sin=3):
     """Give the default priors for a gesture fit."""
     prior = []
     for k in range(1, nb_sin + 1):  # prior on sin
-        prior.extend([0, 0, np.pi/(k**2), 5*3**k])
+        prior.extend([0, 0, np.pi/(k**2), 3**k])
     prior.append(0)
     prior.extend([0, 0, 0, 0, 0.15])  # beta prior
     return np.array(prior)
@@ -87,36 +89,68 @@ class SongModel:
                 del gestures[-1]
         return SongModel(self.song, gestures, parent=self)
 
-    def gen_sound(self):
+    def gen_sound(self, range_=None):
         """Generate the full song."""
-        ab = self.gen_alphabeta('last')
+        ab = self.gen_alphabeta(range_=range_, pad='last')
         out = synthesize(ab)
         assert np.isclose(np.nanmean(out), 0)
-        assert len(out) == len(self.song)
+        if range_ is not None:
+            expected_len = self.gesture_end(range_[-1]) - self.gestures[range_[0]][0]
+        else:
+            expected_len = len(self.song)
+        assert len(out) == expected_len
+        if range_ is not None:
+            cmp = _padded_gen_sound(self, range_, range_.start, self.gestures[range_.start][1])
         return out
 
-    def gen_alphabeta(self, pad=False):
+    def gen_alphabeta(self, range_=None, pad=False):
         """Compute alpha and beta for the whole song."""
+        if range_ is None:
+            range_ = range(len(self.gestures))
+        inner_pad = False
+        length = self.gesture_end(range_[-1]) - self.gestures[range_[0]][0]
         if pad == 'last':
-            length = len(self.song) + 2
-            pad = False
-        else:
-            length = len(self.song)
-
+            length += 2
+        elif pad:
+            length += 2 * len(range_)
+            inner_pad = True
         ab = np.zeros((length, 2))
-        for i, gesture in enumerate(self.gestures):
-            start = gesture[0]
-            params = gesture[1]
-            try:
-                end = self.gestures[i+1][0]
-            except IndexError:
-                end = length
+        # true_start = When the first gesture starts
+        true_start = self.gestures[range_[0]][0]
+        for i in range_[:-1]:
+            params = self.gestures[i][1]
+            start = self.gestures[i][0] - true_start  # correct padding
+            end = self.gesture_end(i) - true_start
             size = end - start
+            if pad is True:
+                end += 2
             assert size != 0
             ab[start:end] = gen_alphabeta(
                 params, size,
                 falpha=lambda x, p: only_sin(x, p, nb_sin=3),
                 fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                falpha_nb_args=13, pad=pad)
+                falpha_nb_args=13, pad=inner_pad)
+        i = range_[-1]
+        params = self.gestures[i][1]
+        start = self.gestures[i][0] - true_start  # correct padding
+        end = self.gesture_end(i) - true_start
+        size = end - start
+        if pad == 'last' or pad is True:
+            end += 2
+        ab[start:end] = gen_alphabeta(
+            params, size,
+            falpha=lambda x, p: only_sin(x, p, nb_sin=3),
+            fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
+            falpha_nb_args=13, pad=pad)
         assert np.all(ab[:, 0] >= 0)
         return ab
+
+    def gesture_end(self, i):
+        """Return the end of a gesture."""
+        if i < 0:
+            i = len(self.gestures) - i
+        try:
+            end = self.gestures[i + 1][0]
+        except IndexError:
+            end = len(self.song)
+        return end

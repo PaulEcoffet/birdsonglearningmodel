@@ -1,13 +1,16 @@
 """Module implementing a simple hillclimbing / Simulated Annealing."""
 
+import logging
 import numpy as np
 
+
+logger = logging.getLogger('hillclimb')
 
 def hill_climbing(function, goal, guess,
                   guess_deviation=0.01, goal_delta=0.01, temp_max=5,
                   comparison_method=None,
                   max_iter=100000, rng=None, verbose=False,
-                  guess_min=None, guess_max=None, logger=None):
+                  guess_min=None, guess_max=None):
     """
     Hill climb to find which is the best value x so that function(x) = goal.
 
@@ -43,6 +46,8 @@ def hill_climbing(function, goal, guess,
         rng = np.random.RandomState()
 
     best_guess = np.clip(guess, guess_min, guess_max)
+    if not np.allclose(best_guess, guess):
+        logger.warning('guess has been clipped.')
     best_res = function(best_guess)
     best_score = comparison_method(goal, best_res)
     init_score = best_score
@@ -61,8 +66,6 @@ def hill_climbing(function, goal, guess,
             best_score = cur_score
             best_res = cur_res
             best_guess = cur_guess
-            if logger is not None:
-                logger.append((i, best_guess, best_score))
             if verbose and i % 100 == 0:
                 print(best_score, '(', i, ')')
         i += 1
