@@ -70,7 +70,7 @@ def gen_sound(params, length, falpha, fbeta, falpha_nb_args, beg=0):
 
 
 def gen_alphabeta(params, length, falpha, fbeta,
-                  falpha_nb_args, pad=True, beg=None):
+                  falpha_nb_args, beg, pad=True):
     """Generate a alpha_beta 2D array.
 
     params - The parameters for falpha and fbeta, concatenated
