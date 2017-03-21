@@ -1,57 +1,124 @@
-import subprocess
+"""Synthesizer module for bird songs.
+
+This module relies on the C program located at
+../../csynthesizer/alphabeta2dat. It call this program with the alpha and
+beta given.
+"""
+
 import numpy as np
-from io import BytesIO
+import birdsynth
 
-def f(x, p, nb_exp=2, nb_sin=2):
+
+def exp_sin(x, p, nb_exp=2, nb_sin=2):
+    """Generator function for parameters with a mixture of exp and sin."""
     ip = np.nditer(p)
-    return np.sum([next(ip) * np.exp(-np.abs(next(ip)) * x) for i in range(nb_exp)]
-                + [next(ip) * np.sin((next(ip) + 2*np.pi * x) * next(ip)) for i in range(nb_sin)] + [next(ip)], axis=0)
+    return np.sum([next(ip) * np.exp(-np.abs(next(ip)) * x)
+                   for i in range(nb_exp)]
+                  + [next(ip) * np.sin(next(ip) + (2 * np.pi * x) * next(ip))
+                     for i in range(nb_sin)] + [next(ip)], axis=0)
 
-def f_str(p, nb_exp=2, nb_sin=2, x='x'):
+
+def only_sin(x, p, nb_sin=3):
+    """Generator function for parameters with only sinuses."""
+    ip = np.nditer(p)
+    return np.sum([(next(ip) * x + next(ip))
+                   * np.sin(next(ip) + (2*np.pi * x) * next(ip))
+                   for i in range(nb_sin)] + [next(ip)], axis=0)
+
+
+def exp_sin_str(p, nb_exp=2, nb_sin=2, x='x'):
+    """Return string representation of `exp_sin`."""
     ip = np.nditer(p)
     out = ''
     for i in range(nb_exp):
-        out += '{:.2} exp({:.2} {}) + '.format(float(next(ip)), -np.abs(float(next(ip))), x)
+        out += '{:.2} exp({:.2} {}) + '.format(float(next(ip)),
+                                               -np.abs(float(next(ip))), x)
     for i in range(nb_sin):
-        out += '{:.2f} sin(({:.2f} + 2π {})/{:.2f}) + '.format(float(next(ip)), float(next(ip)), x, float(next(ip)))
+        out += '{:.2f} sin(({:.2f} + 2π {})/{:.2f}) + '.format(
+            float(next(ip)), float(next(ip)), x, float(next(ip)))
     out += '{:.2f}'.format(float(next(ip)))
     return out
 
-def gen_sound(params, length, alphaf_shape=(1, 3), betaf_shape=(1, 1)):
-    alpha_beta = gen_alphabeta(params, length, alphaf_shape, betaf_shape)
+
+def gen_sound(params, length, falpha, fbeta, falpha_nb_args, beg=0):
+    """Generate a sound with parameters and alpha and beta generators.
+
+    params - The parameters for falpha and fbeta, concatenated
+    length - The length of the alpha_beta 2D array to generate
+    falpha - The generator function for alpha of signature
+             falpha(t:np.array[t], params:np.array[nb_alpha_params]):
+                np.array[t]
+    fbeta - The genenator function for beta of signature
+             falpha(t:pn.array[t], params:np.array[nb_beta_params]):
+                np.array[t]
+    falpha_nb_args - Number of params falpha needs. It will be used for
+                     the slicing of `params`. Indeed, in the code, we do
+    beg - The value to begin with, in sample
+
+    ```
+    falpha(t, params[:falpha_nb_args])
+    fbeta(t, params[falpha_nb_args:])
+    ```
+
+    Returns - 1D numpy.array with the normalized signal between -1 and 1
+    """
+    alpha_beta = gen_alphabeta(params, length, falpha, fbeta, falpha_nb_args,
+                               pad=True, beg=beg)
     out = synthesize(alpha_beta)
+    assert len(out) == length
     return out
 
-def gen_alphabeta(params, length, alphaf_shape=(1, 3), betaf_shape=(1, 1)):
-    t = np.linspace(0, (length+2)/44100, length+2)  # + 2 padding is necessary with ba synth.
-    nb_args_alpha = alphaf_shape[0] * 2 + alphaf_shape[1] * 3 + 1
+
+def gen_alphabeta(params, length, falpha, fbeta,
+                  falpha_nb_args, pad=True, beg=None):
+    """Generate a alpha_beta 2D array.
+
+    params - The parameters for falpha and fbeta, concatenated
+    length - The length of the alpha_beta 2D array to generate
+    falpha - The generator function for alpha of signature
+             falpha(t:np.array[t], params:np.array[nb_alpha_params]):
+                np.array[t]
+    fbeta - The genenator function for beta of signature
+             falpha(t:pn.array[t], params:np.array[nb_beta_params]):
+                np.array[t]
+    falpha_nb_args - Number of params falpha needs. It will be used for
+                     the slicing of `params`. Indeed, in the code, we do
+    pad - Should we add the padding to correct the csynth bug or not
+
+    ```
+    falpha(t, params[:falpha_nb_args])
+    fbeta(t, params[falpha_nb_args:])
+    ```
+
+    Returns - A 2D numpy.array of shape (length, 2) with in the first column
+    the alpha parameters and in the second the beta parameters.
+    """
+    if pad:
+        padding = 2
+    else:
+        padding = 0
+    # + 2 padding is necessary with ba synth.
+    t = beg / 44100 + np.linspace(0, (length+2)/44100, length + padding)
     alpha_beta = np.stack(
         (
-            f(t, params[:nb_args_alpha], alphaf_shape[0], alphaf_shape[1]),
-            f(t, params[nb_args_alpha:], betaf_shape[0], betaf_shape[1])
+            falpha(t, params[:falpha_nb_args]),
+            fbeta(t, params[falpha_nb_args:])
         ), axis=-1)
+    alpha_beta[:, 0] = np.where(alpha_beta[:, 0] < 0, 0, alpha_beta[:, 0])
     return alpha_beta
 
-def synthesize(alpha_beta, amplitudeforwav=False):
-    input_bytes = BytesIO()
-    input_bytes.write(bytes(str(len(alpha_beta)) + "\n", 'utf-8'))
-    np.savetxt(input_bytes, alpha_beta)
-    out_raw_call = subprocess.Popen(["../csynthesizer/alphabeta2dat"],
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE)
-    out_raw = out_raw_call.communicate(input=input_bytes.getvalue())[0]
-    input_bytes.close()
-    out = np.fromstring(out_raw, dtype=float, sep="\n")
-    if amplitudeforwav:
-        out = dat2wav(out)
-    return out
 
-def dat2wav(dat):
-    ampMax = np.max(dat)
-    ampMin = np.min(dat)
-    if ampMax - ampMin == 0:
-        scalingFactor = 1
-    else:
-        scalingFactor = 65535 / (ampMax - ampMin)
-    wav = np.clip(np.round((dat - ampMin) * scalingFactor) - 32768, -32768, 32767).astype(np.dtype('int16'))
-    return wav
+def synthesize(alpha_beta):
+    """Return the song signal given the alpha beta parameters.
+
+    alpha_beta - A 2d numpy.array of shape (length, 2)
+                 with alpha on the alpha_beta[:, 0] elements
+                 and beta on the alpha_beta[:, 1] elements
+
+    Returns - 1D numpy.array with the normalized signal between -1 and 1
+    """
+    out = birdsynth.synth(alpha_beta)
+    assert not np.any(np.isnan(out))
+    out = 2 * (out - np.nanmin(out)) / (np.nanmax(out) - np.nanmin(out)) - 1
+    out = out - np.nanmean(out)
+    return out
