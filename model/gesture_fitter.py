@@ -150,6 +150,4 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
     ax.plot(ab)
     fig.savefig('res/after.svg')
     plt.close(fig)
-    if np.random.random() < 0.01:
-        raise Exception
     return x, score
