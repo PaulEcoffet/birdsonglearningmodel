@@ -2,7 +2,7 @@
     "days": 200,
     "name": "huge_ba",
     "concurrent": 4,
-    "tutor": "../../data/ba_example.wav",
+    "tutor": "../data/ba_example.wav",
     "train_per_day": 200,
     "replay": 10,
     "iter_per_train": 20,

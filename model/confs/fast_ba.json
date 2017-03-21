@@ -2,7 +2,7 @@
     "days": 5,
     "name": "fast_ba",
     "concurrent": 3,
-    "tutor": "../../data/ba_example.wav",
+    "tutor": "../data/ba_example.wav",
     "train_per_day": 30,
     "replay": 5,
     "iter_per_train": 20,

@@ -2,7 +2,7 @@
     "days": 100,
     "name": "huge_bells",
     "concurrent": 3,
-    "tutor": "../../data/bells.wav",
+    "tutor": "../data/bells.wav",
     "train_per_day": 100,
     "replay": 5,
     "iter_per_train": 20,
