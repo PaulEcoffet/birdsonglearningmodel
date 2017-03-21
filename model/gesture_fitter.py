@@ -2,8 +2,15 @@
 from copy import deepcopy
 import numpy as np
 
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 from hill_climbing import hill_climbing
 from synth import gen_sound, only_sin, gen_alphabeta, synthesize
+
+
+sns.set_palette('colorblind')
+sns.set_context('talk')
 
 
 def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
@@ -66,7 +73,7 @@ def _padded_gen_sound(songmodel, range_, change_index, param, out_ab=False):
                 param, size,
                 falpha=lambda x, p: only_sin(x, p, nb_sin=3),
                 fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                falpha_nb_args=13, pad=False))
+                falpha_nb_args=13, pad=False, beg=start))
     # last one with padding
     i = range_[-1]
     if i != change_index:
@@ -79,7 +86,7 @@ def _padded_gen_sound(songmodel, range_, change_index, param, out_ab=False):
             param, size,
             falpha=lambda x, p: only_sin(x, p, nb_sin=3),
             fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-            falpha_nb_args=13, pad=True))
+            falpha_nb_args=13, pad=True, beg=start))
     if out_ab:
         return synthesize(np.concatenate(alpha_betas)), np.concatenate(alpha_betas)
     else:
@@ -107,6 +114,16 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
     dev.extend([0.005, 0.005, 0.005, 10, 0.0001])
     mins.extend([-100, 0, -np.pi, 0, -3])
     maxs.extend([100, 3, np.pi, 1000, 2])
+    sound, ab = _padded_gen_sound(
+        songmodel,
+        range(prev_igest, next_igest+1),
+        None,
+        None, out_ab=True)
+    fig = plt.figure(figsize=(16, 5))
+    ax = fig.gca()
+    ax.plot(ab)
+    fig.savefig('res/before_ab.svg')
+    plt.close(fig)
     x, dummy_y, score = hill_climbing(
         function=lambda x: measure(_padded_gen_sound(
             songmodel,
@@ -123,4 +140,16 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
         temp_max=temp,
         verbose=False,
         rng=rng)
+    sound, ab = _padded_gen_sound(
+        songmodel,
+        range(prev_igest, next_igest+1),
+        gesture_index,
+        x, out_ab=True)
+    fig = plt.figure(figsize=(16, 5))
+    ax = fig.gca()
+    ax.plot(ab)
+    fig.savefig('res/after.svg')
+    plt.close(fig)
+    if np.random.random() < 0.01:
+        raise Exception
     return x, score

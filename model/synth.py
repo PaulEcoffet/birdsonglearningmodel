@@ -40,7 +40,7 @@ def exp_sin_str(p, nb_exp=2, nb_sin=2, x='x'):
     return out
 
 
-def gen_sound(params, length, falpha, fbeta, falpha_nb_args):
+def gen_sound(params, length, falpha, fbeta, falpha_nb_args, beg=0):
     """Generate a sound with parameters and alpha and beta generators.
 
     params - The parameters for falpha and fbeta, concatenated
@@ -53,6 +53,7 @@ def gen_sound(params, length, falpha, fbeta, falpha_nb_args):
                 np.array[t]
     falpha_nb_args - Number of params falpha needs. It will be used for
                      the slicing of `params`. Indeed, in the code, we do
+    beg - The value to begin with, in sample
 
     ```
     falpha(t, params[:falpha_nb_args])
@@ -62,14 +63,14 @@ def gen_sound(params, length, falpha, fbeta, falpha_nb_args):
     Returns - 1D numpy.array with the normalized signal between -1 and 1
     """
     alpha_beta = gen_alphabeta(params, length, falpha, fbeta, falpha_nb_args,
-                               pad=True)
+                               pad=True, beg=beg)
     out = synthesize(alpha_beta)
     assert len(out) == length
     return out
 
 
 def gen_alphabeta(params, length, falpha, fbeta,
-                  falpha_nb_args, pad=True):
+                  falpha_nb_args, pad=True, beg=None):
     """Generate a alpha_beta 2D array.
 
     params - The parameters for falpha and fbeta, concatenated
@@ -97,7 +98,7 @@ def gen_alphabeta(params, length, falpha, fbeta,
     else:
         padding = 0
     # + 2 padding is necessary with ba synth.
-    t = np.linspace(0, (length+2)/44100, length + padding)
+    t = beg / 44100 + np.linspace(0, (length+2)/44100, length + padding)
     alpha_beta = np.stack(
         (
             falpha(t, params[:falpha_nb_args]),

@@ -129,7 +129,7 @@ class SongModel:
                 params, size,
                 falpha=lambda x, p: only_sin(x, p, nb_sin=3),
                 fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                falpha_nb_args=13, pad=inner_pad)
+                falpha_nb_args=13, pad=inner_pad, beg=self.gestures[i][0])
         i = range_[-1]
         params = self.gestures[i][1]
         start = self.gestures[i][0] - true_start  # correct padding
@@ -141,7 +141,7 @@ class SongModel:
             params, size,
             falpha=lambda x, p: only_sin(x, p, nb_sin=3),
             fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-            falpha_nb_args=13, pad=pad)
+            falpha_nb_args=13, pad=pad, beg=self.gestures[i][0])
         assert np.all(ab[:, 0] >= 0)
         return ab
 
