@@ -10,7 +10,7 @@ def bsa_measure(sig, sr, coefs=None):
     out = []
     fnames = ['fm', 'am', 'entropy', 'goodness', 'amplitude', 'pitch']
     if coefs is None:
-        coefs = {'fm': 1, 'am': 50, 'entropy': 1, 'goodness': 1,
+        coefs = {'fm': 1, 'am': 1, 'entropy': 1, 'goodness': 1,
                  'amplitude': 50, 'pitch': 1}
     features = bsa.normalize_features(
         bsa.all_song_features(sig, sr, 256, 40, 1024))
