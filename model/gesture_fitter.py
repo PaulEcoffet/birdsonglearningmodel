@@ -119,11 +119,6 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
         range(prev_igest, next_igest+1),
         None,
         None, out_ab=True)
-    fig = plt.figure(figsize=(16, 5))
-    ax = fig.gca()
-    ax.plot(ab)
-    fig.savefig('res/before_ab.svg')
-    plt.close(fig)
     x, dummy_y, score = hill_climbing(
         function=lambda x: measure(_padded_gen_sound(
             songmodel,
@@ -145,9 +140,4 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
         range(prev_igest, next_igest+1),
         gesture_index,
         x, out_ab=True)
-    fig = plt.figure(figsize=(16, 5))
-    ax = fig.gca()
-    ax.plot(ab)
-    fig.savefig('res/after.svg')
-    plt.close(fig)
     return x, score
