@@ -14,9 +14,13 @@ logger = logging.getLogger('songmodel')
 def default_priors(nb_sin=3):
     """Give the default priors for a gesture fit."""
     prior = []
-    for k in range(1, nb_sin + 1):  # prior on sin
+    for k in range(1, nb_sin):  # prior on sin
         prior.extend([0, 0, np.pi/(k**2), 3**k])
-    prior.append(0)
+
+    # Prior on last sin, with a very fast oscillation for entropy
+    prior.extend([0, 0, 0, 10000])
+    prior.append(0)  # constant prior
+
     prior.extend([0, 0, 0, 0, 0.15])  # beta prior
     return np.array(prior)
 

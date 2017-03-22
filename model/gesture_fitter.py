@@ -23,11 +23,16 @@ def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
     dev = []
     mins = []
     maxs = []
-    for k in range(1, j + 1):  # prior on sin
+    for k in range(1, j):  # prior on sin
         prior.extend([0/k, 0/k, np.pi/(k**2), 10*3**k])
         dev.extend([0.05/k, 0.01/k, 0.005, 5*(k**2)])
         mins.extend([-50, 0, -np.pi, 0])
-        maxs.extend([50, 2, np.pi, 8000])
+        maxs.extend([50, 2, np.pi, 40000])
+    #last sin prior
+    dev.extend([0.005, 0.001, 0.005, 5*(k**2)])
+    mins.extend([-50, 0, -np.pi, 0])
+    maxs.extend([50, 2, np.pi, 40000])
+    # cst prior
     prior.append(0)
     mins.append(0)
     maxs.append(10)
@@ -104,10 +109,14 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
     dev = []
     mins = []
     maxs = []
-    for k in range(1, j + 1):  # prior on sin
+    for k in range(1, j):  # prior on sin
         dev.extend([0.05/k, 0.01/k, 0.005, 1])
         mins.extend([-50, 0, -np.pi, 0])
-        maxs.extend([50, 4, np.pi, 8000])
+        maxs.extend([50, 4, np.pi, 40000])
+    # last sin prior
+    dev.extend([0.005, 0.001, 0.005, 100])
+    mins.extend([-50, 0, -np.pi, 0])
+    maxs.extend([50, 4, np.pi, 40000])
     mins.append(-5)
     maxs.append(10)
     dev.append(0.005)
