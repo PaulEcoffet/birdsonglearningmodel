@@ -122,8 +122,8 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
     dev.append(0.005)
 
     # beta
-    dev.extend([0.05, 0.01, 0.005, 1, 0.05])
-    mins.extend([-50, 0, -np.pi, 0, -5])
+    dev.extend([0.05, 0.01, 0.05, 1, 0.005])
+    mins.extend([-50, 0, -np.pi, 0, -3])
     maxs.extend([50, 3, np.pi, 1000, 2])
     sound, ab = _padded_gen_sound(
         songmodel,
