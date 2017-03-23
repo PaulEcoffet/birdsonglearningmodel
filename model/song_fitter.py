@@ -18,7 +18,8 @@ from fastdtw import fastdtw
 from scipy.io import wavfile
 from datasaver import DataSaver, QuietDataSaver
 
-from day_optimisers import optimise_gesture_dummy, optimise_gesture_padded
+from day_optimisers import optimise_gesture_dummy, optimise_gesture_padded,\
+                           optimise_gesture_whole
 from measures import bsa_measure, get_scores
 from night_optimisers import mutate_best_models_dummy, mutate_best_models_elite
 from song_model import SongModel
@@ -189,7 +190,7 @@ def main():
             tsong,
             measure=lambda x: bsa_measure(x, sr),
             comp=comp_methods[data['comp']],
-            day_optimisation=optimise_gesture_padded,
+            day_optimisation=optimise_gesture_whole,
             night_optimisation=mutate_best_models_elite,
             day_conf=day_conf,
             night_conf=night_conf,

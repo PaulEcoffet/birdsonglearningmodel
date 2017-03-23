@@ -152,3 +152,45 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
         gesture_index,
         x, out_ab=True)
     return x, score
+
+
+def fit_gesture_whole(tutor, songmodel, gesture_index, measure, comp, nb_iter,
+                       temp=None, rng=None):
+    goal = measure(tutor)
+    j = 3
+    dev = []
+    mins = []
+    maxs = []
+    for k in range(1, j):  # prior on sin
+        dev.extend([0.05/k, 0.01/k, 0.005, 1])
+        mins.extend([-50, 0, -np.pi, 0])
+        maxs.extend([50, 4, np.pi, 40000])
+    # last sin prior
+    dev.extend([0.005, 0.001, 0.005, 100])
+    mins.extend([-50, 0, -np.pi, 0])
+    maxs.extend([50, 4, np.pi, 40000])
+    mins.append(-5)
+    maxs.append(10)
+    dev.append(0.005)
+
+    # beta
+    dev.extend([0.05, 0.01, 0.05, 1, 0.005])
+    mins.extend([-50, 0, -np.pi, 0, -3])
+    maxs.extend([50, 3, np.pi, 1000, 2])
+    x, dummy_y, score = hill_climbing(
+        function=lambda x: measure(_padded_gen_sound(
+            songmodel,
+            range(0, len(songmodel.gestures)),
+            gesture_index,
+            x)),
+        goal=goal,
+        guess=deepcopy(songmodel.gestures[gesture_index][1]),
+        guess_min=mins,
+        guess_max=maxs,
+        guess_deviation=np.diag(dev),
+        max_iter=nb_iter,
+        comparison_method=comp,
+        temp_max=temp,
+        verbose=False,
+        rng=rng)
+    return x, score
