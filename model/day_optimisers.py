@@ -6,7 +6,8 @@ from copy import deepcopy
 import numpy as np
 
 from datasaver import QuietDataSaver
-from gesture_fitter import fit_gesture_hill, fit_gesture_padded
+from gesture_fitter import fit_gesture_hill, fit_gesture_padded, \
+                           fit_gesture_whole
 from synth import gen_sound, only_sin
 
 logger = logging.getLogger('DayOptim')
@@ -108,12 +109,15 @@ def optimise_gesture_whole(songs, tutor_song, measure, comp, train_per_day=10,
         assert len(tutor_song) == len(s), "%d %d" % (end - start, len(s))
         c = measure(s)
         pre_score = comp(g, c)
+        logger.info('{}/{}: fit gesture {} of song {} (length {}, score {})'.format(
+            itrain+1, train_per_day, ig, isong, len(s), pre_score))
         res, hill_score = fit_gesture_whole(
             tutor_song, song, ig, measure, comp,
             nb_iter=nb_iter_per_train, temp=None, rng=rng)
         # datasaver.add(pre_score=pre_score,
         #               new_score=hill_score, isong=isong, ig=ig)
         songs[isong].gestures[ig][1] = deepcopy(res)
+        logger.info('new score {}'.format(hill_score))
         assert pre_score >= hill_score, "{} >= {} est faux".format(
             pre_score, hill_score)
     return songs
