@@ -174,7 +174,7 @@ def fit_gesture_whole(tutor, songmodel, gesture_index, measure, comp, nb_iter,
     dev.append(0.005)
 
     # beta
-    dev.extend([0.05, 0.01, 0.05, 1, 0.005])
+    dev.extend([0.05, 0.01, 0.05, 1, 0.01])
     mins.extend([-50, 0, -np.pi, 0, -3])
     maxs.extend([50, 3, np.pi, 1000, 2])
     x, dummy_y, score = hill_climbing(
