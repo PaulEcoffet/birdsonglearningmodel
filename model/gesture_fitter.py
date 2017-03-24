@@ -166,7 +166,7 @@ def fit_gesture_whole(tutor, songmodel, gesture_index, measure, comp, nb_iter,
         mins.extend([-50, 0, -np.pi, 0])
         maxs.extend([50, 4, np.pi, 40000])
     # last sin prior
-    dev.extend([0.005, 0.001, 0.005, 100])
+    dev.extend([0.005, 0.001, 0.01, 100])
     mins.extend([-50, 0, -np.pi, 0])
     maxs.extend([50, 4, np.pi, 40000])
     mins.append(-5)

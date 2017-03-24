@@ -116,6 +116,16 @@ def main():
     )
     comp_methods = {'linalg': lambda g, c: np.linalg.norm(g - c),
                     'fastdtw': lambda g, c: fastdtw(g, c, dist=2, radius=1)[0]}
+    day_learning_models = {
+        'optimise_gesture_dummy': optimise_gesture_dummy,
+        'optimise_gesture_padded': optimise_gesture_padded,
+        'optimise_gesture_whole': optimise_gesture_whole
+    }
+    night_learning_models = {
+        'mutate_best_models_dummy': mutate_best_models_dummy,
+        'mutate_best_models_elite': mutate_best_models_elite
+    }
+
     parser.add_argument('tutor', type=ap.FileType('rb'), nargs='?',
                         help='The targeted song to learn')
     parser.add_argument('--config', type=ap.FileType('r'), required=False,
@@ -135,9 +145,14 @@ def main():
                         ' night')
     parser.add_argument('-i', '--iter-per-train', type=int, required=False,
                         help='number of iteration when training a gesture')
-    parser.add_argument('--comp', type=str, required=False,
+    parser.add_argument('--comp', type=str, required=False, default='linalg',
                         choices=comp_methods,
                         help='comparison method to use')
+    parser.add_argument('--dlm', type=str, required=False,
+                        choices=day_learning_models, help="day learning model")
+    parser.add_argument('--nlm', type=str, required=False,
+                        choices=night_learning_models,
+                        help="night learning model")
     args = parser.parse_args()
     if args.seed is None:
         seed = int(datetime.datetime.now().timestamp())
@@ -168,7 +183,9 @@ def main():
                'replay': args.replay,
                'iter_per_train': args.iter_per_train,
                'commit': get_git_revision_hash(),
-               'comp': args.comp}
+               'comp': args.comp,
+               'dlm': args.dlm,
+               'nlm': args.nlm}
     if args.tutor is not None:
         argdata['tutor'] = args.tutor.name
     data.update({k: v for k, v in argdata.items() if v is not None})
@@ -190,8 +207,8 @@ def main():
             tsong,
             measure=lambda x: bsa_measure(x, sr),
             comp=comp_methods[data['comp']],
-            day_optimisation=optimise_gesture_whole,
-            night_optimisation=mutate_best_models_elite,
+            day_optimisation=day_learning_models[data['dlm']],
+            night_optimisation=night_learning_models[data['nlm']],
             day_conf=day_conf,
             night_conf=night_conf,
             nb_day=data['days'],
