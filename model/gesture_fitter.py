@@ -154,9 +154,9 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
     return x, score
 
 
-def fit_gesture_whole(tutor, songmodel, gesture_index, measure, comp, nb_iter,
-                       temp=None, rng=None):
-    goal = measure(tutor)
+def fit_gesture_whole(measured_tutor, songmodel, gesture_index, measure, comp,
+                      nb_iter, temp=None, rng=None):
+    goal = measured_tutor
     j = 3
     dev = []
     mins = []

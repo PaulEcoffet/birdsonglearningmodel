@@ -104,15 +104,15 @@ def optimise_gesture_whole(songs, tutor_song, measure, comp, train_per_day=10,
         isong = rng.randint(len(songs))
         song = songs[isong]
         ig = rng.randint(len(song.gestures))
-        g = measure(tutor_song)
+        goal = measure(tutor_song)
         s = song.gen_sound()
         assert len(tutor_song) == len(s), "%d %d" % (end - start, len(s))
         c = measure(s)
-        pre_score = comp(g, c)
+        pre_score = comp(goal, c)
         logger.info('{}/{}: fit gesture {} of song {} (length {}, score {})'.format(
             itrain+1, train_per_day, ig, isong, len(s), pre_score))
         res, hill_score = fit_gesture_whole(
-            tutor_song, song, ig, measure, comp,
+            goal, song, ig, measure, comp,
             nb_iter=nb_iter_per_train, temp=None, rng=rng)
         # datasaver.add(pre_score=pre_score,
         #               new_score=hill_score, isong=isong, ig=ig)
