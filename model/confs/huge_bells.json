@@ -7,6 +7,6 @@
     "replay": 5,
     "iter_per_train": 20,
     "comp": "linalg",
-    "name": "full_length_opti_10_models",
-    "nlm": "mutate_best_models_elite"
+    "nlm": "mutate_best_models_elite",
+    "dlm": "optimise_gesture_whole"
 }
