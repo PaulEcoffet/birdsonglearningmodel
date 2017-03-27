@@ -18,10 +18,10 @@ def default_priors(nb_sin=3):
         prior.extend([0, 0, np.pi/(k**2), 3**k])
 
     # Prior on last sin, with a very fast oscillation for entropy
-    prior.extend([0, 0, 0, 10000])
+    prior.extend([0, 0, 0, 5000])
     prior.append(0)  # constant prior
 
-    prior.extend([0, 0, 0, 0, 0.15])  # beta prior
+    prior.extend([0, 0, 0, 0, 0])  # beta prior
     return np.array(prior)
 
 

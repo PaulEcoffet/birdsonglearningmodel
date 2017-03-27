@@ -6,5 +6,7 @@
     "train_per_day": 200,
     "replay": 10,
     "iter_per_train": 20,
-    "comp": "linalg"
+    "comp": "linalg",
+    "nlm": "mutate_best_models_elite",
+    "dlm": "optimise_gesture_whole"
 }

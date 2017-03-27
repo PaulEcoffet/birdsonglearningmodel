@@ -13,39 +13,35 @@ sns.set_palette('colorblind')
 sns.set_context('talk')
 
 
-def fit_gesture_hill(gesture, measure, comp, start_prior=None, nb_iter=300,
-                     temp=10, rng=None):
-    """Find the parameters to fit to a gesture."""
-    size = len(gesture)
-    goal = measure(gesture)
-    j = 3
-    prior = []
+def _get_defaults_min_max_dev(j=3):
     dev = []
     mins = []
     maxs = []
     for k in range(1, j):  # prior on sin
-        prior.extend([0/k, 0/k, np.pi/(k**2), 10*3**k])
-        dev.extend([0.05/k, 0.01/k, 0.005, 5*(k**2)])
+        dev.extend([0.05/k, 0.01/k, 0.005, 1])
         mins.extend([-50, 0, -np.pi, 0])
-        maxs.extend([50, 2, np.pi, 40000])
-    #last sin prior
-    dev.extend([0.005, 0.001, 0.005, 5*(k**2)])
+        maxs.extend([50, 4, np.pi, 40000])
+    # last sin prior
+    dev.extend([0.001, 0.001, 0.005, 100])
     mins.extend([-50, 0, -np.pi, 0])
-    maxs.extend([50, 2, np.pi, 40000])
-    # cst prior
-    prior.append(0)
-    mins.append(0)
+    maxs.extend([50, 4, np.pi, 40000])
+    mins.append(-5)
     maxs.append(10)
     dev.append(0.005)
 
-    if start_prior is not None:
-        prior = start_prior
-    else:
-        prior.extend([0, 0, 0, 0, -0.002])  # beta prior
+    # beta
+    dev.extend([0.05, 0.01, 0.05, 1, 0.005])
+    mins.extend([-50, 0, -np.pi, 0, -3])
+    maxs.extend([50, 3, np.pi, 1000, 2])
+    return mins, maxs, dev
 
-    dev.extend([0.005, 0.005, 0.005, 10, 0.0001])
-    mins.extend([-100, 0, -np.pi, 0, -3])
-    maxs.extend([100, 3, np.pi, 1000, 2])
+
+def fit_gesture_hill(gesture, measure, comp, prior=None, nb_iter=300,
+                     temp=10, rng=None):
+    """Find the parameters to fit to a gesture."""
+    size = len(gesture)
+    goal = measure(gesture)
+    mins, maxs, dev = _get_defaults_min_max_dev()
     x, dummy_y, score = hill_climbing(
         function=lambda x: measure(gen_sound(
             x, size,
@@ -105,26 +101,7 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
     next_igest = min(len(songmodel.gestures) - 1, gesture_index + 1)
     end_tutor = songmodel.gesture_end(next_igest)
     goal = measure(tutor[start_tutor:end_tutor])
-    j = 3
-    dev = []
-    mins = []
-    maxs = []
-    for k in range(1, j):  # prior on sin
-        dev.extend([0.05/k, 0.01/k, 0.005, 1])
-        mins.extend([-50, 0, -np.pi, 0])
-        maxs.extend([50, 4, np.pi, 40000])
-    # last sin prior
-    dev.extend([0.005, 0.001, 0.005, 100])
-    mins.extend([-50, 0, -np.pi, 0])
-    maxs.extend([50, 4, np.pi, 40000])
-    mins.append(-5)
-    maxs.append(10)
-    dev.append(0.005)
-
-    # beta
-    dev.extend([0.05, 0.01, 0.05, 1, 0.005])
-    mins.extend([-50, 0, -np.pi, 0, -3])
-    maxs.extend([50, 3, np.pi, 1000, 2])
+    mins, maxs, dev = _get_defaults_min_max_dev()
     sound, ab = _padded_gen_sound(
         songmodel,
         range(prev_igest, next_igest+1),
@@ -151,4 +128,27 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
         range(prev_igest, next_igest+1),
         gesture_index,
         x, out_ab=True)
+    return x, score
+
+
+def fit_gesture_whole(measured_tutor, songmodel, gesture_index, measure, comp,
+                      nb_iter, temp=None, rng=None):
+    goal = measured_tutor
+    mins, maxs, dev = _get_defaults_min_max_dev()
+    x, dummy_y, score = hill_climbing(
+        function=lambda x: measure(_padded_gen_sound(
+            songmodel,
+            range(0, len(songmodel.gestures)),
+            gesture_index,
+            x)),
+        goal=goal,
+        guess=deepcopy(songmodel.gestures[gesture_index][1]),
+        guess_min=mins,
+        guess_max=maxs,
+        guess_deviation=np.diag(dev),
+        max_iter=nb_iter,
+        comparison_method=comp,
+        temp_max=temp,
+        verbose=False,
+        rng=rng)
     return x, score

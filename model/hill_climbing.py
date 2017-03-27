@@ -6,13 +6,13 @@ import numpy as np
 
 logger = logging.getLogger('hillclimb')
 
+
 def hill_climbing(function, goal, guess,
                   guess_deviation=0.01, goal_delta=0.01, temp_max=5,
                   comparison_method=None,
                   max_iter=100000, rng=None, verbose=False,
                   guess_min=None, guess_max=None):
-    """
-    Hill climb to find which is the best value x so that function(x) = goal.
+    """Hill climb to find which is the best value x so that function(x) = goal.
 
     It is a Simulated Annealing algorithm to avoid getting stuck in local max
 

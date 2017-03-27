@@ -6,7 +6,8 @@ from copy import deepcopy
 import numpy as np
 
 from datasaver import QuietDataSaver
-from gesture_fitter import fit_gesture_hill, fit_gesture_padded
+from gesture_fitter import fit_gesture_hill, fit_gesture_padded, \
+                           fit_gesture_whole
 from synth import gen_sound, only_sin
 
 logger = logging.getLogger('DayOptim')
@@ -83,6 +84,40 @@ def optimise_gesture_padded(songs, tutor_song, measure, comp, train_per_day=10,
         # datasaver.add(pre_score=pre_score,
         #               new_score=hill_score, isong=isong, ig=ig)
         songs[isong].gestures[ig][1] = deepcopy(res)
+        assert pre_score >= hill_score, "{} >= {} est faux".format(
+            pre_score, hill_score)
+    return songs
+
+
+def optimise_gesture_whole(songs, tutor_song, measure, comp, train_per_day=10,
+                           nb_iter_per_train=10, datasaver=None, rng=None):
+    """Optimise gestures randomly from the song models with dummy algorithm.
+
+    Include the previous and next gesture in the evaluation to remove
+    border issues.
+    """
+    if datasaver is None:
+        datasaver = QuietDataSaver()
+    if rng is None:
+        rng = np.random.RandomState()
+    for itrain in range(train_per_day):
+        isong = rng.randint(len(songs))
+        song = songs[isong]
+        ig = rng.randint(len(song.gestures))
+        goal = measure(tutor_song)
+        s = song.gen_sound()
+        assert len(tutor_song) == len(s), "%d %d" % (end - start, len(s))
+        c = measure(s)
+        pre_score = comp(goal, c)
+        logger.info('{}/{}: fit gesture {} of song {} (length {}, score {})'.format(
+            itrain+1, train_per_day, ig, isong, len(s), pre_score))
+        res, hill_score = fit_gesture_whole(
+            goal, song, ig, measure, comp,
+            nb_iter=nb_iter_per_train, temp=None, rng=rng)
+        # datasaver.add(pre_score=pre_score,
+        #               new_score=hill_score, isong=isong, ig=ig)
+        songs[isong].gestures[ig][1] = deepcopy(res)
+        logger.info('new score {}'.format(hill_score))
         assert pre_score >= hill_score, "{} >= {} est faux".format(
             pre_score, hill_score)
     return songs
