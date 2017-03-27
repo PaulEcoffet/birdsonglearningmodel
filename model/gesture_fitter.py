@@ -95,10 +95,10 @@ def _padded_gen_sound(songmodel, range_, change_index, param, out_ab=False):
 
 
 def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
-                       temp=None, rng=None):
-    prev_igest = max(0, gesture_index - 1)
+                       nb_pad=1, temp=None, rng=None):
+    prev_igest = max(0, gesture_index - nb_pad)
     start_tutor = songmodel.gestures[prev_igest][0]
-    next_igest = min(len(songmodel.gestures) - 1, gesture_index + 1)
+    next_igest = min(len(songmodel.gestures) - 1, gesture_index + nb_pad)
     end_tutor = songmodel.gesture_end(next_igest)
     goal = measure(tutor[start_tutor:end_tutor])
     mins, maxs, dev = _get_defaults_min_max_dev()

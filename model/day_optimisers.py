@@ -57,6 +57,7 @@ def optimise_gesture_padded(songs, tutor_song, measure, comp, train_per_day=10,
     Include the previous and next gesture in the evaluation to remove
     border issues.
     """
+    nb_pad = 4
     if datasaver is None:
         datasaver = QuietDataSaver()
     if rng is None:
@@ -65,22 +66,22 @@ def optimise_gesture_padded(songs, tutor_song, measure, comp, train_per_day=10,
         isong = rng.randint(len(songs))
         song = songs[isong]
         ig = rng.randint(len(song.gestures))
-        if ig-1 >= 0:
-            start = song.gestures[ig - 1][0]
+        if ig-nb_pad >= 0:
+            start = song.gestures[ig - nb_pad][0]
         else:
             start = 0
-        end = song.gesture_end(ig + 1)
+        end = song.gesture_end(ig + nb_pad)
         logger.info('{}/{}: fit gesture {} of song {} (length {})'.format(
             itrain+1, train_per_day, ig, isong, end-start))
         g = measure(tutor_song[start:end])
-        range_ = range(max(0, ig-1), min(len(song.gestures)-1, ig+1)+1)
+        range_ = range(max(0, ig-nb_pad), min(len(song.gestures)-1, ig+nb_pad)+1)
         s = song.gen_sound(range_)
         assert len(tutor_song[start:end]) == len(s), "%d %d" % (end - start, len(s))
         c = measure(s)
         pre_score = comp(g, c)
         res, hill_score = fit_gesture_padded(
             tutor_song, song, ig, measure, comp,
-            nb_iter=nb_iter_per_train, temp=None, rng=rng)
+            nb_iter=nb_iter_per_train, nb_pad=nb_pad, temp=None, rng=rng)
         # datasaver.add(pre_score=pre_score,
         #               new_score=hill_score, isong=isong, ig=ig)
         songs[isong].gestures[ig][1] = deepcopy(res)
