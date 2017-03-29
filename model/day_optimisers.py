@@ -57,7 +57,7 @@ def optimise_gesture_padded(songs, tutor_song, measure, comp, train_per_day=10,
     Include the previous and next gesture in the evaluation to remove
     border issues.
     """
-    nb_pad = 4
+    nb_pad = 2
     if datasaver is None:
         datasaver = QuietDataSaver()
     if rng is None:
