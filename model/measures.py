@@ -5,6 +5,11 @@ import birdsonganalysis as bsa
 from python_speech_features import mfcc
 
 
+def _running_mean(x, N):
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    return (cumsum[N:] - cumsum[:-N]) / N
+
+
 def bsa_measure(sig, sr, coefs=None):
     """Measure the song or song part with standard birdsong analysis."""
     out = []
@@ -17,7 +22,7 @@ def bsa_measure(sig, sr, coefs=None):
                               fft_size=1024, pitch_method='fft'))
     for key in fnames:
         coef = coefs[key]
-        feat = features[key]  # Verbose affectation to catch rare error
+        feat = _running_mean(features[key], 10)
         out.append(coef * feat)
     out = np.array(out).T
     return out
