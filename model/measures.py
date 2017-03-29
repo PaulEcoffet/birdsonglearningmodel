@@ -11,7 +11,7 @@ def bsa_measure(sig, sr, coefs=None):
     fnames = ['fm', 'am', 'entropy', 'goodness', 'amplitude', 'pitch']
     if coefs is None:
         coefs = {'fm': 1, 'am': 1, 'entropy': 1, 'goodness': 1,
-                 'amplitude': 50, 'pitch': 10}
+                 'amplitude': 1, 'pitch': 1}
     features = bsa.normalize_features(
         bsa.all_song_features(sig, sr, freq_range=256, fft_step=40,
                               fft_size=1024, pitch_method='fft'))
