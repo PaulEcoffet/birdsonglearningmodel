@@ -12,6 +12,9 @@ import pickle
 import json
 import subprocess
 from pprint import pformat
+import sys
+from shutil import copyfile
+from subprocess import call
 
 import numpy as np
 from fastdtw import fastdtw
@@ -27,6 +30,7 @@ from song_model import SongModel
 
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('root')
+EDITOR = os.environ.get('EDITOR', 'vim')
 
 
 def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
@@ -201,6 +205,9 @@ def main():
     day_conf = {'nb_iter_per_train': data['iter_per_train'],
                 'train_per_day': data['train_per_day']}
     night_conf = {'nb_replay': data['replay']}
+
+    write_run_description(path)
+
     datasaver = DataSaver(defaultdest=os.path.join(path, 'data_cur.pkl'))
     try:
         songs = fit_song(
@@ -238,6 +245,12 @@ def main():
                           '{}_{} is finished'.format(date, data['name'])])
     except OSError:
         pass
+
+
+def write_run_description(path):
+    """Open an editor with a prefilled file to describe the run."""
+    copyfile('desc.template.md', os.path.join(path, 'desc.md'))
+    call([EDITOR, os.path.join(path, 'desc.md')])
 
 
 if __name__ == '__main__':
