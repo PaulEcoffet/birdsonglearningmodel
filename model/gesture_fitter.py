@@ -27,7 +27,7 @@ def _get_defaults_min_max_dev(j=3):
     maxs.extend([50, 5, np.pi, 40000])
     mins.append(-5)
     maxs.append(10)
-    dev.append(0.1)
+    dev.append(0.2)
 
     # beta
     dev.extend([0.05, 0.01, 0.05, 1, 0.005])
