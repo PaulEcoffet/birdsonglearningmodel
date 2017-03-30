@@ -22,7 +22,7 @@ def bsa_measure(sig, sr, coefs=None):
                               fft_size=1024, pitch_method='fft'))
     for key in fnames:
         coef = coefs[key]
-        feat = _running_mean(features[key], 10)
+        feat = features[key]
         out.append(coef * feat)
     out = np.array(out).T
     return out

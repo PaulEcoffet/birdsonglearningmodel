@@ -15,13 +15,13 @@ def default_priors(nb_sin=3):
     """Give the default priors for a gesture fit."""
     prior = []
     for k in range(1, nb_sin):  # prior on sin
-        prior.extend([0, 0, np.pi/(k**2), 20 * 3**k])
+        prior.extend([0, 0, np.pi/(k**3), 5 * 3**k])
 
     # Prior on last sin, with a very fast oscillation for entropy
     prior.extend([0, 0, 0, 5000])
-    prior.append(0)  # constant prior
+    prior.append(0.0)  # constant prior
 
-    prior.extend([0, 0, 0, 0, -0.15])  # beta prior
+    prior.extend([0, 0, 0, 0, -0])  # beta prior
     return np.array(prior)
 
 
@@ -109,8 +109,6 @@ class SongModel:
         else:
             expected_len = len(self.song)
         assert len(out) == expected_len
-        if range_ is not None:
-            cmp = _padded_gen_sound(self, range_, range_.start, self.gestures[range_.start][1])
         return out
 
     def gen_alphabeta(self, range_=None, pad=False):

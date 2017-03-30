@@ -18,16 +18,16 @@ def _get_defaults_min_max_dev(j=3):
     mins = []
     maxs = []
     for k in range(1, j):  # prior on sin
-        dev.extend([0.05/k, 0.01/k, 0.005, 1])
+        dev.extend([0.1/k, 0.1/k, 0.05, 1])
         mins.extend([-50, 0, -np.pi, 0])
         maxs.extend([50, 4, np.pi, 40000])
     # last sin prior
     dev.extend([0.001, 0.001, 0.005, 100])
     mins.extend([-50, 0, -np.pi, 0])
-    maxs.extend([50, 4, np.pi, 40000])
+    maxs.extend([50, 5, np.pi, 40000])
     mins.append(-5)
     maxs.append(10)
-    dev.append(0.01)
+    dev.append(0.1)
 
     # beta
     dev.extend([0.05, 0.01, 0.05, 1, 0.005])
