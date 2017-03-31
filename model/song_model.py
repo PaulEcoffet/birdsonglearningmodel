@@ -5,31 +5,16 @@ from copy import deepcopy
 import numpy as np
 import logging
 from synth import only_sin, gen_alphabeta, synthesize
-from gesture_fitter import _padded_gen_sound
 
 
 logger = logging.getLogger('songmodel')
-
-
-def default_priors(nb_sin=3):
-    """Give the default priors for a gesture fit."""
-    prior = []
-    for k in range(1, nb_sin):  # prior on sin
-        prior.extend([0, 0, np.pi/(k**3), 5 * 3**k])
-
-    # Prior on last sin, with a very fast oscillation for entropy
-    prior.extend([0, 0, 0, 5000])
-    prior.append(0.0)  # constant prior
-
-    prior.extend([0, 0, 0, 0, -0])  # beta prior
-    return np.array(prior)
 
 
 class SongModel:
     """Song model structure."""
 
     def __init__(self, song, gestures=None, nb_split=20, rng=None,
-                 parent=None):
+                 parent=None, priors=None):
         """
         Initialize the song model structure.
 
@@ -42,7 +27,9 @@ class SongModel:
             self.rng = np.random.RandomState(rng)
         self.song = song
         if gestures is None:
-            gestures = [[(i * len(song)) // nb_split, default_priors()]
+            if priors is None:
+                raise ValueError('should give prior if no gestures.')
+            gestures = [[(i * len(song)) // nb_split, np.array(priors)]
                         for i in range(nb_split)]
         self.gestures = deepcopy(gestures)
         # Do not keep track of parent for now, avoid blow up in copy

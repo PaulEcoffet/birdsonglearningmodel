@@ -1,47 +1,22 @@
 """Fit a gesture to real sound."""
 from copy import deepcopy
+import json
 import numpy as np
-
-import matplotlib.pyplot as plt
-import seaborn as sns
+import functools
 
 from hill_climbing import hill_climbing
 from synth import gen_sound, only_sin, gen_alphabeta, synthesize
 
 
-sns.set_palette('colorblind')
-sns.set_context('talk')
-
-
-def _get_defaults_min_max_dev(j=3):
-    dev = []
-    mins = []
-    maxs = []
-    for k in range(1, j):  # prior on sin
-        dev.extend([0.1/k, 0.1/k, 0.05, 1])
-        mins.extend([-50, 0, -np.pi, 0])
-        maxs.extend([50, 4, np.pi, 40000])
-    # last sin prior
-    dev.extend([0.001, 0.001, 0.005, 100])
-    mins.extend([-50, 0, -np.pi, 0])
-    maxs.extend([50, 5, np.pi, 40000])
-    mins.append(-5)
-    maxs.append(10)
-    dev.append(0.2)
-
-    # beta
-    dev.extend([0.05, 0.01, 0.05, 1, 0.005])
-    mins.extend([-50, 0, -np.pi, 0, -3])
-    maxs.extend([50, 3, np.pi, 1000, 2])
-    return mins, maxs, dev
-
-
-def fit_gesture_hill(gesture, measure, comp, prior=None, nb_iter=300,
-                     temp=10, rng=None):
+def fit_gesture_hill(gesture, conf, prior):
     """Find the parameters to fit to a gesture."""
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
+    nb_iter = conf['iter_per_train']
+    temp = conf.get('temperature', None)
+    rng = conf.get('rng', None)
     size = len(gesture)
     goal = measure(gesture)
-    mins, maxs, dev = _get_defaults_min_max_dev()
     x, dummy_y, score = hill_climbing(
         function=lambda x: measure(gen_sound(
             x, size,
@@ -50,9 +25,9 @@ def fit_gesture_hill(gesture, measure, comp, prior=None, nb_iter=300,
             falpha_nb_args=13)),
         goal=goal,
         guess=np.array(prior),
-        guess_min=mins,
-        guess_max=maxs,
-        guess_deviation=np.diag(dev),
+        guess_min=conf['mins'],
+        guess_max=conf['maxs'],
+        guess_deviation=np.diag(conf['dev']),
         max_iter=nb_iter,
         comparison_method=comp,
         temp_max=temp,
@@ -94,14 +69,19 @@ def _padded_gen_sound(songmodel, range_, change_index, param, out_ab=False):
         return synthesize(np.concatenate(alpha_betas))
 
 
-def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
-                       nb_pad=1, temp=None, rng=None):
+def fit_gesture_padded(tutor, songmodel, gesture_index, conf):
+    measure = conf['measure']
+    comp = conf['comparison']
+    nb_iter = conf['iter_per_train']
+    nb_pad = conf.get('nb_pad', 2),
+    temp = conf.get('temperature', None)
+    rng = conf.get('rng', None)
+
     prev_igest = max(0, gesture_index - nb_pad)
     start_tutor = songmodel.gestures[prev_igest][0]
     next_igest = min(len(songmodel.gestures) - 1, gesture_index + nb_pad)
     end_tutor = songmodel.gesture_end(next_igest)
     goal = measure(tutor[start_tutor:end_tutor])
-    mins, maxs, dev = _get_defaults_min_max_dev()
     sound, ab = _padded_gen_sound(
         songmodel,
         range(prev_igest, next_igest+1),
@@ -115,9 +95,9 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
             x)),
         goal=goal,
         guess=deepcopy(songmodel.gestures[gesture_index][1]),
-        guess_min=mins,
-        guess_max=maxs,
-        guess_deviation=np.diag(dev),
+        guess_min=conf['mins'],
+        guess_max=conf['maxs'],
+        guess_deviation=np.diag(conf['dev']),
         max_iter=nb_iter,
         comparison_method=comp,
         temp_max=temp,
@@ -131,10 +111,13 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, measure, comp, nb_iter,
     return x, score
 
 
-def fit_gesture_whole(measured_tutor, songmodel, gesture_index, measure, comp,
-                      nb_iter, temp=None, rng=None):
+def fit_gesture_whole(measured_tutor, songmodel, gesture_index, conf):
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
+    nb_iter = conf['iter_per_train']
+    temp = conf.get('temperature', None)
+    rng = conf.get('rng', None)
     goal = measured_tutor
-    mins, maxs, dev = _get_defaults_min_max_dev()
     x, dummy_y, score = hill_climbing(
         function=lambda x: measure(_padded_gen_sound(
             songmodel,
@@ -143,9 +126,9 @@ def fit_gesture_whole(measured_tutor, songmodel, gesture_index, measure, comp,
             x)),
         goal=goal,
         guess=deepcopy(songmodel.gestures[gesture_index][1]),
-        guess_min=mins,
-        guess_max=maxs,
-        guess_deviation=np.diag(dev),
+        guess_min=conf['mins'],
+        guess_max=conf['maxs'],
+        guess_deviation=np.diag(conf['dev']),
         max_iter=nb_iter,
         comparison_method=comp,
         temp_max=temp,

@@ -54,8 +54,8 @@ def mutate_best_models_dummy(songs, tutor_song, measure, comp, nb_replay,
     return nsongs
 
 
-def mutate_best_models_elite(songs, tutor_song, measure, comp, nb_replay,
-                             datasaver=None, rng=None):
+def mutate_best_models_elite(songs, tutor_song, conf,
+                             datasaver=None):
     """
     Elite selection and mutation of the best models.
 
@@ -64,8 +64,10 @@ def mutate_best_models_elite(songs, tutor_song, measure, comp, nb_replay,
     """
     if datasaver is None:
         datasaver = QuietDataSaver()
-    if rng is None:
-        rng = np.random.RandomState()
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
+    nb_replay = conf['replay']
+    rng = conf['rng_obj']
     nb_conc_song = len(songs)
     pscore = get_scores(tutor_song, songs, measure, comp)
     score = pscore

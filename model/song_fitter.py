@@ -32,10 +32,21 @@ logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('root')
 EDITOR = os.environ.get('EDITOR', 'vim')
 
+DAY_LEARNING_MODELS = {
+    'optimise_gesture_dummy': optimise_gesture_dummy,
+    'optimise_gesture_padded': optimise_gesture_padded,
+    'optimise_gesture_whole': optimise_gesture_whole
+}
+NIGHT_LEARNING_MODELS = {
+    'mutate_best_models_dummy': mutate_best_models_dummy,
+    'mutate_best_models_elite': mutate_best_models_elite
+}
+COMP_METHODS = {'linalg': lambda g, c: np.linalg.norm(g - c),
+                'fastdtw': lambda g, c: fastdtw(g, c, dist=2, radius=1)[0]}
 
-def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
-             day_conf, night_conf, nb_day=5, nb_conc_song=3, nb_split=10,
-             datasaver=None, rng=None):
+
+def fit_song(tutor_song, conf, datasaver=None):
+    # FIXME OUTDATED
     """
     Fit a song with a day and a night phase.
 
@@ -63,7 +74,17 @@ def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
                        This function does the optimisations that are supposed
                        to occur during the day.
     """
-    songs = [SongModel(song=tutor_song, nb_split=nb_split, rng=rng)
+    day_optimisation = DAY_LEARNING_MODELS[conf['dlm']]
+    night_optimisation = NIGHT_LEARNING_MODELS[conf['nlm']]
+    nb_day = conf['days']
+    nb_conc_song = conf['concurrent']
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
+    rng = conf['rng_obj']
+    nb_split = 30
+
+    songs = [SongModel(song=tutor_song, priors=conf['prior'],
+                       nb_split=nb_split, rng=rng)
              for i in range(nb_conc_song)]
     if datasaver is None:
         datasaver = QuietDataSaver()
@@ -73,9 +94,8 @@ def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
     for iday in range(nb_day):
         logger.info('☀️️\t☀️️\t☀️️\tDay {} of {}\t☀️️\t☀️️\t☀️'.format(iday+1, nb_day)) # noqa
         with datasaver.set_context('day_optim'):
-            songs = day_optimisation(songs,
-                                     tutor_song, measure, comp,
-                                     datasaver=datasaver, rng=rng, **day_conf)
+            songs = day_optimisation(songs, tutor_song, conf,
+                                     datasaver=datasaver)
         score = get_scores(tutor_song, songs, measure, comp)
         if iday + 1 != nb_day:
             logger.debug(score)
@@ -84,9 +104,8 @@ def fit_song(tutor_song, measure, comp, day_optimisation, night_optimisation,
             logger.info('💤\t💤\t💤\tNight\t💤\t💤\t💤')
             with datasaver.set_context('night_optim'):
                 songs = night_optimisation(songs,
-                                           tutor_song, measure, comp,
-                                           datasaver=datasaver, rng=rng,
-                                           **night_conf)
+                                           tutor_song, conf,
+                                           datasaver=datasaver)
             score = get_scores(tutor_song, songs, measure, comp)
             datasaver.add(moment='AfterNight', songs=songs, scores=score)
         datasaver.write()
@@ -111,6 +130,7 @@ def get_git_revision_hash():
 
 def main():
     """Main function for this module, called if not imported."""
+    global NIGHT_LEARNING_MODELS, DAY_LEARNING_MODELS, COMP_METHODS
     start = datetime.datetime.now()
     tsong = None
     parser = ap.ArgumentParser(
@@ -118,18 +138,6 @@ def main():
         reproduce the learning of a zebra finch for a given tutor song.
         """
     )
-    comp_methods = {'linalg': lambda g, c: np.linalg.norm(g - c),
-                    'fastdtw': lambda g, c: fastdtw(g, c, dist=2, radius=1)[0]}
-    day_learning_models = {
-        'optimise_gesture_dummy': optimise_gesture_dummy,
-        'optimise_gesture_padded': optimise_gesture_padded,
-        'optimise_gesture_whole': optimise_gesture_whole
-    }
-    night_learning_models = {
-        'mutate_best_models_dummy': mutate_best_models_dummy,
-        'mutate_best_models_elite': mutate_best_models_elite
-    }
-
     parser.add_argument('tutor', type=ap.FileType('rb'), nargs='?',
                         help='The targeted song to learn')
     parser.add_argument('--config', type=ap.FileType('r'), required=False,
@@ -150,35 +158,34 @@ def main():
     parser.add_argument('-i', '--iter-per-train', type=int, required=False,
                         help='number of iteration when training a gesture')
     parser.add_argument('--comp', type=str, required=False, default='linalg',
-                        choices=comp_methods,
+                        choices=COMP_METHODS,
                         help='comparison method to use')
     parser.add_argument('--dlm', type=str, required=False,
-                        choices=day_learning_models, help="day learning model")
+                        choices=DAY_LEARNING_MODELS, help="day learning model")
     parser.add_argument('--nlm', type=str, required=False,
-                        choices=night_learning_models,
+                        choices=NIGHT_LEARNING_MODELS,
                         help="night learning model")
+    parser.add_argument('--edit-prior', action='store_true')
     args = parser.parse_args()
     if args.seed is None:
         seed = int(datetime.datetime.now().timestamp())
     else:
         seed = args.seed
     rng = np.random.RandomState(seed)
-
-    date = datetime.datetime.now().strftime('%y%m%d_%H%M%S')
-    data = {}
+    conf = {}
     if args.config:
-        data.update(json.load(args.config))
+        conf.update(json.load(args.config))
         try:  # Warning if reproduction (with commit key) and different commits
-            if data['commit'] != get_git_revision_hash():
-                logger.warning('Commit recommended for the data is different'
+            if conf['commit'] != get_git_revision_hash():
+                logger.warning('Commit recommended for the conf is different'
                                ' from the current commit.')
         except KeyError:
             pass
         try:
-            sr, tsong = wavfile.read(data['tutor'])
+            sr, tsong = wavfile.read(conf['tutor'])
         except KeyError:
             pass
-        data['commit'] = get_git_revision_hash()
+        conf['commit'] = get_git_revision_hash()
     argdata = {'days': args.days,
                'train_per_day': args.train_per_day,
                'concurrent': args.concurrent,
@@ -192,57 +199,49 @@ def main():
                'nlm': args.nlm}
     if args.tutor is not None:
         argdata['tutor'] = args.tutor.name
-    data.update({k: v for k, v in argdata.items() if v is not None})
     if tsong is None:
         sr, tsong = wavfile.read(args.tutor)
 
-    path = 'res/{}_{}'.format(date, data['name'])
+    conf.update({k: v for k, v in argdata.items() if v is not None})
+    conf['rng_obj'] = rng
+    conf['measure_obj'] = lambda x: bsa_measure(x, 44100)  # FIXME should not be hardcoded
+    conf['comp_obj'] = COMP_METHODS[conf['comp']]
+    date = datetime.datetime.now().strftime('%y%m%d_%H%M%S')
+    run_name = '{}_{}'.format(conf['name'], date)
+    path = 'res/{}'.format(run_name)
     os.makedirs(path)
     wavfile.write(os.path.join(path, 'tutor.wav'), sr, tsong)
-    logger.info(pformat(data))
-    with open(os.path.join(path, 'params.json'), 'w') as f:
-        json.dump(data, f, indent=4)  # human readable parameters
-    day_conf = {'nb_iter_per_train': data['iter_per_train'],
-                'train_per_day': data['train_per_day']}
-    night_conf = {'nb_replay': data['replay']}
+    logger.info(pformat(conf))
+    copyfile('confs/default_prior_max_min_dev.json',
+             os.path.join(path, 'prior_max_min_dev.json'))
 
     write_run_description(path)
-
+    if args.edit_prior:
+        call([EDITOR, os.path.join(path, 'prior_max_min_dev.json')])
+    with open(os.path.join(path, 'params.json'), 'w') as f:
+        json.dump({k: conf[k] for k in conf if not k.endswith('_obj')},
+                  f, indent=4)  # human readable parameters
+    with open(os.path.join(path, 'prior_max_min_dev.json')) as f:
+        pmmd = json.load(f)
+    conf.update(pmmd)
     datasaver = DataSaver(defaultdest=os.path.join(path, 'data_cur.pkl'))
+
+    #########################################
+    # STOP READING CONF; START THE LEARNING #
+    #########################################
     try:
-        songs = fit_song(
-            tsong,
-            measure=lambda x: bsa_measure(x, sr),
-            comp=comp_methods[data['comp']],
-            day_optimisation=day_learning_models[data['dlm']],
-            night_optimisation=night_learning_models[data['nlm']],
-            day_conf=day_conf,
-            night_conf=night_conf,
-            nb_day=data['days'],
-            nb_conc_song=data['concurrent'],
-            nb_split=30,
-            datasaver=datasaver,
-            rng=rng)
+        songs = fit_song(tsong, conf, datasaver=datasaver)
     except KeyboardInterrupt as e:
         logger.warning('Aborted')
         with open(os.path.join(path, 'aborted.txt'), 'a') as f:
-            f.write('aborted')
+            f.write('aborted\n')
     finally:
         logger.info('Saving the data.')
         datasaver.write(os.path.join(path, 'data.pkl'))
     logger.info('!!!! Learning over !!!!')
-    logger.info('Logging the songs')
-    with open(os.path.join(path, 'songs.pkl'), 'wb') as f:
-        pickle.dump(songs, f)
-    logger.info('Generating the waves')
-    for i, song in enumerate(songs):
-        wavfile.write(os.path.join(path, 'out_{}.wav'.format(i)),
-                      44100, song.gen_sound())
-    logger.info('run {}_{} is finished'.format(date, data['name']))
-    logger.info('took {}'.format((datetime.datetime.now() - start)))
     try:
         subprocess.Popen(['notify-send',
-                          '{}_{} is finished'.format(date, data['name'])])
+                          '{} is finished'.format(run_name)])
     except OSError:
         pass
 

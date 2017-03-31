@@ -90,13 +90,16 @@ def optimise_gesture_padded(songs, tutor_song, measure, comp, train_per_day=10,
     return songs
 
 
-def optimise_gesture_whole(songs, tutor_song, measure, comp, train_per_day=10,
-                           nb_iter_per_train=10, datasaver=None, rng=None):
+def optimise_gesture_whole(songs, tutor_song, conf, datasaver=None):
     """Optimise gestures randomly from the song models with dummy algorithm.
 
     Include the previous and next gesture in the evaluation to remove
     border issues.
     """
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
+    train_per_day = conf['train_per_day']
+    rng = conf['rng_obj']
     if datasaver is None:
         datasaver = QuietDataSaver()
     if rng is None:
@@ -113,8 +116,7 @@ def optimise_gesture_whole(songs, tutor_song, measure, comp, train_per_day=10,
         logger.info('{}/{}: fit gesture {} of song {} (length {}, score {})'.format(
             itrain+1, train_per_day, ig, isong, len(s), pre_score))
         res, hill_score = fit_gesture_whole(
-            goal, song, ig, measure, comp,
-            nb_iter=nb_iter_per_train, temp=None, rng=rng)
+            goal, song, ig, conf)
         # datasaver.add(pre_score=pre_score,
         #               new_score=hill_score, isong=isong, ig=ig)
         songs[isong].gestures[ig][1] = deepcopy(res)
