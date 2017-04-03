@@ -28,7 +28,6 @@ from night_optimisers import mutate_best_models_dummy, mutate_best_models_elite
 from song_model import SongModel
 
 
-logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger('root')
 EDITOR = os.environ.get('EDITOR', 'vim')
 
@@ -131,6 +130,8 @@ def get_git_revision_hash():
 def main():
     """Main function for this module, called if not imported."""
     global NIGHT_LEARNING_MODELS, DAY_LEARNING_MODELS, COMP_METHODS
+    logging.basicConfig(level=logging.DEBUG)
+
     start = datetime.datetime.now()
     tsong = None
     parser = ap.ArgumentParser(
@@ -166,6 +167,7 @@ def main():
                         choices=NIGHT_LEARNING_MODELS,
                         help="night learning model")
     parser.add_argument('--edit-prior', action='store_true')
+    parser.add_argument('--no-desc', dest='edit_desc', action='store_false')
     args = parser.parse_args()
     if args.seed is None:
         seed = int(datetime.datetime.now().timestamp())
@@ -214,8 +216,8 @@ def main():
     logger.info(pformat(conf))
     copyfile('confs/default_prior_max_min_dev.json',
              os.path.join(path, 'prior_max_min_dev.json'))
-
-    write_run_description(path)
+    if args.edit_desc:
+        write_run_description(path)
     if args.edit_prior:
         call([EDITOR, os.path.join(path, 'prior_max_min_dev.json')])
     with open(os.path.join(path, 'params.json'), 'w') as f:
@@ -244,6 +246,8 @@ def main():
                           '{} is finished'.format(run_name)])
     except OSError:
         pass
+    total_time = datetime.datetime.now() - start
+    logger.info('Run {} is over. Took {}'.format(run_name, ))
 
 
 def write_run_description(path):
