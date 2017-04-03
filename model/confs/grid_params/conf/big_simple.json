@@ -1,8 +1,8 @@
 {
     "days": 50,
-    "name": "big_ba",
+    "name": "big_simple",
     "concurrent": 10,
-    "tutor": "../data/ba_example.wav",
+    "tutor": "../data/simple.wav",
     "train_per_day": 100,
     "replay": 5,
     "iter_per_train": 20,

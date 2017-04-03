@@ -49,6 +49,7 @@ def get_confs(confdir):
 
 def start_run(run_name, conf, grid_path):
     """Start a run with run_name and the conf `conf`."""
+    start = datetime.datetime.now()
     conf['rng_obj'] = np.random.RandomState()
     conf['measure_obj'] = lambda x: bsa_measure(x, 44100,
                                                 coefs=conf['coefs'])
@@ -58,13 +59,14 @@ def start_run(run_name, conf, grid_path):
         sr, tutor = wavfile.read(tutor_f)
     run_path = join(grid_path, run_name)
     os.makedirs(run_path)
+    shutil.copyfile(conf['tutor'], join(run_path, 'tutor.wav'))
     datasaver = DataSaver(join(run_path, 'data_cur.pkl'))
     with open(join(run_path, 'conf.json'), 'w') as conf_file:
         json.dump({key: conf[key] for key in conf
                    if not key.endswith('obj')}, conf_file, indent=4)
     songs = fit_song(tutor, conf, datasaver)
     datasaver.write(join(run_path, 'data.pkl'))
-    print(run_name, 'is over')
+    print(run_name, 'is over and took', datetime.datetime.now() - start)
 
 
 def main():
@@ -86,7 +88,10 @@ def main():
         delayed(start_run)(run_name, conf, grid_path)
         for run_name, conf in get_confs(args.confdir))
     logger.info('All over!')
+    print('took', datetime.datetime.now() - start)
 
 
 if __name__ == "__main__":
     main()
+    #for name, conf in sorted(get_confs('confs/grid_params'), key=lambda x: x[0]):
+    #    print(name)
