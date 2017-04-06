@@ -86,10 +86,10 @@ class SongModel:
                 del gestures[-1]
         return SongModel(self.song, gestures, parent=self)
 
-    def gen_sound(self, range_=None):
+    def gen_sound(self, range_=None, fixed_normalize=True):
         """Generate the full song."""
         ab = self.gen_alphabeta(range_=range_, pad='last')
-        out = synthesize(ab)
+        out = synthesize(ab, fixed_normalize)
         assert np.isclose(np.nanmean(out), 0)
         if range_ is not None:
             expected_len = self.gesture_end(range_[-1]) - self.gestures[range_[0]][0]

@@ -108,7 +108,7 @@ def gen_alphabeta(params, length, falpha, fbeta,
     return alpha_beta
 
 
-def synthesize(alpha_beta, normalize=True, min_boundary=20000):
+def synthesize(alpha_beta, fixed_normalize=False, boundary=150000):
     """Return the song signal given the alpha beta parameters.
 
     alpha_beta - A 2d numpy.array of shape (length, 2)
@@ -119,12 +119,10 @@ def synthesize(alpha_beta, normalize=True, min_boundary=20000):
     """
     out = birdsynth.synth(alpha_beta)
     assert not np.any(np.isnan(out))
-    if normalize:
-        # If out is really small, it makes noise really present for no reason
-        # Thus, we want at least to scale by 20_000.
-        # For instance, with a stream of alpha_beta of only zeros, some noise
-        # can be heard without this boundary scaling.
-        scale = np.max(((np.nanmax(out) - np.nanmin(out)), min_boundary))
-        out = 2 * (out - np.nanmin(out)) / scale - 1
-        out = out - np.nanmean(out)
+    if fixed_normalize:
+        scale = boundary
+    else:
+        scale = np.nanmax(out) - np.nanmin(out)
+    out = 2 * (out - np.nanmin(out)) / scale - 1
+    out = out - np.nanmean(out)
     return out

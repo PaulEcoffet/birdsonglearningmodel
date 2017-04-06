@@ -64,9 +64,10 @@ def _padded_gen_sound(songmodel, range_, change_index, param, out_ab=False):
             fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
             falpha_nb_args=13, pad=True, beg=start))
     if out_ab:
-        return synthesize(np.concatenate(alpha_betas)), np.concatenate(alpha_betas)
+        return synthesize(np.concatenate(alpha_betas),
+                          fixed_normalize=True), np.concatenate(alpha_betas)
     else:
-        return synthesize(np.concatenate(alpha_betas))
+        return synthesize(np.concatenate(alpha_betas), fixed_normalize=True)
 
 
 def fit_gesture_padded(tutor, songmodel, gesture_index, conf):
