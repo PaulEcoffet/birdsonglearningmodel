@@ -70,10 +70,10 @@ def _padded_gen_sound(songmodel, range_, change_index, param, out_ab=False):
 
 
 def fit_gesture_padded(tutor, songmodel, gesture_index, conf):
-    measure = conf['measure']
-    comp = conf['comparison']
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
     nb_iter = conf['iter_per_train']
-    nb_pad = conf.get('nb_pad', 2),
+    nb_pad = conf.get('nb_pad', 1)
     temp = conf.get('temperature', None)
     rng = conf.get('rng', None)
 

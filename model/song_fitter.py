@@ -247,7 +247,7 @@ def main():
     except OSError:
         pass
     total_time = datetime.datetime.now() - start
-    logger.info('Run {} is over. Took {}'.format(run_name, ))
+    logger.info('Run {} is over. Took {}'.format(run_name, total_time))
 
 
 def write_run_description(path):

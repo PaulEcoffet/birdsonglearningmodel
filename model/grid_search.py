@@ -50,6 +50,7 @@ def get_confs(confdir):
 def start_run(run_name, conf, grid_path):
     """Start a run with run_name and the conf `conf`."""
     start = datetime.datetime.now()
+    print('starting {}'.format(run_name))
     conf['rng_obj'] = np.random.RandomState()
     conf['measure_obj'] = lambda x: bsa_measure(x, 44100,
                                                 coefs=conf['coefs'])
@@ -73,6 +74,7 @@ def main():
     """Do the gridsearch over several configuration files."""
     parser = ap.ArgumentParser()
     parser.add_argument('-n', '--name', required=True)
+    parser.add_argument('--cpu', type=int, default=cpu_count()//2)
     parser.add_argument('confdir', type=str)
     args = parser.parse_args()
     start = datetime.datetime.now()
@@ -84,7 +86,7 @@ def main():
     subprocess.call([EDITOR, join(grid_path, 'desc.md')])
     print('Using {} cpu'.format(cpu_count()-2))
     logging.basicConfig(level=logging.CRITICAL)
-    Parallel(n_jobs=cpu_count()-2)(
+    Parallel(n_jobs=args.cpu)(
         delayed(start_run)(run_name, conf, grid_path)
         for run_name, conf in get_confs(args.confdir))
     logger.info('All over!')
