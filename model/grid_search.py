@@ -44,7 +44,7 @@ def get_confs(confdir):
                 names.append(conf['name'])
             except KeyError:
                 pass
-        yield '_'.join(names), tot_conf
+        yield '+'.join(names), tot_conf
 
 
 def start_run(run_name, conf, grid_path):
@@ -68,6 +68,8 @@ def start_run(run_name, conf, grid_path):
     songs = fit_song(tutor, conf, datasaver)
     datasaver.write(join(run_path, 'data.pkl'))
     print(run_name, 'is over and took', datetime.datetime.now() - start)
+    print('By the way, it is {}'.format(
+        datetime.datetim.now().strftime("%Y-%m-%d %H:%M:%S")))
 
 
 def main():
