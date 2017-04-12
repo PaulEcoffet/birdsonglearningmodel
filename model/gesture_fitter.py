@@ -83,11 +83,6 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, conf):
     next_igest = min(len(songmodel.gestures) - 1, gesture_index + nb_pad)
     end_tutor = songmodel.gesture_end(next_igest)
     goal = measure(tutor[start_tutor:end_tutor])
-    sound, ab = _padded_gen_sound(
-        songmodel,
-        range(prev_igest, next_igest+1),
-        None,
-        None, out_ab=True)
     x, dummy_y, score = hill_climbing(
         function=lambda x: measure(_padded_gen_sound(
             songmodel,
@@ -104,11 +99,6 @@ def fit_gesture_padded(tutor, songmodel, gesture_index, conf):
         temp_max=temp,
         verbose=False,
         rng=rng)
-    sound, ab = _padded_gen_sound(
-        songmodel,
-        range(prev_igest, next_igest+1),
-        gesture_index,
-        x, out_ab=True)
     return x, score
 
 

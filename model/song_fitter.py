@@ -166,7 +166,12 @@ def main():
     parser.add_argument('--nlm', type=str, required=False,
                         choices=NIGHT_LEARNING_MODELS,
                         help="night learning model")
-    parser.add_argument('--edit-prior', action='store_true')
+    parser.add_argument('--edit-conf', action='store_true')
+    parser.add_argument('--coefs', type=ap.FileType('r'),
+                        default='confs/default_coefs.json',
+                        help="file with the coefs")
+    parser.add_argument('--priors', type=ap.FileType('r'),
+                        default="confs/default_prior_max_min_dev.json")
     parser.add_argument('--no-desc', dest='edit_desc', action='store_false')
     args = parser.parse_args()
     if args.seed is None:
@@ -205,28 +210,32 @@ def main():
         sr, tsong = wavfile.read(args.tutor)
 
     conf.update({k: v for k, v in argdata.items() if v is not None})
-    conf['rng_obj'] = rng
-    conf['measure_obj'] = lambda x: bsa_measure(x, 44100)  # FIXME should not be hardcoded
-    conf['comp_obj'] = COMP_METHODS[conf['comp']]
+
     date = datetime.datetime.now().strftime('%y%m%d_%H%M%S')
     run_name = '{}_{}'.format(conf['name'], date)
     path = 'res/{}'.format(run_name)
     os.makedirs(path)
     wavfile.write(os.path.join(path, 'tutor.wav'), sr, tsong)
-    logger.info(pformat(conf))
-    copyfile('confs/default_prior_max_min_dev.json',
-             os.path.join(path, 'prior_max_min_dev.json'))
+    pmmd = json.load(args.priors)
+    conf.update(pmmd)
+    coefs = json.load(args.coefs)
+    conf.update(coefs)
     if args.edit_desc:
         write_run_description(path)
-    if args.edit_prior:
-        call([EDITOR, os.path.join(path, 'prior_max_min_dev.json')])
     with open(os.path.join(path, 'params.json'), 'w') as f:
         json.dump({k: conf[k] for k in conf if not k.endswith('_obj')},
                   f, indent=4)  # human readable parameters
-    with open(os.path.join(path, 'prior_max_min_dev.json')) as f:
-        pmmd = json.load(f)
-    conf.update(pmmd)
+    if args.edit_conf:
+        call([EDITOR, os.path.join(path, 'params.json')])
+        with open(os.path.join(path, 'params.json'), 'r') as f:
+            conf = json.load(f)
+
     datasaver = DataSaver(defaultdest=os.path.join(path, 'data_cur.pkl'))
+    logger.info(pformat(conf))
+
+    conf['rng_obj'] = rng
+    conf['measure_obj'] = lambda x: bsa_measure(x, 44100)
+    conf['comp_obj'] = COMP_METHODS[conf['comp']]
 
     #########################################
     # STOP READING CONF; START THE LEARNING #

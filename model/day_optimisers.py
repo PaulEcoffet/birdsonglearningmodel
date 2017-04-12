@@ -56,7 +56,7 @@ def optimise_gesture_padded(songs, tutor_song, conf, datasaver=None):
     Include the previous and next gesture in the evaluation to remove
     border issues.
     """
-    nb_pad = 1
+    nb_pad = conf.get('nb_pad', 2)
     measure = conf['measure_obj']
     comp = conf['comp_obj']
     train_per_day = conf['train_per_day']
