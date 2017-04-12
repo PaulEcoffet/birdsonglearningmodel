@@ -67,6 +67,7 @@ class GridAnalyser:
             vbox.children = [
                 self.title(i),
                 self.audio(i, -1, best),
+                self.tutor_audio(i),
                 self.configuration(i),
                 self.learning_curve(i),
                 self.spec_deriv_plot(i, -1, best),
@@ -80,6 +81,10 @@ class GridAnalyser:
     def audio(self, irun, iday, ismodel):
         a = Audio(self.rd[irun]['songs'].iloc[iday][ismodel].gen_sound(),
                   rate=44100)
+        return widgets.HTML(a._repr_html_())
+
+    def tutor_audio(self, i):
+        a = Audio(join(self.run_paths[i], 'tutor.wav'))
         return widgets.HTML(a._repr_html_())
 
     def spec_deriv_plot(self, irun, iday, ismodel):
