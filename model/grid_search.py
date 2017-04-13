@@ -34,7 +34,11 @@ def get_confs(confdir):
             continue
         for conf_file_name in iglob(join(folder, '*.json')):
             with open(conf_file_name) as conf_file:
-                confs[-1].append(json.load(conf_file))
+                try:
+                    confs[-1].append(json.load(conf_file))
+                except json.decoder.JSONDecodeError:
+                    print(conf_file_name)
+                    raise
     for conf_prod in itertools.product(*confs):
         tot_conf = dict()
         names = []
@@ -47,7 +51,7 @@ def get_confs(confdir):
         yield '+'.join(names), tot_conf
 
 
-def start_run(run_name, conf, grid_path):
+def start_run(run_name, conf, res_grid_path):
     """Start a run with run_name and the conf `conf`."""
     start = datetime.datetime.now()
     print('starting {}'.format(run_name))
@@ -58,7 +62,7 @@ def start_run(run_name, conf, grid_path):
     conf['name'] = run_name
     with open(conf['tutor'], 'rb') as tutor_f:
         sr, tutor = wavfile.read(tutor_f)
-    run_path = join(grid_path, run_name)
+    run_path = join(res_grid_path, run_name)
     os.makedirs(run_path)
     shutil.copyfile(conf['tutor'], join(run_path, 'tutor.wav'))
     datasaver = DataSaver(join(run_path, 'data_cur.pkl'))
@@ -77,25 +81,30 @@ def main():
     parser = ap.ArgumentParser()
     parser.add_argument('-n', '--name', required=True)
     parser.add_argument('--cpu', type=int, default=cpu_count()//2)
+    parser.add_argument('--single-job', action="store_true")
+    parser.add_argument('--outdir', type=str)
     parser.add_argument('confdir', type=str)
     args = parser.parse_args()
-    start = datetime.datetime.now()
-    packed_run_name = '{}_{}'.format(args.name,
-                                     start.strftime('%y%m%d_%H%M%S'))
-    grid_path = join('res', packed_run_name)
-    os.makedirs(grid_path)
-    shutil.copy('desc.template.md', join(grid_path, 'desc.md'))
-    subprocess.call([EDITOR, join(grid_path, 'desc.md')])
-    print('Using {} cpu'.format(cpu_count()-2))
-    logging.basicConfig(level=logging.CRITICAL)
-    Parallel(n_jobs=args.cpu)(
-        delayed(start_run)(run_name, conf, grid_path)
-        for run_name, conf in get_confs(args.confdir))
-    logger.info('All over!')
-    print('took', datetime.datetime.now() - start)
+    if args.single_job:
+        with open(args.confdir, 'r') as f:
+            conf = json.load(f)
+        start_run(args.name, conf, args.outdir)
+    else:
+        start = datetime.datetime.now()
+        packed_run_name = '{}_{}'.format(args.name,
+                                         start.strftime('%y%m%d_%H%M%S'))
+        res_grid_path = join('res', packed_run_name)
+        os.makedirs(res_grid_path)
+        shutil.copy('desc.template.md', join(res_grid_path, 'desc.md'))
+        subprocess.call([EDITOR, join(res_grid_path, 'desc.md')])
+        print('Using {} cpu'.format(args.cpu))
+        logging.basicConfig(level=logging.CRITICAL)
+        Parallel(n_jobs=args.cpu)(
+            delayed(start_run)(run_name, conf, res_grid_path)
+            for run_name, conf in get_confs(args.confdir))
+        logger.info('All over!')
+        print('took', datetime.datetime.now() - start)
 
 
 if __name__ == "__main__":
     main()
-    #for name, conf in sorted(get_confs('confs/grid_params'), key=lambda x: x[0]):
-    #    print(name)
