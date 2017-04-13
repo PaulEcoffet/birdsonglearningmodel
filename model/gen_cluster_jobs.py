@@ -15,7 +15,7 @@ WALLTIME = {'q1heure': '1:00:00',
             'q1semaine': '167:00:00'}
 
 
-COMMAND = "/home/paul.ecoffet/.virtualenvs/birdsongs/bin/python "
+COMMAND = "/home/paul.ecoffet/.virtualenvs/birdsongs/bin/python " \
           + "grid_search.py --single-job -n {name} " \
           + "--outdir={outdir} {conffile}"
 
