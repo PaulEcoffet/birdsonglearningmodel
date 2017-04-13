@@ -32,7 +32,7 @@ SCRIPT = """#!/bin/sh
 def purge_dir(dir):
     """Remove all the files in `dir`."""
     for fname in iglob(os.path.join(dir, '*')):
-        shutil.rmtree(fname)
+        os.remove(fname)
 
 
 def main():
