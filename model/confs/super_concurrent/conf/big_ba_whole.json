@@ -1,11 +1,10 @@
 {
     "days": 50,
-    "name": "big_ba",
+    "name": "big_ba_whole",
     "tutor": "../data/ba_example.wav",
-    "train_per_day": 100,
-    "replay": 5,
+    "train_per_day": 500,
     "iter_per_train": 20,
     "comp": "linalg",
     "nlm": "mutate_best_models_elite",
-    "dlm": "optimise_gesture_whole",
+    "dlm": "optimise_gesture_whole"
 }
