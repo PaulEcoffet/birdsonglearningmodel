@@ -20,8 +20,8 @@ COMMAND = "python grid_search.py --single-job -n {name} " \
 
 SCRIPT = """#!/bin/sh
 #PBS -N {name}
-#PBS -o {name}.out
-#PBS -b {name}.err
+#PBS -o log/{name}.out
+#PBS -b log/{name}.err
 #PBS -l walltime={walltime}
 #PBS -l ncpus=1
 #PBS -d /home/paul.ecoffet/birdsonglearningmodel/model
