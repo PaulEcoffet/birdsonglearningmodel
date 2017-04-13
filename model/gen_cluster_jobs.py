@@ -57,7 +57,7 @@ def main():
         with open(runname + '.sh', 'w') as f:
             f.write(SCRIPT.format(name=name, walltime=WALLTIME[args.queue],
                                   command=command))
-        to_call.append('.' + join('/', runname + '.sh'))
+        to_call.append('qsub ' + join('./', runname + '.sh'))
     with open('run_{}.sh'.format(args.name), 'w') as f:
         f.write('\n'.join(to_call))
 
