@@ -57,3 +57,30 @@ def percentage_change(first, last):
     last = copy(last)
     last['cond'] = 'last'
     return ((last.median() - first.median()) / first.median() * 100).abs()
+
+
+def all_syllables_features(rd: pd.DataFrame):
+    """Get all the information from each syllables from all the songs."""
+    syllables = []
+    for i, row in rd.iterrows():
+        moment = row['moment']
+        if moment == 'Start' or moment == 'AfterNight':
+            moment = 'morning'
+        elif moment == 'End' or moment == 'BeforeNight':
+            moment = 'evening'
+        out = []
+        for sm in row['songs']:
+            out += extract_syllables_feature(sm.gen_sound())
+            for syllable in out:
+                syb_dict = {'day': i//2,
+                            'moment': moment,
+                            'beg': syllable['beg'],
+                            'end': syllable['end'],
+                            'length': syllable['end'] - syllable['beg']}
+                for key in syllable:
+                    if key == 'beg' or key == 'end':
+                        continue
+                    syb_dict['m'+key] = np.mean(syllable[key])
+                    syb_dict['v'+key] = np.var(syllable[key])
+                syllables.append(syb_dict)
+    return pd.DataFrame(syllables)

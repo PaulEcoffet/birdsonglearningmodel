@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from os.path import join
+from os.path import join, basename
 import pandas as pd
 from collections import defaultdict
 import io
@@ -60,6 +60,17 @@ class GridAnalyser:
         self.conf = CacheDict(lambda i: self._get_conf(i))
         self.rd = CacheDict(lambda i: self._get_rd(i))
         self.run_paths = run_paths
+        self.options_list = []
+        for path in self.run_paths:
+            options = basename(path).split('+')
+            print(options)
+            for i, option in enumerate(options):
+                try:
+                    self.options_list[i].add(option)
+                except IndexError:
+                    self.options_list.append(set([option]))
+
+
 
     def show(self, i, vbox):
         try:
