@@ -73,7 +73,7 @@ def start_run(run_name, conf, res_grid_path):
     datasaver.write(join(run_path, 'data.pkl'))
     print(run_name, 'is over and took', datetime.datetime.now() - start)
     print('By the way, it is {}'.format(
-        datetime.datetim.now().strftime("%Y-%m-%d %H:%M:%S")))
+        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
 
 
 def main():
@@ -83,20 +83,23 @@ def main():
     parser.add_argument('--cpu', type=int, default=cpu_count()//2)
     parser.add_argument('--single-job', action="store_true")
     parser.add_argument('--outdir', type=str)
-    parser.add_argument('confdir', type=str)
+    parser.add_argument('confdir', type=str, nargs='+')
+    parser.add_argument('--no-desc', dest='edit_desc', action='store_false')
     args = parser.parse_args()
-    if args.single_job:
+    if args.single_job or len(confdir) >= 2:
         with open(args.confdir, 'r') as f:
             conf = json.load(f)
         start_run(args.name, conf, args.outdir)
     else:
+        confdir = confdir[0]
         start = datetime.datetime.now()
         packed_run_name = '{}_{}'.format(args.name,
                                          start.strftime('%y%m%d_%H%M%S'))
         res_grid_path = join('res', packed_run_name)
         os.makedirs(res_grid_path)
         shutil.copy('desc.template.md', join(res_grid_path, 'desc.md'))
-        subprocess.call([EDITOR, join(res_grid_path, 'desc.md')])
+        if args.edit_desc:
+            subprocess.call([EDITOR, join(res_grid_path, 'desc.md')])
         print('Using {} cpu'.format(args.cpu))
         logging.basicConfig(level=logging.CRITICAL)
         Parallel(n_jobs=args.cpu)(
