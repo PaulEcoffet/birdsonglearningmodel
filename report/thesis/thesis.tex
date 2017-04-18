@@ -1,0 +1,176 @@
+\documentclass{report}
+\usepackage[dvipsnames]{xcolor}
+\usepackage[american]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[dvipsnames]{xcolor}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{comment} % enables the use of multi-line comments (\ifx \fi)
+\usepackage{fullpage} % changes the margin
+\usepackage{todonotes}
+\usepackage{import}
+\usepackage{multicol}
+
+\usepackage[backend=biber,style=apa,bibstyle=authoryear,url=false,isbn=false]{biblatex}
+\addbibresource{SingingBirds.bib}
+%\DeclareLanguageMapping{american}{american-apa}
+
+\usepackage{xifthen}
+\usepackage{soul}
+\sethlcolor{Apricot}
+\newcommand\bla[1]{\ifthenelse{\isempty{#1}}{\hl{**~bla~bla~**}}{\hl{**~#1~**}}}
+\usepackage[unicode=true]{hyperref}
+\usepackage[all]{hypcap} % ref link to the top of the figure
+
+\usepackage{csquotes} % Dependency for APA
+
+\usepackage{titlesec}
+
+\titleformat{\chapter}{\normalfont\huge}{\thechapter.}{20pt}{\Huge}
+
+
+\hypersetup{breaklinks=true,
+            pdfauthor={Paul Ecoffet},
+            pdftitle={Master thesis},
+            colorlinks=true,
+            citecolor=blue,
+            urlcolor=blue,
+            linkcolor=magenta,
+            pdfborder={0 0 0}
+            }
+\urlstyle{same} % don't use monospace font for urls
+
+
+\title{Master Thesis - Zebra finches}
+\author{Paul Ecoffet}
+\date{The 6th of June, 2017}
+
+
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+The Zebra Finches are songbirds which learn the song of their tutor. They learn
+it from 25 days post hatch (DPH) to 90 DPH \parencite{liu_juvenile_2004}. Zebra
+finches are commonly used as a model of speech acquisition.
+
+\textcite{deregnaucourt_how_2005} showed that sleep plays an important role in
+the learning of tutor songs. Indeed, they showed that sleeping has a negative
+impact on song restitution by zebra finches in the short term but a positive
+impact on the long run. Song restitution is less complex and less similar to the
+tutor song from one morning to the previous day evening, but the greater this
+loss in performance was overall for one bird, the better this bird was able to
+reproduce the tutor song at the end of its learning.
+
+
+In addition to that, \textcite{dave_song_2000} have found neurons in the motor
+cortex which fires sequences during sleep that correspond to their activity
+pattern when the birds sing in adult zebra finches. This shows that motor
+neurons that are highly correlated with bird's own song (BOS) are activated
+during the night. These identified replays suggest that some learning may occur
+during sleep that use past experiences.
+
+Our hypothesis is that during its sleep, the zebra finch restructures the
+knowledge it has acquired so far thanks to replay mechanisms. We hypothesize
+that this restructuring can account for the loss of performance in the short
+term and an improvement of performance in the long term.
+
+The goal of this internship is to offer a model of the zebra finch song
+learning which can explain different behavioral data observed such as the
+correlation between the loss of performance every night and the overall
+performance at the end of learning.
+\end{abstract}
+
+\tableofcontents
+
+\chapter{Introduction}
+
+\section{Zebra finch song learning}
+The Zebra Finches are songbirds which learn the song of their tutor. They learn
+it from 25 days post hatch (DPH) to 90 DPH \parencite{liu_juvenile_2004}. Zebra
+finches are commonly used as a model of speech acquisition.
+
+Why model of speech acquisition:
+* fast learning (90 days)
+* Learning during development \cite{margoliash_offline_2003}
+* Very reproductible result with a tutor song that the bird will mimic its whole
+  life \cite{margoliash_sleep_2010}
+    * Close ended learners vs open-ended learner \cite{margoliash_sleep_2010}
+* Many-to-many relationship between auditory feedback and muscle outputs \cite{margoliash_offline_2003}
+
+* Can be easily raised domesticaly (Rosenfield)
+* More localised brain structure (Rosenfield)
+    * Can study circuitries
+
+
+
+The stages of learning
+* subsong, plastic, cristallization \cite{margoliash_sleep_2010}
+
+
+\section{Neuroscience}
+
+\section{Sleep}
+\textcite{deregnaucourt_how_2005} showed that sleep plays an important role in
+the learning of tutor songs. Indeed, they showed that sleeping has a negative
+impact on song restitution by zebra finches in the short term but a positive
+impact on the long run. Song restitution is less complex and less similar to the
+tutor song from one morning to the previous day evening, but the greater this
+loss in performance was overall for one bird, the better this bird was able to
+reproduce the tutor song at the end of its learning.
+
+\textcite{dave_song_2000} have found neurons in the motor cortex which fires
+sequences during sleep that correspond to their activity pattern when the birds
+sing in adult zebra finches. This shows that motor neurons that are highly
+correlated with bird's own song (BOS) are activated during the night. These
+identified replays suggest that some learning may occur during sleep that use
+past experiences.
+
+* Replays can explain learning \cite{margoliash_offline_2003}
+* Consolidate learning
+* Needed to reach new sounds \cite{margoliash_offline_2003}
+* replays with weird burst inside \cite{margoliash_evaluating_2002}
+
+\section{Sum up}
+Our hypothesis is that during its sleep, the zebra finch restructures the
+knowledge it has acquired so far thanks to replay mechanisms. We hypothesize
+that this restructuring can account for the loss of performance in the short
+term and an improvement of performance in the long term.
+
+The goal of this internship is to offer a model of the zebra finch song
+learning which can explain different behavioral data observed such as the
+correlation between the loss of performance every night and the overall
+performance at the end of learning.
+
+\chapter{Model}
+
+\section{Previous model for birdsong learning with Zebra Finches}
+
+* Preference for same species songs \cite{margoliash_evaluating_2002,
+marler_three_1997}
+* \cite{marler_three_1997}
+* \cite{coen_learning_2007}
+
+
+\section{Our proposed model}
+
+* Tutor song is known by the bird ``by heart'' \cite{deregnaucourt_how_2005, margoliash_sleep_2010}
+``Exposure to a song model, either from a live tutor (e.g. father or other
+male) or song playback, typically results in the production of a good imitation
+of the tutor song. For learning to occur, birds only need to hear the song
+template during a short critical period in their life suggesting that auditory
+encoding of the song template and the process of vocal imitation are two
+separate events''
+
+\chapter{Results}
+
+\chapter{Discussion}
+
+\chapter{Conclusion}
+
+\printbibliography{}
+
+\end{document}
