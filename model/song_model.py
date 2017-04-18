@@ -68,7 +68,8 @@ class SongModel:
                     logger.debug('last gesture picked')
                     max_pos = len(self.song) - 100
                 new_pos = self.rng.normal(loc=gestures[to_move][0],
-                                          scale=(max_pos-min_pos)/4)
+                                          scale=max((max_pos-min_pos)/4,
+                                                    0.00005))
                 gestures[to_move][0] = int(np.clip(new_pos, min_pos, max_pos))
             else:  # Do not mutate
                 pass
