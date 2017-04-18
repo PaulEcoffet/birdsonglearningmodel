@@ -31,6 +31,7 @@ def extract_syllables_feature(song, threshold=None, normalize=True):
                               freq_range=256, fft_size=1024, fft_step=40))
     if threshold is None:
         sort_amp = np.sort(sfeat['amplitude'])
+        sort_amp = sort_amp[len(sort_amp)//10:]  # discard too low values
         i_max_diff = np.argmax(_running_mean(np.diff(sort_amp), 100))
         threshold = sort_amp[i_max_diff]
     syllables = []
@@ -50,30 +51,39 @@ def extract_syllables_feature(song, threshold=None, normalize=True):
             end = None
     return syllables
 
+
 def percentage_change(first, last):
     """Compute the percentage of change between two datasets."""
     first = copy(first)
-    first['cond'] = 'fist'
+    first['cond'] = 'first'
     last = copy(last)
     last['cond'] = 'last'
     return ((last.median() - first.median()) / first.median() * 100).abs()
 
 
-def all_syllables_features(rd: pd.DataFrame):
+def all_syllables_features(rd: pd.DataFrame, progress=None):
     """Get all the information from each syllables from all the songs."""
     syllables = []
+    tot = len(rd) * len(rd.iloc[1]['songs'])
+    done = 0
     for i, row in rd.iterrows():
         moment = row['moment']
         if moment == 'Start' or moment == 'AfterNight':
             moment = 'morning'
         elif moment == 'End' or moment == 'BeforeNight':
             moment = 'evening'
-        out = []
-        for sm in row['songs']:
-            out += extract_syllables_feature(sm.gen_sound())
-            for syllable in out:
+        for isong, sm in enumerate(row['songs']):
+            out = extract_syllables_feature(sm.gen_sound())
+            for isyb, syllable in enumerate(out):
+                if moment == 'evening':
+                    comb = i//2 + 0.5
+                else:
+                    comb = i//2
                 syb_dict = {'day': i//2,
+                            'isyb': isyb,
+                            'isong': isong,
                             'moment': moment,
+                            'comb': com,
                             'beg': syllable['beg'],
                             'end': syllable['end'],
                             'length': syllable['end'] - syllable['beg']}
@@ -83,4 +93,7 @@ def all_syllables_features(rd: pd.DataFrame):
                     syb_dict['m'+key] = np.mean(syllable[key])
                     syb_dict['v'+key] = np.var(syllable[key])
                 syllables.append(syb_dict)
+            done += 1
+            if progress is not None:
+                progress.value = done / tot
     return pd.DataFrame(syllables)
