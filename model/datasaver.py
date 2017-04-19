@@ -1,5 +1,6 @@
 """Data Saver module to save output from different learning mechanism."""
 import pickle
+from copy import deepcopy
 from contextlib import contextmanager
 
 
@@ -18,7 +19,7 @@ class DataSaver():
         """Add element in the data saver."""
         if label is None:
             label = self.labels[-1]
-        self.data.append((label, kwargs))
+        self.data.append((label, deepcopy(kwargs)))
 
     def write(self, path=None):
         """Write the data into a file."""
