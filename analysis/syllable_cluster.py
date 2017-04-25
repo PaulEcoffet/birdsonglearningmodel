@@ -83,7 +83,7 @@ def all_syllables_features(rd: pd.DataFrame, progress=None):
                             'isyb': isyb,
                             'isong': isong,
                             'moment': moment,
-                            'comb': com,
+                            'comb': comb,
                             'beg': syllable['beg'],
                             'end': syllable['end'],
                             'length': syllable['end'] - syllable['beg']}

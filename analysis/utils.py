@@ -18,8 +18,17 @@ import birdsonganalysis as bsa
 sys.path.append('../model')
 
 from song_model import SongModel
+from measures import bsa_measure
 
 sns.set_palette('colorblind')
+
+
+
+def _running_mean(x, N):
+    y = np.zeros((len(x),))
+    for ctr in range(len(x)):
+         y[ctr] = np.sum(x[ctr:(ctr+N)])
+    return y/N
 
 
 def draw_learning_curve(rd, ax=None):
@@ -43,13 +52,15 @@ def plot_to_html(fig):
         base64.b64encode(buf.getvalue()).decode('ascii')))
 
 
-class NoDataException(Exception): pass
+class NoDataException(Exception):
+    pass
 
 
 class CacheDict(defaultdict):
 
     def __missing__(self, key):
-        return self.default_factory(key)
+        self[key] = value = self.default_factory(key)
+        return value
 
 
 class GridAnalyser:
@@ -63,7 +74,6 @@ class GridAnalyser:
         self.options_list = []
         for path in self.run_paths:
             options = basename(path).split('+')
-            print(options)
             for i, option in enumerate(options):
                 try:
                     self.options_list[i].add(option)
@@ -81,8 +91,12 @@ class GridAnalyser:
                 self.tutor_audio(i),
                 self.configuration(i),
                 self.learning_curve(i),
+                self.spec_deriv_plot(i, 1, best),
+                self.spec_deriv_plot(i, 10, best),
                 self.spec_deriv_plot(i, -1, best),
-                self.tutor_spec_plot()
+                self.synth_spec(i),
+                self.tutor_spec_plot(i),
+                self.gestures_hist(i, -1, best)
             ]
         except NoDataException:
             vbox.children = [
@@ -99,20 +113,27 @@ class GridAnalyser:
         return widgets.HTML(a._repr_html_())
 
     def spec_deriv_plot(self, irun, iday, ismodel):
-        song = self.rd[irun]['songs'].iloc[iday][ismodel].gen_sound()
+        sm = self.rd[irun]['songs'].iloc[iday][ismodel]
+        song = sm.gen_sound()
         fig = plt.figure(figsize=(13, 4))
         ax = fig.gca()
         ax = bsa.spectral_derivs_plot(bsa.spectral_derivs(song, 256, 40, 1024),
                                       contrast=0.01, ax=ax)
+        for start, param in sm.gestures:
+            ax.axvline(start//40, color="black", linewidth=1)
         plt.close(fig)
         return plot_to_html(fig)
 
-    def tutor_spec_plot(self):
-        sr, tutor = wavfile.read(join(self.run_paths[0], 'tutor.wav'))
+    def tutor_spec_plot(self, i):
+        sr, tutor = wavfile.read(join(self.run_paths[i], 'tutor.wav'))
         fig = plt.figure(figsize=(13, 4))
         ax = fig.gca()
         bsa.spectral_derivs_plot(bsa.spectral_derivs(tutor, 256, 40, 1024),
                                  contrast=0.01, ax=ax)
+        gtes = np.loadtxt('../data/{}_gte.dat'.format(
+            basename(self.conf[i]['tutor']).split('.')[0]))
+        for start in gtes:
+            ax.axvline(start//40, color="black", linewidth=1)
         plt.close(fig)
         return plot_to_html(fig)
 
@@ -134,6 +155,26 @@ class GridAnalyser:
         ax = fig.gca()
         try:
             ax = draw_learning_curve(self.rd[i], ax)
+        except:
+            pass
+        else:
+            sr, synth = wavfile.read('../data/{}_out.wav'.format(
+                basename(self.conf[i]['tutor']).split('.')[0]))
+
+            # Do compute score on BA synth only on syllables
+            amp = bsa.song_amplitude(synth, 256, 40, 1024)
+            sort_amp = np.sort(amp)
+            sort_amp = sort_amp[len(sort_amp)//10:]  # discard too low values
+            i_max_diff = np.argmax(_running_mean(np.diff(sort_amp), 100))
+            threshold = sort_amp[i_max_diff]
+
+            sr, tutor = wavfile.read(join(self.run_paths[i], 'tutor.wav'))
+            msynth = bsa_measure(synth, 44100)
+            mtutor = bsa_measure(tutor, 44100)
+            score = np.linalg.norm(msynth[amp > threshold] - mtutor[amp > threshold]) / np.sum(amp > threshold) * len(amp)
+            ax.axhline(score, color="orange")
+            score = np.linalg.norm(msynth - mtutor)
+            ax.axhline(score, color="red")
         finally:
             plt.close(fig)
         return plot_to_html(fig)
@@ -150,6 +191,28 @@ class GridAnalyser:
                 raise NoDataException
         return out
 
+    def gestures_hist(self, irun, iday, ismodel):
+        """Plot the histogram of the gesture durations"""
+        sm = self.rd[irun]['songs'].iloc[iday][ismodel]
+        durations = []
+        for i in range(len(sm.gestures) - 1):
+            durations.append(sm.gestures[i+1][0] - sm.gestures[i][0])
+        durations.append(len(sm.song) - sm.gestures[-1][0])
+
+        gtes = np.loadtxt('../data/{}_gte.dat'.format(
+            basename(self.conf[irun]['tutor']).split('.')[0]))
+        tdurations = []
+        for i in range(len(gtes) - 1):
+            tdurations.append(gtes[i+1] - gtes[i])
+        tdurations.append(len(sm.song) - gtes[-1])
+        fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13, 6), sharex=True)
+        ax1 = sns.distplot(durations, ax=ax1)
+        ax1.set_title("{} gestures".format(len(sm.gestures)))
+        ax2 = sns.distplot(tdurations, ax=ax2)
+        ax2.set_title("{} gestures".format(len(gtes)))
+        plt.close(fig)
+        return plot_to_html(fig)
+
     def _get_rd(self, i):
         root_data = [item[1] for item in self.data[i] if item[0] == 'root']
         return pd.DataFrame(root_data)
@@ -158,3 +221,17 @@ class GridAnalyser:
         with open(join(self.run_paths[i], 'conf.json')) as f:
             conf = json.load(f)
         return conf
+
+    def synth_spec(self, i):
+        sr, synth = wavfile.read('../data/{}_out.wav'.format(
+            basename(self.conf[i]['tutor']).split('.')[0]))
+        fig = plt.figure(figsize=(13, 4))
+        ax = fig.gca()
+        bsa.spectral_derivs_plot(bsa.spectral_derivs(synth, 256, 40, 1024),
+                                 contrast=0.01, ax=ax)
+        gtes = np.loadtxt('../data/{}_gte.dat'.format(
+            basename(self.conf[i]['tutor']).split('.')[0]))
+        for start in gtes:
+            ax.axvline(start//40, color="black", linewidth=1)
+        plt.close(fig)
+        return plot_to_html(fig)
