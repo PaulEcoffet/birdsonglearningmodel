@@ -49,7 +49,7 @@ def _padded_gen_sound(songmodel, range_, change_index, param, out_ab=False):
                 param, size,
                 falpha=lambda x, p: only_sin(x, p, nb_sin=3),
                 fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-                falpha_nb_args=13, pad=False, beg=start))
+                falpha_nb_args=13, pad=False, beg=0))
     # last one with padding
     i = range_[-1]
     if i != change_index:
@@ -62,7 +62,7 @@ def _padded_gen_sound(songmodel, range_, change_index, param, out_ab=False):
             param, size,
             falpha=lambda x, p: only_sin(x, p, nb_sin=3),
             fbeta=lambda x, p: only_sin(x, p, nb_sin=1),
-            falpha_nb_args=13, pad=True, beg=start))
+            falpha_nb_args=13, pad=True, beg=0))
     if out_ab:
         return synthesize(np.concatenate(alpha_betas),
                           fixed_normalize=True), np.concatenate(alpha_betas)
