@@ -91,3 +91,49 @@ def mutate_best_models_elite(songs, tutor_song, conf,
     datasaver.add(prev_songs=songs, prev_scores=pscore, new_songs=nsongs,
                   new_scores=score)
     return nsongs
+
+
+def mutate_microbial(songs, tutor_song, conf, datasaver=None):
+    """Microbial GA implementation for the songs."""
+    if datasaver is None:
+        datasaver = QuietDataSaver()
+    songs = np.asarray(songs)
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
+    nb_replay = conf['replay']
+    rng = conf['rng_obj']
+    for i in range(nb_replay):
+        picked_songs = rng.choice(len(songs), size=2, replace=False)
+        scores = get_scores(tutor_song, songs[picked_songs], measure, comp)
+        best = np.argmin(scores)
+        loser = 1 - best  # if best = 0, loser = 1, else: loser = 0
+        songs[picked_songs[loser]] = songs[picked_songs[best]].mutate()
+    return songs
+
+
+def extend_pop(songs, tutor_song, conf, datasaver=None):
+    """Extend the size of a population."""
+    if datasaver is None:
+        datasaver = QuietDataSaver()
+    new_pop_size = conf['night_concurrent']
+    rng = conf['rng_obj']
+    songs = np.asarray(songs)
+    night_pop = rng.choice(songs, size=new_pop_size, replace=True)
+    night_pop = np.array([song.mutate() for song in night_pop])
+    return night_pop
+
+
+def restrict_pop(songs, tutor_song, conf, datasaver=None):
+    """Restrict the size of a population."""
+    nb_concurrent = conf['concurrent']
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
+    indices = np.argpartition(get_scores(tutor_song, songs, measure, comp),
+                              -nb_concurrent)[-nb_concurrent:]
+    return np.asarray(songs[indices])
+
+
+def mutate_microbial_extended(songs, tutor_song, conf, datasaver=None):
+    new_pop = extend_pop(songs, tutor_song, conf, datasaver)
+    mutate_pop = mutate_microbial(new_pop, tutor_song, conf, datasaver)
+    return restrict_pop(mutate_pop, tutor_song, conf, datasaver)
