@@ -6,7 +6,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import birdsonganalysis as bsa
 from copy import deepcopy, copy
+from os.path import join, basename
 import pandas as pd
+import pickle
+import sys
+
+sys.path.append('../model')
+
+from song_model import SongModel
 
 
 sns.set_palette('colorblind')
@@ -15,7 +22,7 @@ sns.set_palette('colorblind')
 def _running_mean(x, N):
     y = np.zeros((len(x),))
     for ctr in range(len(x)):
-         y[ctr] = np.sum(x[ctr:(ctr+N)])
+        y[ctr] = np.sum(x[ctr:(ctr+N)])
     return y/N
 
 
@@ -40,7 +47,8 @@ def extract_syllables_feature(song, threshold=None, normalize=True):
     for i, amp in enumerate(sfeat['amplitude']):
         if beg is None and amp > threshold:
             beg = i
-        elif beg is not None and amp < threshold:
+        elif (beg is not None and
+                (amp < threshold or i == len(sfeat['amplitude']) - 1)):
             end = i
             if end - beg > 15:
                 syllable_dict = {'beg': beg, 'end': end}
@@ -52,13 +60,21 @@ def extract_syllables_feature(song, threshold=None, normalize=True):
     return syllables
 
 
-def percentage_change(first, last):
-    """Compute the percentage of change between two datasets."""
+def percentage_change(first, last, objective=None):
+    """Compute the percentage of change between two datasets.
+
+    If objective is set, then a signed value is given for the percentage
+    change.
+    """
     first = copy(first)
     first['cond'] = 'first'
     last = copy(last)
     last['cond'] = 'last'
-    return ((last.median() - first.median()) / first.median() * 100).abs()
+    if objective is not None:
+        sign = np.sign(last.median() - first.median()) * np.sign(objective.median() - first.median())
+    else:
+        sign = np.ones(len(last.median()))
+    return sign * ((last.median() - first.median()) / first.median() * 100).abs()
 
 
 def all_syllables_features(rd: pd.DataFrame, progress=None):
@@ -97,3 +113,29 @@ def all_syllables_features(rd: pd.DataFrame, progress=None):
             if progress is not None:
                 progress.value = done / tot
     return pd.DataFrame(syllables)
+
+
+def syllables_from_run(run_path: str, force=False, progress=None):
+    """Load all the syllables from a run and cache them."""
+    if not force:
+        try:
+            load = pd.HDFStore(join(run_path, 'syllables.hd5'))
+            all_dat = load['syllables']
+            if progress is not None:
+                progress.value = 1
+        except Exception as e:
+            force = True
+
+    if force:
+        try:
+            f = open(join(run_path, 'data.pkl'), 'rb')
+        except FileNotFoundError:
+            f = open(join(run_path, 'data_cur.pkl'), 'rb')
+        data = pickle.load(f)
+        f.close()
+        root_data = [item[1] for item in data if item[0] == 'root']
+        rd = pd.DataFrame(root_data)
+        all_dat = all_syllables_features(rd, progress)
+        all_dat['run_name'] = basename(run_path)
+        all_dat.to_hdf(join(run_path, 'syllables.hd5'), 'syllables')
+    return all_dat
