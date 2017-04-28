@@ -1,5 +1,5 @@
 {
-  "name": "default_coef",
+  "name": "prior_amp_entropy",
   "coefs": {"fm": 1, "am": 1, "entropy": 5, "goodness": 1,
                "amplitude": 5, "pitch": 1}
 }
