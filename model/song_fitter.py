@@ -43,7 +43,7 @@ NIGHT_LEARNING_MODELS = {
     'mutate_best_models_dummy': mutate_best_models_dummy,
     'mutate_best_models_elite': mutate_best_models_elite,
     'mutate_microbial': mutate_microbial,
-    'mutate_microbial_extended': mutate_microbial_extended,
+    'mutate_microbial_extended_elite': mutate_microbial_extended_elite,
     'mutate_microbial_extended_uniform': mutate_microbial_extended_uniform
 }
 COMP_METHODS = {'linalg': lambda g, c: np.linalg.norm(g - c),
