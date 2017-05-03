@@ -6,7 +6,7 @@ from os.path import join, isdir
 import shutil
 import datetime
 import json
-from glob import iglob
+from glob import glob
 import logging
 import itertools
 from pprint import pprint
@@ -28,7 +28,7 @@ EDITOR = os.environ.get('EDITOR', 'vim')
 def get_confs(confdir):
     """Iterator over all combinations of the files in subfolders."""
     confs = []
-    for folder in iglob(join(confdir, "*")):
+    for folder in sorted(glob(join(confdir, "*"))):
         confs.append([])
         if not isdir(folder):
             continue

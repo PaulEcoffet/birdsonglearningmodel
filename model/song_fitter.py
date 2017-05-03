@@ -26,7 +26,7 @@ from measures import bsa_measure, get_scores
 from night_optimisers import mutate_best_models_dummy, \
                              mutate_best_models_elite, \
                              mutate_microbial, \
-                             mutate_microbial_extended, \
+                             mutate_microbial_extended_elite, \
                              mutate_microbial_extended_uniform
 from song_model import SongModel
 
