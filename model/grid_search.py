@@ -32,7 +32,7 @@ def get_confs(confdir):
         confs.append([])
         if not isdir(folder):
             continue
-        for conf_file_name in iglob(join(folder, '*.json')):
+        for conf_file_name in sorted(glob(join(folder, '*.json'))):
             with open(conf_file_name) as conf_file:
                 try:
                     confs[-1].append(json.load(conf_file))
