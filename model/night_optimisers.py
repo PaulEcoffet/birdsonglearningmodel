@@ -123,7 +123,7 @@ def extend_pop(songs, tutor_song, conf, datasaver=None):
     return night_pop
 
 
-def restrict_pop(songs, tutor_song, conf, datasaver=None):
+def restrict_pop_elite(songs, tutor_song, conf, datasaver=None):
     """Restrict the size of a population."""
     nb_concurrent = conf['concurrent']
     measure = conf['measure_obj']
@@ -133,7 +133,30 @@ def restrict_pop(songs, tutor_song, conf, datasaver=None):
     return np.asarray(songs[indices])
 
 
-def mutate_microbial_extended(songs, tutor_song, conf, datasaver=None):
+def restrict_pop_uniform(songs, conf, datasaver=None):
+    nb_concurrent = conf['concurrent']
+    rng = conf['rng_obj']
+    return rng.choice(songs, nb_concurrent, replace=False)
+
+
+def restrict_pop_rank(songs, tutor_song, conf, datasaver=None):
+    nb_concurrent = conf['concurrent']
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
+    rng = conf['rng_obj']
+    scores = get_scores(tutor_song, night_songs, measure, comp)
+    fitness = len(night_songs) - rank(score)
+    return rng.choice(songs, nb_concurrent, replace=False,
+                      p=fitness/np.sum(fitness))
+
+
+def mutate_microbial_extended_elite(songs, tutor_song, conf, datasaver=None):
     new_pop = extend_pop(songs, tutor_song, conf, datasaver)
     mutate_pop = mutate_microbial(new_pop, tutor_song, conf, datasaver)
-    return restrict_pop(mutate_pop, tutor_song, conf, datasaver)
+    return restrict_pop_elite(mutate_pop, tutor_song, conf, datasaver)
+
+
+def mutate_microbial_extended_uniform(songs, tutor_song, conf, datasaver=None):
+    new_pop = extend_pop(songs, tutor_song, conf, datasaver)
+    mutate_pop = mutate_microbial(new_pop, tutor_song, conf, datasaver)
+    return restrict_pop_uniform(mutate_pop, tutor_song, conf, datasaver)

@@ -1,5 +1,4 @@
-"""
-Fit a whole song.
+"""Fit a whole song.
 
 This module fits a whole song!
 """
@@ -43,7 +42,8 @@ NIGHT_LEARNING_MODELS = {
     'mutate_best_models_dummy': mutate_best_models_dummy,
     'mutate_best_models_elite': mutate_best_models_elite,
     'mutate_microbial': mutate_microbial,
-    'mutate_microbial_extended': mutate_microbial_extended
+    'mutate_microbial_extended': mutate_microbial_extended,
+    'mutate_microbial_extended_uniform': mutate_microbial_extended_uniform
 }
 COMP_METHODS = {'linalg': lambda g, c: np.linalg.norm(g - c),
                 'fastdtw': lambda g, c: fastdtw(g, c, dist=2, radius=1)[0]}
@@ -51,8 +51,7 @@ COMP_METHODS = {'linalg': lambda g, c: np.linalg.norm(g - c),
 
 def fit_song(tutor_song, conf, datasaver=None):
     # FIXME OUTDATED
-    """
-    Fit a song with a day and a night phase.
+    """Fit a song with a day and a night phase.
 
     tutor_song - Format: 1D np.array
                  The tutor song that the algorithm will try to reproduce.
