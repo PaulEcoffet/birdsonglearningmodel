@@ -66,10 +66,6 @@ def percentage_change(first, last, objective=None):
     If objective is set, then a signed value is given for the percentage
     change.
     """
-    first = copy(first)
-    first['cond'] = 'first'
-    last = copy(last)
-    last['cond'] = 'last'
     if objective is not None:
         sign = np.sign(last.median() - first.median()) * np.sign(objective.median() - first.median())
     else:
@@ -89,31 +85,35 @@ def all_syllables_features(rd: pd.DataFrame, progress=None):
         elif moment == 'End' or moment == 'BeforeNight':
             moment = 'evening'
         for isong, sm in enumerate(row['songs']):
-            out = extract_syllables_feature(sm.gen_sound())
-            for isyb, syllable in enumerate(out):
-                if moment == 'evening':
-                    comb = i//2 + 0.5
-                else:
-                    comb = i//2
-                syb_dict = {'day': i//2,
-                            'isyb': isyb,
-                            'isong': isong,
-                            'moment': moment,
-                            'comb': comb,
-                            'beg': syllable['beg'],
-                            'end': syllable['end'],
-                            'length': syllable['end'] - syllable['beg']}
-                for key in syllable:
-                    if key == 'beg' or key == 'end':
-                        continue
-                    syb_dict['m'+key] = np.mean(syllable[key])
-                    syb_dict['v'+key] = np.var(syllable[key])
-                syllables.append(syb_dict)
+            syllables.extend(extract_syllables_statistics(sm.gen_sound(),
+                                                          isong, moment, i))
             done += 1
             if progress is not None:
                 progress.value = done / tot
     return pd.DataFrame(syllables)
 
+
+def extract_syllables_statistics(song, isong=None, moment=None, day=0):
+    syllables = []
+    out = extract_syllables_feature(song)
+    for isyb, syllable in enumerate(out):
+        if moment == 'evening':
+            comb = day//2 + 0.5
+        else:
+            comb = day//2
+        syb_dict = {'day': day//2,
+                    'isyb': isyb,
+                    'isong': isong,
+                    'moment': moment,
+                    'comb': comb,
+                    'beg': syllable['beg'],
+                    'end': syllable['end'],
+                    'length': syllable['end'] - syllable['beg']}
+        for key in ['fm', 'am', 'entropy', 'goodness', 'amplitude', 'pitch']:
+            syb_dict['m'+key] = np.mean(syllable[key])
+            syb_dict['v'+key] = np.var(syllable[key])
+        syllables.append(syb_dict)
+    return syllables
 
 def syllables_from_run(run_path: str, force=False, progress=None):
     """Load all the syllables from a run and cache them."""
@@ -124,6 +124,8 @@ def syllables_from_run(run_path: str, force=False, progress=None):
             if progress is not None:
                 progress.value = 1
         except Exception as e:
+            print(type(e))
+            print(e)
             force = True
 
     if force:

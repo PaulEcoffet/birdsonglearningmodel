@@ -120,7 +120,10 @@ class GridAnalyser:
         ax = bsa.spectral_derivs_plot(bsa.spectral_derivs(song, 256, 40, 1024),
                                       contrast=0.01, ax=ax)
         for start, param in sm.gestures:
-            ax.axvline(start//40, color="black", linewidth=1)
+            ax.axvline(start//40, color="black", linewidth=1, alpha=0.1)
+        ax.set_title('Spectrogram of model {} on day {} (run {})'.format(
+            ismodel, iday, irun)
+        )
         plt.close(fig)
         return plot_to_html(fig)
 
@@ -133,7 +136,7 @@ class GridAnalyser:
         gtes = np.loadtxt('../data/{}_gte.dat'.format(
             basename(self.conf[i]['tutor']).split('.')[0]))
         for start in gtes:
-            ax.axvline(start//40, color="black", linewidth=1)
+            ax.axvline(start//40, color="black", linewidth=1, alpha=0.1)
         plt.close(fig)
         return plot_to_html(fig)
 
@@ -169,12 +172,13 @@ class GridAnalyser:
             threshold = sort_amp[i_max_diff]
 
             sr, tutor = wavfile.read(join(self.run_paths[i], 'tutor.wav'))
-            msynth = bsa_measure(synth, 44100)
-            mtutor = bsa_measure(tutor, 44100)
+            msynth = bsa_measure(synth, 44100, coefs=self.conf[i]['coefs'])
+            mtutor = bsa_measure(tutor, 44100, coefs=self.conf[i]['coefs'])
             score = np.linalg.norm(msynth[amp > threshold] - mtutor[amp > threshold]) / np.sum(amp > threshold) * len(amp)
-            ax.axhline(score, color="orange")
+            ax.axhline(score, color="orange", label="corrected error")
             score = np.linalg.norm(msynth - mtutor)
-            ax.axhline(score, color="red")
+            ax.axhline(score, color="red", label="true error")
+            ax.legend()
         finally:
             plt.close(fig)
         return plot_to_html(fig)
@@ -232,6 +236,6 @@ class GridAnalyser:
         gtes = np.loadtxt('../data/{}_gte.dat'.format(
             basename(self.conf[i]['tutor']).split('.')[0]))
         for start in gtes:
-            ax.axvline(start//40, color="black", linewidth=1)
+            ax.axvline(start//40, color="black", linewidth=1, alpha=0.1)
         plt.close(fig)
         return plot_to_html(fig)
