@@ -159,4 +159,4 @@ def mutate_microbial_extended_elite(songs, tutor_song, conf, datasaver=None):
 def mutate_microbial_extended_uniform(songs, tutor_song, conf, datasaver=None):
     new_pop = extend_pop(songs, tutor_song, conf, datasaver)
     mutate_pop = mutate_microbial(new_pop, tutor_song, conf, datasaver)
-    return restrict_pop_uniform(mutate_pop, tutor_song, conf, datasaver)
+    return restrict_pop_uniform(mutate_pop, conf, datasaver)
