@@ -13,7 +13,7 @@ import sys
 
 sys.path.append('../model')
 
-from song_model import SongModel
+from song_model import SongModel  # noqa
 
 
 sns.set_palette('colorblind')
@@ -29,12 +29,37 @@ def _running_mean(x, N):
 def extract_syllables_feature(song, threshold=None, normalize=False):
     """Extract the features of all syllables and segment them.
 
-    If threshold is None, the threshold will be the one with the biggest jump
-    between two amplitude, smoothen by a runnig mean.
-    The guess is not always perfect though.
+    Parameters
+    ----------
+    song : 1D array_like
+        The song to extract syllables from.
+    threshold : float, optional
+        Threshold for the amplitude of the song to determine when a syllable
+        begins and ends. When the amplitude is above the threshold, the
+        syllable begins and ends when the amplitude goes under this threshold.
+        If threshold is None, then it will be infered by a taking all the
+        amplitude sorted and selecting the amplitude for which there is the
+        biggest jump in value between this amplitude and the next one.
+        The difference are smoothen with a running mean first. See code for
+        more details.
+
+    Returns
+    -------
+    syllables - List of Dict
+        Each element of the list is a syllables with the features that have
+        been computed for this syllable, in addition to the beg and end of the
+        syllable in the measure sampling (one measure every 40 sample of
+        sound).
+
+    See also
+    --------
+    extract_syllables_statistics : compute also the mean and variance of each
+        feature.
+    all_syllables_features : extract all syllable statistics from a population
+        of songs.
     """
     sfeat = bsa.all_song_features(song, 44100, freq_range=256,
-                                   fft_size=1024, fft_step=40)
+                                  fft_size=1024, fft_step=40)
     if normalize:
         sfeat = bsa.normalize_features(sfeat)
     if threshold is None:
@@ -68,10 +93,12 @@ def percentage_change(first, last, objective=None):
     change.
     """
     if objective is not None:
-        sign = np.sign(last.median() - first.median()) * np.sign(objective.median() - first.median())
+        sign = (np.sign(last.median() - first.median())
+                * np.sign(objective.median() - first.median()))
     else:
         sign = np.ones(len(last.median()))
-    return sign * ((last.median() - first.median()) / first.median() * 100).abs()
+    return sign * ((last.median() - first.median())
+                   / first.median() * 100).abs()
 
 
 def all_syllables_features(rd: pd.DataFrame, progress=None):
@@ -95,6 +122,7 @@ def all_syllables_features(rd: pd.DataFrame, progress=None):
 
 
 def extract_syllables_statistics(song, isong=None, moment=None, day=0):
+    """Extract syllables from a song and compute the associated statistics."""
     syllables = []
     out = extract_syllables_feature(song)
     for isyb, syllable in enumerate(out):
@@ -116,8 +144,31 @@ def extract_syllables_statistics(song, isong=None, moment=None, day=0):
         syllables.append(syb_dict)
     return syllables
 
-def syllables_from_run(run_path: str, force=False, progress=None):
-    """Load all the syllables from a run and cache them."""
+
+def syllables_from_run(run_path: str, force: bool=False,
+                       progress: 'FloatProgress' = None):
+    """Load all the syllables from a run and cache them.
+
+    It will extract day by day all the syllables from all the song models of
+    the run and return it as a `pandas.DataFrame`. It will also store the
+    extraction in a file in the run folder because extraction is very long.
+
+    Parameters
+    ----------
+    run_path : str
+        The location of the directory of the run.
+    force : bool
+        Force the recomputation of all the syllables even if a cache exists.
+    progress : ipywidgets.widgets.FloatProgress
+        The progress bar to see the evolution of the extraction. Only useful
+        if you run `syllables_from_run` in a Jupyter notebook.
+
+    Returns
+    -------
+    syllables - pandas.DataFrame
+        All the syllables in a DataFrame with their statistics, the day and the
+        song model they are from.
+    """
     if not force:
         try:
             load = pd.HDFStore(join(run_path, 'syllables.hd5'))

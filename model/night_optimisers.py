@@ -1,5 +1,4 @@
-"""
-Collection of functions to optimise songs during the night.
+"""Collection of functions to optimise songs during the night.
 
 These algorithms are mainly restructuring algorithms.
 """
@@ -14,11 +13,11 @@ logger = logging.getLogger('night_optimisers')
 
 
 def rank(array):
-    """
-    Give the rank of each element of an array.
+    """Give the rank of each element of an array.
 
     >>> rank([3 5 2 6])
     [2 3 1 4]
+
     Indeed, 2 is the 1st smallest element of the array, 3 is the 2nd smallest,
     and so on.
     """
@@ -56,8 +55,7 @@ def mutate_best_models_dummy(songs, tutor_song, measure, comp, nb_replay,
 
 def mutate_best_models_elite(songs, tutor_song, conf,
                              datasaver=None):
-    """
-    Elite selection and mutation of the best models.
+    """Elite selection and mutation of the best models.
 
     Keep the best mutations after each replay, parents are present in the
     selection.
@@ -124,7 +122,7 @@ def extend_pop(songs, tutor_song, conf, datasaver=None):
 
 
 def restrict_pop_elite(songs, tutor_song, conf, datasaver=None):
-    """Restrict the size of a population."""
+    """Restrict the size of a population with elitism (bests are kept)."""
     nb_concurrent = conf['concurrent']
     measure = conf['measure_obj']
     comp = conf['comp_obj']
@@ -134,12 +132,14 @@ def restrict_pop_elite(songs, tutor_song, conf, datasaver=None):
 
 
 def restrict_pop_uniform(songs, conf, datasaver=None):
+    """Restrict the size of a population by uniform random selection."""
     nb_concurrent = conf['concurrent']
     rng = conf['rng_obj']
     return rng.choice(songs, nb_concurrent, replace=False)
 
 
 def restrict_pop_rank(songs, tutor_song, conf, datasaver=None):
+    """Restrict the size of a population by rank driven random selection."""
     nb_concurrent = conf['concurrent']
     measure = conf['measure_obj']
     comp = conf['comp_obj']
@@ -151,12 +151,14 @@ def restrict_pop_rank(songs, tutor_song, conf, datasaver=None):
 
 
 def mutate_microbial_extended_elite(songs, tutor_song, conf, datasaver=None):
+    """Do a microbial on an extended population and restrict with elitism."""
     new_pop = extend_pop(songs, tutor_song, conf, datasaver)
     mutate_pop = mutate_microbial(new_pop, tutor_song, conf, datasaver)
     return restrict_pop_elite(mutate_pop, tutor_song, conf, datasaver)
 
 
 def mutate_microbial_extended_uniform(songs, tutor_song, conf, datasaver=None):
+    """Do a microbial on an extended population and restrict by random."""
     new_pop = extend_pop(songs, tutor_song, conf, datasaver)
     mutate_pop = mutate_microbial(new_pop, tutor_song, conf, datasaver)
     return restrict_pop_uniform(mutate_pop, conf, datasaver)

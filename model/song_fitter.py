@@ -1,6 +1,27 @@
-"""Fit a whole song.
+"""Train a model to reproduce a specific birdsong.
 
-This module fits a whole song!
+This module can be called from the shell. It takes a configuration file as a
+parameters. Some parameters can be directly overwritten by the script call.
+
+This module also contains the function `fit_song` which is the main function
+of this research project. See `fit_song` documentation for a full description.
+
+Example
+-------
+
+Run the algorithm with the parameters from a file in JSON format.
+
+    $ python song_fitter.py --conf confs/conf.json
+
+Display help to see all the argument that can be given to the song fitter
+script.
+
+    $ python song_fitter.py --help
+
+Prevent the editor call to take notes before the run.
+
+    $ python song_fitter.py --conf confs/conf.json --no-desc
+
 """
 
 import argparse as ap
@@ -34,11 +55,17 @@ from song_model import SongModel
 logger = logging.getLogger('root')
 EDITOR = os.environ.get('EDITOR', 'vim')
 
+"""
+Available day learning models for the configuration files
+"""
 DAY_LEARNING_MODELS = {
     'optimise_gesture_dummy': optimise_gesture_dummy,
     'optimise_gesture_padded': optimise_gesture_padded,
     'optimise_gesture_whole': optimise_gesture_whole
 }
+"""
+Available night learning models for the configuration files
+"""
 NIGHT_LEARNING_MODELS = {
     'mutate_best_models_dummy': mutate_best_models_dummy,
     'mutate_best_models_elite': mutate_best_models_elite,
@@ -46,37 +73,59 @@ NIGHT_LEARNING_MODELS = {
     'mutate_microbial_extended_elite': mutate_microbial_extended_elite,
     'mutate_microbial_extended_uniform': mutate_microbial_extended_uniform
 }
+"""
+Available comparison methods for the configuration files
+"""
 COMP_METHODS = {'linalg': lambda g, c: np.linalg.norm(g - c),
                 'fastdtw': lambda g, c: fastdtw(g, c, dist=2, radius=1)[0]}
 
 
 def fit_song(tutor_song, conf, datasaver=None):
-    # FIXME OUTDATED
     """Fit a song with a day and a night phase.
 
-    tutor_song - Format: 1D np.array
-                 The tutor song that the algorithm will try to reproduce.
-                 It will be normalized between -1 and +1 internally.
-                 You don't need to do it yourself.
-    measure - Format: a function taking a song or a gesture as argument.
-              signature : measure(1D-np.array) -> `comp` argument.
-              The function to measure the features of the tutor songs
-              and the generated songs. The module `measures` contains
-              several measures that can be used. The classical ones are
-              `lambda x: birdsonganalysis.all_song_features(x, samplerate)` and
-              `lambda x: python_speech_features.mfcc(x, ...)`.
-    comp - Format: a function taking the tutor song measure and a generated
-           song measure and return a real score.
-           Signature : comp(goal_measure, cur_measure) -> float
-           `lambda g, c: np.linalg.norm(g - c)` and
-           `lambda g, c: fastdtw.fastdtw(g, c)[0]` are common comparison
-           function.
-    day_optimisation - Format: function taking a list of SongModel and returns
-                       a list of SongModel.
-                       Signature: day_optimisation(list(SongModel), **day_conf)
-                                        ->list(SongModel)
-                       This function does the optimisations that are supposed
-                       to occur during the day.
+    This function returns SongModel.
+
+    The fit is split in two phases: A day part and a night part. The day part
+    is an simple optimisation algorithm withing gesture. The night part
+    is a restructuring algorithm. See details in the modules
+    `song_model.SongModel`, `day_optimisers` and `night_optimisers`
+
+
+    Parameters
+    ----------
+    tutor_song : 1D array_like
+        The tutor song that the algorithm will try to reproduce.
+        It will be normalized between -1 and +1 internally.
+        You don't need to do it yourself.
+    conf : dict
+        The dictionnary of all the parameters needed for the run.
+        Values that are required with `fit_song are`:
+            'dlm': The day learning model key from DAY_LEARNING_MODELS dict.
+            'nlm': The night learning model key from DAY_LEARNING_MODELS dict.
+            'days': The number of day for a run
+            'concurrent': The number of concurrent songs during the day.
+            'comp_obj': a callable for the comparison.
+            'rng_obj': a `numpy.RandomState` object for the random generation.
+            'measure_obj': a callable to measure song features.
+
+        'comp_obj', 'rng_obj' and 'measure_obj' are not importable from json
+        files, but can be built easily by reading arguments like 'seed' or keys
+        from the configuration files, like 'dlm' and 'nlm'.
+
+        The required values depend on the day learning model and night
+        learning model picked.
+
+    Returns
+    -------
+    songmodels : List[SongModel]
+        The songmodels at the end of the training.
+
+    See also
+    --------
+    song_model.SongModel
+    day_optimisers
+    night_optimisers
+
     """
     day_optimisation = DAY_LEARNING_MODELS[conf['dlm']]
     night_optimisation = NIGHT_LEARNING_MODELS[conf['nlm']]
@@ -119,11 +168,11 @@ def fit_song(tutor_song, conf, datasaver=None):
 
 
 def get_git_revision_hash():
-    """
-    Get the git commit/revision hash.
+    """Get the git commit/revision hash.
 
     Knowing the git revision hash is helpful to reproduce a result with
     the code corresponding to a specific run.
+
     """
     try:
         return str(subprocess.check_output(['git', 'rev-parse', 'HEAD']),
