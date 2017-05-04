@@ -26,16 +26,17 @@ def _running_mean(x, N):
     return y/N
 
 
-def extract_syllables_feature(song, threshold=None, normalize=True):
+def extract_syllables_feature(song, threshold=None, normalize=False):
     """Extract the features of all syllables and segment them.
 
     If threshold is None, the threshold will be the one with the biggest jump
     between two amplitude, smoothen by a runnig mean.
     The guess is not always perfect though.
     """
-    sfeat = bsa.normalize_features(
-        bsa.all_song_features(song, 44100,
-                              freq_range=256, fft_size=1024, fft_step=40))
+    sfeat = bsa.all_song_features(song, 44100, freq_range=256,
+                                   fft_size=1024, fft_step=40)
+    if normalize:
+        sfeat = bsa.normalize_features(sfeat)
     if threshold is None:
         sort_amp = np.sort(sfeat['amplitude'])
         sort_amp = sort_amp[len(sort_amp)//10:]  # discard too low values
