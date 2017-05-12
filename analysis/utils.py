@@ -113,7 +113,10 @@ class GridAnalyser:
         return widgets.HTML(a._repr_html_())
 
     def spec_deriv_plot(self, irun, iday, ismodel):
-        sm = self.rd[irun]['songs'].iloc[iday][ismodel]
+        try:
+            sm = self.rd[irun]['songs'].iloc[iday][ismodel]
+        except IndexError:
+            return widgets.HTML('')
         song = sm.gen_sound()
         fig = plt.figure(figsize=(13, 4))
         ax = fig.gca()
