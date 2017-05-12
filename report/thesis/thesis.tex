@@ -11,10 +11,12 @@
 \usepackage{todonotes}
 \usepackage{import}
 \usepackage{multicol}
+\usepackage{enumitem}
 
-\usepackage[backend=biber,style=apa,bibstyle=authoryear,url=false,isbn=false]{biblatex}
+
+\usepackage[backend=biber,style=apa]{biblatex}
 \addbibresource{SingingBirds.bib}
-%\DeclareLanguageMapping{american}{american-apa}
+\DeclareLanguageMapping{american}{american-apa}
 
 \usepackage{xifthen}
 \usepackage{soul}
@@ -145,8 +147,6 @@ learning which can explain different behavioral data observed such as the
 correlation between the loss of performance every night and the overall
 performance at the end of learning.
 
-\chapter{Model}
-
 \section{Previous models for birdsong learning with Zebra Finches}
 
 * Preference for same species songs \cite{margoliash_evaluating_2002,
@@ -155,7 +155,29 @@ marler_three_1997}
 * \cite{coen_learning_2007}
 
 
-\section{Our proposed model}
+\chapter{Our proposed model}
+
+I build the model in Python.
+
+\section{Global architecture}
+
+\subsection{Terminology}
+
+\begin{description}
+  \item[Tutor song] The tutor song is the goal song the agent try to reproduce.
+  \item[Song Model] A song model is the representation of the motor commands an
+  agent has to produce a song. A song model is composed of several gestures,
+  with the associated parameters and duration.
+  \item[Song structure] The song structure is the agencement of the gestures.
+  Without modifying the parameters of a gesture, the song structure can change
+  by inserting a new gesture, deleting one or changing the length of a gesture.
+  \item[Gesture] ?
+  \item[Learning model] ?
+\end{description}
+
+\subsection{Overview}
+
+\subsection{Memorisation of the tutor song template}
 
 * Tutor song is known by the bird ``by heart'' \cite{deregnaucourt_how_2005, margoliash_sleep_2010}
 ``Exposure to a song model, either from a live tutor (e.g. father or other
@@ -165,7 +187,32 @@ template during a short critical period in their life suggesting that auditory
 encoding of the song template and the process of vocal imitation are two
 separate events'' \todo{source?}
 
+\subsection{Day learning model}
+
+* hillclimbing
+* Optimize gesture but not song structure
+
+
+\subsection{Night learning model}
+
+* Microbial GA
+* Optimise only song structure, not gestures
+
+\subsection{Satellite Modules}
+
+\subsubsection{Bird song analysis package}
+
+* Imported from matlab
+
+\subsubsection{Synthesizer}
+
+* Cythonized and debugged
+
 \chapter{Results}
+
+\section{Syllables development trajectories}
+
+\section{Influence of song model restructuration on learning}
 
 \chapter{Discussion}
 
