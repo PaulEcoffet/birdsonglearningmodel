@@ -48,7 +48,8 @@ from night_optimisers import mutate_best_models_dummy, \
                              mutate_best_models_elite, \
                              mutate_microbial, \
                              mutate_microbial_extended_elite, \
-                             mutate_microbial_extended_uniform
+                             mutate_microbial_extended_uniform, \
+                             mutate_microbial_diversity_uniform
 from song_model import SongModel
 
 
@@ -71,7 +72,8 @@ NIGHT_LEARNING_MODELS = {
     'mutate_best_models_elite': mutate_best_models_elite,
     'mutate_microbial': mutate_microbial,
     'mutate_microbial_extended_elite': mutate_microbial_extended_elite,
-    'mutate_microbial_extended_uniform': mutate_microbial_extended_uniform
+    'mutate_microbial_extended_uniform': mutate_microbial_extended_uniform,
+    'mutate_microbial_diversity_uniform': mutate_microbial_diversity_uniform
 }
 """
 Available comparison methods for the configuration files

@@ -109,6 +109,25 @@ def mutate_microbial(songs, tutor_song, conf, datasaver=None):
     return songs
 
 
+def mutate_microbial_diversity(songs, tutor_song, conf, datasaver=None):
+    """Microbial GA implementation for the songs."""
+    if datasaver is None:
+        datasaver = QuietDataSaver()
+    songs = np.asarray(songs)
+    measure = conf['measure_obj']
+    comp = conf['comp_obj']
+    nb_replay = conf['replay']
+    rng = conf['rng_obj']
+    for i in range(nb_replay):
+        picked_songs = rng.choice(len(songs), size=2, replace=False)
+        scores = get_scores(tutor_song, songs[picked_songs], measure, comp)
+        nb_similar = genetic_neighbours(songs[picked_songs], songs)
+        best = np.argmin(scores * nb_similar)
+        loser = 1 - best  # if best = 0, loser = 1, else: loser = 0
+        songs[picked_songs[loser]] = songs[picked_songs[best]].mutate()
+    return songs
+
+
 def extend_pop(songs, tutor_song, conf, datasaver=None):
     """Extend the size of a population."""
     if datasaver is None:
@@ -152,13 +171,35 @@ def restrict_pop_rank(songs, tutor_song, conf, datasaver=None):
 
 def mutate_microbial_extended_elite(songs, tutor_song, conf, datasaver=None):
     """Do a microbial on an extended population and restrict with elitism."""
+    datasaver.add(label='night', cond='before_evening', pop=songs)
     new_pop = extend_pop(songs, tutor_song, conf, datasaver)
+    datasaver.add(label='night', cond='evening', pop=new_pop)
     mutate_pop = mutate_microbial(new_pop, tutor_song, conf, datasaver)
-    return restrict_pop_elite(mutate_pop, tutor_song, conf, datasaver)
+    datasaver.add(label='night', cond="before_morning", pop=mutate_pop)
+    new_pop = restrict_pop_elite(mutate_pop, tutor_song, conf, datasaver)
+    datasaver.add(label='night', cond='morning', pop=new_pop)
+    return new_pop
 
 
 def mutate_microbial_extended_uniform(songs, tutor_song, conf, datasaver=None):
     """Do a microbial on an extended population and restrict by random."""
+    datasaver.add(label='night', cond='before_evening', pop=songs)
     new_pop = extend_pop(songs, tutor_song, conf, datasaver)
+    datasaver.add(label='night', cond='evening', pop=new_pop)
     mutate_pop = mutate_microbial(new_pop, tutor_song, conf, datasaver)
-    return restrict_pop_uniform(mutate_pop, conf, datasaver)
+    datasaver.add(label='night', cond="before_morning", pop=mutate_pop)
+    new_pop = restrict_pop_uniform(mutate_pop, conf, datasaver)
+    datasaver.add(label='night', cond='morning', pop=new_pop)
+    return new_pop
+
+def mutate_microbial_diversity_uniform(songs, tutor_song, conf, datasaver=None):
+    """Do a microbial on an extended population and restrict by random."""
+    datasaver.add(label='night', cond='before_evening', pop=songs)
+    new_pop = extend_pop(songs, tutor_song, conf, datasaver)
+    datasaver.add(label='night', cond='evening', pop=new_pop)
+    mutate_pop = mutate_microbial_diversity(new_pop, tutor_song, conf,
+                                            datasaver)
+    datasaver.add(label='night', cond="before_morning", pop=mutate_pop)
+    new_pop = restrict_pop_uniform(mutate_pop, conf, datasaver)
+    datasaver.add(label='night', cond='morning', pop=new_pop)
+    return new_pop
