@@ -7,7 +7,7 @@ import logging
 import numpy as np
 
 from datasaver import QuietDataSaver
-from measures import get_scores
+from measures import get_scores, genetic_neighbours
 
 logger = logging.getLogger('night_optimisers')
 

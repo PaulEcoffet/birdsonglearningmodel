@@ -3,7 +3,7 @@
 import numpy as np
 import birdsonganalysis as bsa
 from python_speech_features import mfcc
-
+from bisect import bisect_left
 
 def _running_mean(x, N):
     cumsum = np.cumsum(np.insert(x, 0, 0))
@@ -54,7 +54,7 @@ def get_scores(tutor_song, song_models, measure, comp):
 
 def genetic_neighbours(songs, all_songs, threshold=2000):
     neighbours = np.ones(len(songs))
-    for i, refsong in songs:
+    for iref, refsong in enumerate(songs):
         nb_close = 0
         for isong, song in enumerate(all_songs):
             song_dist = 0
@@ -69,5 +69,5 @@ def genetic_neighbours(songs, all_songs, threshold=2000):
                 song_dist += cur_dist
             if song_dist < threshold:
                 nb_close += 1
-        neighbours[i] = nb_close
+        neighbours[iref] = nb_close
     return neighbours
