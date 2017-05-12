@@ -29,8 +29,10 @@ class SongModel:
         if gestures is None:
             if priors is None:
                 raise ValueError('should give prior if no gestures.')
-            gestures = [[(i * len(song)) // nb_split, np.array(priors)]
-                        for i in range(nb_split)]
+            gestures = [[start, np.array(priors)]
+                        for start in sorted([0] +
+                       list(rng.randint(0, len(song) - 400, size=nb_split-1)))]
+            print(gestures)
         self.gestures = deepcopy(gestures)
         # Do not keep track of parent for now, avoid blow up in copy
         self.parent = None
