@@ -53,27 +53,31 @@ def get_confs(confdir):
 
 def start_run(run_name, conf, res_grid_path):
     """Start a run with run_name and the conf `conf`."""
-    start = datetime.datetime.now()
-    print('starting {}'.format(run_name))
-    conf['rng_obj'] = np.random.RandomState()
-    conf['measure_obj'] = lambda x: bsa_measure(x, 44100,
-                                                coefs=conf['coefs'])
-    conf['comp_obj'] = COMP_METHODS[conf['comp']]
-    conf['name'] = run_name
-    with open(conf['tutor'], 'rb') as tutor_f:
-        sr, tutor = wavfile.read(tutor_f)
-    run_path = join(res_grid_path, run_name)
-    os.makedirs(run_path)
-    shutil.copyfile(conf['tutor'], join(run_path, 'tutor.wav'))
-    datasaver = DataSaver(join(run_path, 'data_cur.pkl'))
-    with open(join(run_path, 'conf.json'), 'w') as conf_file:
-        json.dump({key: conf[key] for key in conf
-                   if not key.endswith('obj')}, conf_file, indent=4)
-    songs = fit_song(tutor, conf, datasaver)
-    datasaver.write(join(run_path, 'data.pkl'))
-    print(run_name, 'is over and took', datetime.datetime.now() - start)
-    print('By the way, it is {}'.format(
-        datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    try:
+        start = datetime.datetime.now()
+        print('starting {}'.format(run_name))
+        conf['rng_obj'] = np.random.RandomState()
+        conf['measure_obj'] = lambda x: bsa_measure(x, 44100,
+                                                    coefs=conf['coefs'])
+        conf['comp_obj'] = COMP_METHODS[conf['comp']]
+        conf['name'] = run_name
+        with open(conf['tutor'], 'rb') as tutor_f:
+            sr, tutor = wavfile.read(tutor_f)
+        run_path = join(res_grid_path, run_name)
+        os.makedirs(run_path)
+        shutil.copyfile(conf['tutor'], join(run_path, 'tutor.wav'))
+        datasaver = DataSaver(join(run_path, 'data_cur.pkl'))
+        with open(join(run_path, 'conf.json'), 'w') as conf_file:
+            json.dump({key: conf[key] for key in conf
+                       if not key.endswith('obj')}, conf_file, indent=4)
+        songs = fit_song(tutor, conf, datasaver)
+        datasaver.write(join(run_path, 'data.pkl'))
+        print(run_name, 'is over and took', datetime.datetime.now() - start)
+        print('By the way, it is {}'.format(
+            datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+    except Exception as e:
+        logger.error('{} crashed'.format(run_name))
+        logger.exception(e)
 
 
 def main():
