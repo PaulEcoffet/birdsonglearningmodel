@@ -118,10 +118,11 @@ def mutate_microbial_diversity(songs, tutor_song, conf, datasaver=None):
     comp = conf['comp_obj']
     nb_replay = conf['replay']
     rng = conf['rng_obj']
+    threshold = conf.get('diversity_threshold', 2000)
     for i in range(nb_replay):
         picked_songs = rng.choice(len(songs), size=2, replace=False)
         scores = get_scores(tutor_song, songs[picked_songs], measure, comp)
-        nb_similar = genetic_neighbours(songs[picked_songs], songs)
+        nb_similar = genetic_neighbours(songs[picked_songs], songs, threshold)
         best = np.argmin(scores * nb_similar)
         loser = 1 - best  # if best = 0, loser = 1, else: loser = 0
         songs[picked_songs[loser]] = songs[picked_songs[best]].mutate()
