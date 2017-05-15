@@ -34,10 +34,14 @@ class SongModel:
                         list(rng.randint(100, len(song) - 100,
                                          size=nb_split-1)))]
             # remove gestures that are too close (or equal)
-            for i in range(nb_split-1):
-                if gestures[i+1][0] - gestures[i][0] < 100:
-                    del gestures[i+1]
-            print(gestures)
+            remove_gesture = True
+            while remove_gesture:
+                remove_gesture = False
+                for i in range(len(gestures)-1):
+                    if gestures[i+1][0] - gestures[i][0] < 100:
+                        del gestures[i+1]
+                        remove_gesture = True  # need to remove more stuff
+                        break
         self.gestures = deepcopy(gestures)
         # Do not keep track of parent for now, avoid blow up in copy
         self.parent = None
