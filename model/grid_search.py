@@ -104,7 +104,7 @@ def main():
         if args.edit_desc:
             subprocess.call([EDITOR, join(res_grid_path, 'desc.md')])
         print('Using {} cpu'.format(args.cpu))
-        logging.basicConfig(level=logging.CRITICAL)
+        logging.basicConfig(level=logging.WARNING)
         Parallel(n_jobs=args.cpu)(
             delayed(start_run)(run_name, conf, res_grid_path)
             for run_name, conf in get_confs(args.confdir))
