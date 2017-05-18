@@ -56,10 +56,10 @@ def genetic_neighbours(songs, all_songs, threshold=2000):
     neighbours = np.ones(len(songs))
     for iref, refsong in enumerate(songs):
         nb_close = 0
-        for isong, song in enumerate(all_songs):
+        for isong, othersong in enumerate(all_songs):
             song_dist = 0
-            other = [gesture[0] for gesture in song.gestures]
-            for i, gesture in enumerate(songs[0].gestures):
+            other = [gesture[0] for gesture in othersong.gestures]
+            for i, gesture in enumerate(refsong.gestures):
                 start = gesture[0]
                 near_i = bisect_left(other, start)
                 if near_i >= len(other) - 1:
