@@ -124,9 +124,12 @@ class GridAnalyser:
                                       contrast=0.01, ax=ax)
         for start, param in sm.gestures:
             ax.axvline(start//40, color="black", linewidth=1, alpha=0.1)
-        ax.set_title('Spectrogram of model {} on day {} (run {})'.format(
-            ismodel, iday, irun)
-        )
+        #ax.set_title('Spectrogram of model {} on day {} (run {})'.format(
+        #    ismodel, iday, irun)
+        #)
+        ax.set_yticks([])
+        ax.set_xticks([])
+        fig.savefig('{}_{}_{}.png'.format(irun, iday, ismodel), dpi=300)
         plt.close(fig)
         return plot_to_html(fig)
 
@@ -140,6 +143,9 @@ class GridAnalyser:
             basename(self.conf[i]['tutor']).split('.')[0]))
         for start in gtes:
             ax.axvline(start//40, color="black", linewidth=1, alpha=0.1)
+        ax.set_yticks([])
+        ax.set_xticks([])
+        fig.savefig('tutor.png', dpi=300)
         plt.close(fig)
         return plot_to_html(fig)
 
@@ -178,11 +184,10 @@ class GridAnalyser:
             msynth = bsa_measure(synth, 44100, coefs=self.conf[i]['coefs'])
             mtutor = bsa_measure(tutor, 44100, coefs=self.conf[i]['coefs'])
             score = np.linalg.norm(msynth[amp > threshold] - mtutor[amp > threshold]) / np.sum(amp > threshold) * len(amp)
-            ax.axhline(score, color="orange", label="corrected error")
-            score = np.linalg.norm(msynth - mtutor)
-            ax.axhline(score, color="red", label="true error")
+            ax.axhline(score, color="orange", label="Boari et al. synth error")
             ax.legend()
         finally:
+            fig.savefig('learning_curve_{}.png'.format(i), dpi=300)
             plt.close(fig)
         return plot_to_html(fig)
 
@@ -240,5 +245,8 @@ class GridAnalyser:
             basename(self.conf[i]['tutor']).split('.')[0]))
         for start in gtes:
             ax.axvline(start//40, color="black", linewidth=1, alpha=0.1)
+        ax.set_yticks([])
+        ax.set_xticks([])
+        fig.savefig('synth.png', dpi=300)
         plt.close(fig)
         return plot_to_html(fig)
