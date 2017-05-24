@@ -108,7 +108,6 @@ Why model of speech acquisition:
     * Can study circuitries
 
 
-
 The stages of learning
 * subsong, plastic, cristallization \cite{margoliash_sleep_2010}
 
@@ -142,10 +141,14 @@ knowledge it has acquired so far thanks to replay mechanisms. We hypothesize
 that this restructuring can account for the loss of performance in the short
 term and an improvement of performance in the long term.
 
-The goal of this internship is to offer a model of the zebra finch song
-learning which can explain different behavioral data observed such as the
-correlation between the loss of performance every night and the overall
-performance at the end of learning.
+
+The goal of this internship is first of all to provide a model of the zebra
+finch song learning with realistic constraints. This model will then allow us
+to explore different strategies that can be used
+
+can explain different behavioral
+data observed such as the correlation between the loss of performance every
+night and the overall performance at the end of learning.
 
 \section{Previous models for birdsong learning with Zebra Finches}
 
@@ -157,7 +160,8 @@ marler_three_1997}
 
 \chapter{Our proposed model}
 
-I build the model in Python.
+\textcite{perl_reconstruction_2011} built a realistic model of the Zebra Finch
+Vocal Apparatus.
 
 \section{Global architecture}
 
@@ -179,13 +183,15 @@ I build the model in Python.
 
 \subsection{Memorisation of the tutor song template}
 
-* Tutor song is known by the bird ``by heart'' \cite{deregnaucourt_how_2005, margoliash_sleep_2010}
-``Exposure to a song model, either from a live tutor (e.g. father or other
-male) or song playback, typically results in the production of a good imitation
-of the tutor song. For learning to occur, birds only need to hear the song
-template during a short critical period in their life suggesting that auditory
-encoding of the song template and the process of vocal imitation are two
-separate events'' \todo{source?}
+* Tutor song is known by the bird ``by heart''
+
+\parencite{deregnaucourt_how_2005, margoliash_sleep_2010} ``Exposure to a song
+model, either from a live tutor (e.g. father or other male) or song playback,
+typically results in the production of a good imitation of the tutor song. For
+learning to occur, birds only need to hear the song template during a short
+critical period in their life suggesting that auditory encoding of the song
+template and the process of vocal imitation are two separate events''
+\todo{source?}
 
 \subsection{Day learning model}
 
