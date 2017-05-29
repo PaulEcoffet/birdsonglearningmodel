@@ -1,166 +1,49 @@
-\documentclass{report}
-\usepackage[dvipsnames]{xcolor}
-\usepackage[american]{babel}
-\usepackage{fontspec}
-\usepackage[dvipsnames]{xcolor}
-\usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{comment} % enables the use of multi-line comments (\ifx \fi)
-\usepackage{fullpage} % changes the margin
-\usepackage{todonotes}
-\usepackage{graphicx}
-\usepackage{import}
-\usepackage{multicol}
-\usepackage{enumitem}
-
-
-\usepackage[backend=biber,style=apa,url=false]{biblatex}
-\addbibresource{SingingBirds.bib}
-\DeclareLanguageMapping{american}{american-apa}
-
-\usepackage{xifthen}
-\usepackage{soul}
-\sethlcolor{Apricot}
-\newcommand\bla[1]{\ifthenelse{\isempty{#1}}{\hl{**~bla~bla~**}}{\hl{**~#1~**}}}
-\usepackage[unicode=true]{hyperref}
-\usepackage[all]{hypcap} % ref link to the top of the figure
-
-\usepackage{csquotes} % Dependency for APA
-
-\usepackage{titlesec}
-\newcommand{\comm}[1]{}
-
-
-\titleformat{\chapter}{\normalfont\huge}{\thechapter.}{20pt}{\Huge}
-
-
-\hypersetup{breaklinks=true,
-            pdfauthor={Paul Ecoffet},
-            pdftitle={Master thesis Computational Model of birdsong learning},
-            colorlinks=true,
-            citecolor=blue,
-            urlcolor=blue,
-            linkcolor=black,
-            pdfborder={0 0 0}
-            }
-\urlstyle{same} % don't use monospace font for urls
-
-
-\title{Master Thesis - Computational model of Zebra Finch song learning and the
-influence of sleep on it}
-\author{Paul Ecoffet}
-\date{The 6th of June, 2017}
-
-
-
-
-\begin{document}
-\maketitle
-
-\begin{abstract}
-The Zebra Finches are songbirds which learn the song of their tutor. They learn
-it from 25 days post hatch (DPH) to 90 DPH \parencite{liu_juvenile_2004}. Zebra
-finches are commonly used as a model of speech acquisition.
-
-\textcite{deregnaucourt_how_2005} showed that sleep plays an important role in
-the learning of tutor songs. Indeed, they showed that sleeping has a negative
-impact on song restitution by zebra finches in the short term but a positive
-impact on the long run. Song restitution is less complex and less similar to the
-tutor song from one morning to the previous day evening, but the greater this
-loss in performance was overall for one bird, the better this bird was able to
-reproduce the tutor song at the end of its learning.
-
-In addition to that, \textcite{dave_song_2000} have found neurons in the motor
-cortex which fires sequences during sleep that correspond to their activity
-pattern when the birds sing in adult zebra finches. This shows that motor
-neurons that are highly correlated with bird's own song (BOS) are activated
-during the night. These identified replays suggest that some learning may occur
-during sleep that use past experiences.
-
-Our hypothesis is that during its sleep, the zebra finch restructures the
-knowledge it has acquired so far thanks to replay mechanisms. We hypothesize
-that this restructuring can account for the loss of performance in the short
-term and an improvement of performance in the long term.
-
-The goal of this internship is to offer a model of the zebra finch song
-learning which can explain different behavioral data observed such as the
-correlation between the loss of performance every night and the overall
-performance at the end of learning.
-\end{abstract}
-
-\tableofcontents
-
 \chapter{Introduction}\label{introduction}
 
 \section{Zebra Finch song learning}\label{zebra-finch-song-learning}
 
-\subsection{Characteristic of the zebra finch song
+\subsection{Characteristic of zebra finch song
 learning}\label{characteristic-of-zebra-finch-song-learning}
 
-\todo{insert zebra finch figure}
-
-The Zebra Finches are songbirds which learn the song of their tutor. Only males
-sing. Singing is part of the courtship of the bird. They learn their tutor song
-from 25 days post hatch (DPH) to 90 DPH \parencite{liu_juvenile_2004}. The songs
-have rather complex structure, with a chain of syllables. A syllable is defined
-by a sound surrounded by short silences. This chain of syllables forms a
-``motif'' \parencite{doupe_birdsong_1999, margoliash_evaluating_2002}. Zebra
-finches are close-ended learners \parencite{margoliash_sleep_2010}. They learns
-only one song and will retain it their whole life, in comparison of open-ended
-learners such as canaries which learns a new song each year.
-
-The Zebra Finch learning development has been described in two different phases.
-First of all, the Zebra Finch is in a sensory phase until 65DPH, when it only
-listens to the song of its tutor, which can be sung by a real Zebra Finch or by
-a song playback. This is a critical period in which the bird memorize fully the
-tutor song. Birds who have access to the tutor song for only ten days between
-25DPH and 65 DPH sing the tutor song as good as the bird with access to the
-tutor song during their whole learning \parencite{bohner_early_1990,
-roper_onset_2006}. The second phase is the sensorimotor phase during which the
-bird sing and use its auditory feedback to improve its performance. It overlaps
-the sensory phase. Starting from 25DPH to 30DPH, the bird produces a
-\emph{subsong}, a process similar to babbling. Then, the bird produce a
-\emph{plastic song} starting from 50DPH. It tries to imitate the tutor song it
-has memorized. After 90DPH, the song has reached its \emph{crystallization}. The
-song is fixed and will not change throughout the Zebra Finch adulthood. The song
-of the Zebra Finch gets highly stereotyped \parencite{williams_birdsong_2004}.
-Zebra Finches needs auditory feedback to learn to sing. Deafening in juvenile
-has severe impact on song acquisition, even if the tutor song has already been
-acquired. Deafening once the song is learned has a much smaller impact on
-performance \parencite{scharff_comparative_1991, doupe_birdsong_1999}. Deafening
-a chicken, in opposition, has no impact on its calls. Zebra Finches raised in
-isolation will also develop abnormal songs. Therefore, Zebra Finches learns
-their vocalisation from a tutor and need to hear themselves to sing correctly.
+\begin{itemize}
+\tightlist
+\item
+  Learn one song for its whole life, Close-end learner (opposition
+  open-end learer)
+\item
+  Learn the song of father
+\item
+  Song divided in motifs, syllables and notes
+\item
+  subsong (babbling), plastic song, cristallysation
+\item
+  Sensory phase (memorisation of tutor song), sensory motor phase
+\item
+  If no auditory feedback, cannot learn.
+\end{itemize}
 
 \subsection{Why is zebra finch song learning
 studied}\label{why-is-zebra-finch-song-learning-studied}
 
-Songbird and especially Zebra finches are commonly used as a comparison with
-human about vocal development. Indeed, the song they produce are not innate even
-though they have predispositions toward learning their songs. They produce
-song with complex structures composed of syllables.
-
-The neuroanatomy of Zebra Finch has also been extensively studied and the
-different structures involved in singing has been identified
-\parencite{nottebohm_neural_2005, bertram_two_2014}.
-\textcite{doupe_birdsong_1999} even proposed parrallels between the areas
-involved in song production with songbird and the areas involved in speech with
-humans.
-
-Zebra Finches are also excellent laboratory animals. They are easily
-domesticated and easy to study compared to other songbirds or ``speaking'' animals\todo{not beautiful sentence}. As they learn only one song, their learning is easily trackable. The developmental trajectory can be inferred. \textcite{deregnaucourt_how_2005} for instance tracked from the \todo{}
-
-
-
 \begin{itemize}
+\tightlist
+\item
+  Model of Human speech learning
 
+  \begin{itemize}
+  \tightlist
+  \item
+    Actual song learning, not innate
+  \item
+    Song with complex structures
+  \end{itemize}
 \item
   Well studied Neuroanatomy
 \item
   Easy to study experimentally
 
   \begin{itemize}
-
+  \tightlist
   \item
     Easily domesticated
   \item
@@ -179,7 +62,7 @@ Finch}\label{neurobiology-of-the-zebra-finch}
 system}\label{neuroanatomy-of-the-zebra-finch-song-system}
 
 \begin{itemize}
-
+\tightlist
 \item
   Connection between RA, HVC, Area X, \ldots{} Inhibition, excitation
 \end{itemize}
@@ -188,14 +71,14 @@ system}\label{neuroanatomy-of-the-zebra-finch-song-system}
 HVC}\label{pattern-of-activation-in-ra-and-hvc}
 
 \begin{itemize}
-
+\tightlist
 \item
   HVC clock like, temporal structure (Ali et al.)
 \item
   RA activation while singing at very precise time and sparse coding
 
   \begin{itemize}
-
+  \tightlist
   \item
     Motor control (Ali et al.) Ali et al. shows real two different
     learning: spectral and temporal
@@ -210,7 +93,7 @@ computational models.
 \subsection{Reinforcement learning}\label{reinforcement-learning}
 
 \begin{itemize}
-
+\tightlist
 \item
   Proposed but no real explanation of what could be the state space, the
   action space, the reward function (Dave\&Margoliash).
@@ -223,7 +106,7 @@ computational models.
 (Marler)}\label{song-preferences-in-selection-marler}
 
 \begin{itemize}
-
+\tightlist
 \item
   Behavioural model to explain how the bird select its template
 \item
@@ -233,12 +116,12 @@ computational models.
 \subsection{Coen's model}\label{coens-model}
 
 \begin{itemize}
-
+\tightlist
 \item
   Clustering technique with babbling (multimodal)
 
   \begin{itemize}
-
+  \tightlist
   \item
     Cluster the tutor song syllables thanks to their characteristics
   \item
@@ -262,14 +145,14 @@ Finch
 song}\label{description-of-perl-song-synthesizer-to-reproduce-zebra-finch-song}
 
 \begin{itemize}
-
+\tightlist
 \item
   Presentation of anatomy simulation, mass and spring\ldots{}
 \item
   Parameters
 
   \begin{itemize}
-
+  \tightlist
   \item
     Air sac pressure
   \item
@@ -284,7 +167,7 @@ song}\label{description-of-perl-song-synthesizer-to-reproduce-zebra-finch-song}
 synthesizer}\label{zebra-finches-are-sensible-to-song-produced-by-the-synthesizer}
 
 \begin{itemize}
-
+\tightlist
 \item
   Show results of Amador where RA neurons were activated by Synth song
   but not by conspecific song.
@@ -294,7 +177,7 @@ synthesizer}\label{zebra-finches-are-sensible-to-song-produced-by-the-synthesize
 structure}\label{gestures-and-song-structure}
 
 \begin{itemize}
-
+\tightlist
 \item
   Boari's Gesture concept and automatic extraction of the gestures
 \item
@@ -308,7 +191,7 @@ development}\label{influence-of-sleep-in-the-zebra-finch-song-development}
 replay}\label{margoliash-results-with-song-replay}
 
 \begin{itemize}
-
+\tightlist
 \item
   RA neurons activated while singing
 \item
@@ -325,7 +208,7 @@ replay}\label{margoliash-results-with-song-replay}
 development}\label{deruxe9gnaucourt-results-about-positive-impact-of-sleep-for-development}
 
 \begin{itemize}
-
+\tightlist
 \item
   Extraction of syllables characteristics and track over time
 \item
@@ -341,13 +224,13 @@ influence}\label{a-computational-model-of-birdsong-learning-to-explain-the-sleep
 learning}\label{interest-of-a-computational-model-of-birdsong-learning}
 
 \begin{itemize}
-
+\tightlist
 \item
   Computational model helps understanding what are the
   \emph{implementation constraints} of the learning mechanisms
 
   \begin{itemize}
-
+  \tightlist
   \item
     Use of synthesizer
   \item
@@ -374,7 +257,7 @@ synthesizer}\label{usage-of-boaris-implementation-of-the-birdsong-synthesizer}
 measures}\label{measurement-of-song-quality-with-standard-measures}
 
 \begin{itemize}
-
+\tightlist
 \item
   Entropy, Pitch, Goodness, Amplitude, Frequency Modulation, Amplitude
   Modulation
@@ -386,7 +269,7 @@ measures}\label{measurement-of-song-quality-with-standard-measures}
 \subsection{Two-step learning model}\label{two-step-learning-model}
 
 \begin{itemize}
-
+\tightlist
 \item
   Bird has several song models it trains to reach tutor
 \item
@@ -410,7 +293,7 @@ synthesizer}\label{gesture-paradigm-inherited-from-synthesizer}
 \subsection{Song structure}\label{song-structure}
 
 \begin{itemize}
-
+\tightlist
 \item
   List of gestures and their duration
 \item
@@ -421,7 +304,7 @@ synthesizer}\label{gesture-paradigm-inherited-from-synthesizer}
 commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
 
 \begin{itemize}
-
+\tightlist
 \item
   Abstracted in sum of sin \& linear func
 \end{itemize}
@@ -431,7 +314,7 @@ commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
 \subsection{goal}\label{goal}
 
 \begin{itemize}
-
+\tightlist
 \item
   Optimise gestures parameters
 \end{itemize}
@@ -439,7 +322,7 @@ commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
 \subsection{Hillclimbing}\label{hillclimbing}
 
 \begin{itemize}
-
+\tightlist
 \item
   really simple
 \item
@@ -452,7 +335,7 @@ commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
   Not whole song but only gesture trained to make faster computations
 
   \begin{itemize}
-
+  \tightlist
   \item
     Actually creates unlearning
   \end{itemize}
@@ -461,7 +344,7 @@ commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
 \subsection{Prediction}\label{prediction}
 
 \begin{itemize}
-
+\tightlist
 \item
   Should improve song production but get stuck in local maximum because
   bad structure
@@ -472,7 +355,7 @@ commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
 \subsection{Goal}\label{goal-1}
 
 \begin{itemize}
-
+\tightlist
 \item
   Find better structure to describe song motor command
 \end{itemize}
@@ -481,12 +364,12 @@ commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
 tested}\label{several-variations-of-algorithm-have-been-tested}
 
 \begin{itemize}
-
+\tightlist
 \item
   Evolutionary algorithm
 
   \begin{itemize}
-
+  \tightlist
   \item
     Simple solution for structure variation
   \end{itemize}
@@ -497,14 +380,14 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
 \subsection{Algorithm}\label{algorithm}
 
 \begin{itemize}
-
+\tightlist
 \item
   Evolutionary algorithm Microbial GA
 \item
   Increase population size and add variation in structure
 
   \begin{itemize}
-
+  \tightlist
   \item
     Remove, add, change, copy gesture
   \item
@@ -514,7 +397,7 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
   Compare by tournament
 
   \begin{itemize}
-
+  \tightlist
   \item
     The winner put a variation of itself in place of the loser
   \item
@@ -525,7 +408,7 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
 \subsection{Predictions}\label{predictions}
 
 \begin{itemize}
-
+\tightlist
 \item
   Structure variation yields unlearning short term but positive impact
   long term
@@ -536,7 +419,7 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
 \section{Parameters}\label{parameters}
 
 \begin{itemize}
-
+\tightlist
 \item
   Tried to be realistic
 \item
@@ -551,7 +434,7 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
   Learning rate
 
   \begin{itemize}
-
+  \tightlist
   \item
     Prevent part of unlearing
   \item
@@ -571,7 +454,7 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
   Diversity threshold to maximise variance in diversity score
 
   \begin{itemize}
-
+  \tightlist
   \item
     Value: 5000
   \item
@@ -585,7 +468,7 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
   Number of tournaments during night: depend of runs
 
   \begin{itemize}
-
+  \tightlist
   \item
     Correlated with replay? By how much?
   \end{itemize}
@@ -597,7 +480,7 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
 better}\label{learning-method-is-as-good-boaris-method-or-better}
 
 \begin{itemize}
-
+\tightlist
 \item
   Using standard measure criteria in the birdsong community
 \item
@@ -606,7 +489,7 @@ better}\label{learning-method-is-as-good-boaris-method-or-better}
   Qualitatively same amount of gestures
 
   \begin{itemize}
-
+  \tightlist
   \item
     Can be due to luck
   \end{itemize}
@@ -616,7 +499,7 @@ better}\label{learning-method-is-as-good-boaris-method-or-better}
 divergence}\label{too-little-training-per-model-cause-divergence}
 
 \begin{itemize}
-
+\tightlist
 \item
   maybe due to global vs local error
 \end{itemize}
@@ -625,7 +508,7 @@ divergence}\label{too-little-training-per-model-cause-divergence}
 reproduced}\label{deruxe9gnaucourt-results-not-reproduced}
 
 \begin{itemize}
-
+\tightlist
 \item
   Syllables extracted by time of begin and end
 \item
@@ -642,7 +525,7 @@ reproduced}\label{deruxe9gnaucourt-results-not-reproduced}
 sounds}\label{the-synthesizer-which-cannot-produce-every-sounds}
 
 \begin{itemize}
-
+\tightlist
 \item
   Our score really close to boari's method (not way better or way
   worst), maybe we reached synthesizer limits
@@ -652,7 +535,7 @@ sounds}\label{the-synthesizer-which-cannot-produce-every-sounds}
 choose}\label{the-parameters-description-we-choose}
 
 \begin{itemize}
-
+\tightlist
 \item
   more simple/complexe possible than sum of sin and affine?
 \end{itemize}
@@ -664,7 +547,7 @@ learning}\label{the-unlearning-during-day-due-to-the-gesture-learning}
 learning}\label{fixed-duration-of-songs-in-learning}
 
 \begin{itemize}
-
+\tightlist
 \item
   Dynamic Time Warping can correct that
 \end{itemize}
@@ -676,7 +559,7 @@ optimisation}\label{big-artificial-separation-between-structuration-and-gestures
 night?}\label{diversity-not-strong-enough-what-if-only-diversity-during-night}
 
 \begin{itemize}
-
+\tightlist
 \item
   Maybe not convergence
 \item
@@ -689,7 +572,7 @@ night?}\label{diversity-not-strong-enough-what-if-only-diversity-during-night}
 learning}\label{learning-algorithm-with-two-step-learning}
 
 \begin{itemize}
-
+\tightlist
 \item
   Very few of them
 \item
@@ -702,15 +585,7 @@ learning}\label{learning-algorithm-with-two-step-learning}
 effect}\label{restructuration-didnt-yield-the-expected-effect}
 
 \begin{itemize}
-
+\tightlist
 \item
   More parameters search might be able to fix it
 \end{itemize}
-
-
-
-
-
-\printbibliography{}
-
-\end{document}
