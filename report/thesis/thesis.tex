@@ -10,9 +10,11 @@
 \usepackage{todonotes}
 \usepackage{graphicx}
 \usepackage{import}
+\usepackage{physics}
+\usepackage{systeme}
 \usepackage{multicol}
 \usepackage{enumitem}
-
+\usepackage[lofdepth,lotdepth]{subfig}
 
 \usepackage[backend=biber,style=apa,url=false]{biblatex}
 \addbibresource{SingingBirds.bib}
@@ -28,8 +30,6 @@
 \usepackage{csquotes} % Dependency for APA
 
 \usepackage{titlesec}
-\newcommand{\comm}[1]{}
-
 
 \titleformat{\chapter}{\normalfont\huge}{\thechapter.}{20pt}{\Huge}
 
@@ -46,13 +46,11 @@
 \urlstyle{same} % don't use monospace font for urls
 
 
-\title{Master Thesis - Computational model of Zebra Finch song learning and the
+\title{Master Thesis\\ Computational model of Zebra Finch song learning and the
 influence of sleep on it}
-\author{Paul Ecoffet}
+\author{Paul Ecoffet\\
+Supervisors: Stéphane Doncieux, Benoît Girard}
 \date{The 6th of June, 2017}
-
-
-
 
 \begin{document}
 \maketitle
@@ -148,257 +146,360 @@ involved in song production with songbird and the areas involved in speech with
 humans.
 
 Zebra Finches are also excellent laboratory animals. They are easily
-domesticated and easy to study compared to other songbirds or ``speaking'' animals\todo{not beautiful sentence}. As they learn only one song, their learning is easily trackable. The developmental trajectory can be inferred. \textcite{deregnaucourt_how_2005} for instance tracked from the \todo{}
+domesticated and easy to study compared to other songbirds or ``speaking''
+animals\todo{not beautiful sentence}. As they learn only one song, their
+learning is easily trackable. The developmental trajectory can be inferred.
+\textcite{deregnaucourt_how_2005} for instance tracked from the syllables
+trajectories by clustering syllable productions over time.
 
+  * Well studied Neuroanatomy
+  * Easy to study experimentally
+        * Easily domesticated
+      * Learn one song
+      * Learn quickly (90DPH)
+      * Easy to track song development
 
+\section{Neurobiology of the Zebra Finch}
+\label{neurobiology-of-the-zebra-finch}
 
-\begin{itemize}
+\subsection{Neuroanatomy of the Zebra Finch song system}
+\label{neuroanatomy-of-the-zebra-finch-song-system}
 
-\item
-  Well studied Neuroanatomy
-\item
-  Easy to study experimentally
+  * Connection between RA, HVC, Area X, \ldots{} Inhibition, excitation
 
-  \begin{itemize}
+\subsection{Pattern of activation in RA and HVC}
+\label{pattern-of-activation-in-ra-and-hvc}
 
-  \item
-    Easily domesticated
-  \item
-    Learn one song
-  \item
-    Learn quickly (90DPH)
-  \item
-    Easy to track song development
-  \end{itemize}
-\end{itemize}
+  * HVC clock like, temporal structure (Ali et al.)
+  * RA activation while singing at very precise time and sparse coding
 
-\section{Neurobiology of the Zebra
-Finch}\label{neurobiology-of-the-zebra-finch}
-
-\subsection{Neuroanatomy of the Zebra Finch song
-system}\label{neuroanatomy-of-the-zebra-finch-song-system}
-
-\begin{itemize}
-
-\item
-  Connection between RA, HVC, Area X, \ldots{} Inhibition, excitation
-\end{itemize}
-
-\subsection{Pattern of activation in RA and
-HVC}\label{pattern-of-activation-in-ra-and-hvc}
-
-\begin{itemize}
-
-\item
-  HVC clock like, temporal structure (Ali et al.)
-\item
-  RA activation while singing at very precise time and sparse coding
-
-  \begin{itemize}
-
-  \item
-    Motor control (Ali et al.) Ali et al. shows real two different
+        * Motor control (Ali et al.) Ali et al. shows real two different
     learning: spectral and temporal
-  \end{itemize}
-\end{itemize}
 
-\section{Models of song learning}\label{models-of-song-learning}
+\section{Models of song learning} \label{models-of-song-learning}
 
 Only very few models have been created. Even less are actual
 computational models.
 
-\subsection{Reinforcement learning}\label{reinforcement-learning}
+\subsection{Reinforcement learning} \label{reinforcement-learning}
 
-\begin{itemize}
-
-\item
-  Proposed but no real explanation of what could be the state space, the
+  * Proposed but no real explanation of what could be the state space, the
   action space, the reward function (Dave\&Margoliash).
-\item
-  Used in paradigm to test different hypothesis (averse reward to force
+  * Used in paradigm to test different hypothesis (averse reward to force
   change in behaviour of the bird)
-\end{itemize}
 
 \subsection{Song preferences in selection
-(Marler)}\label{song-preferences-in-selection-marler}
+(Marler)} \label{song-preferences-in-selection-marler}
 
-\begin{itemize}
+  * Behavioural model to explain how the bird select its template
+  * TODO: Add more
 
-\item
-  Behavioural model to explain how the bird select its template
-\item
-  TODO: Add more
-\end{itemize}
+\subsection{Coen's model} \label{coens-model}
 
-\subsection{Coen's model}\label{coens-model}
+  * Clustering technique with babbling (multimodal)
 
-\begin{itemize}
-
-\item
-  Clustering technique with babbling (multimodal)
-
-  \begin{itemize}
-
-  \item
-    Cluster the tutor song syllables thanks to their characteristics
-  \item
-    Babbling, create a mapping between the motor space and the
+      * Cluster the tutor song syllables thanks to their characteristics
+      * Babbling, create a mapping between the motor space and the
     identified cluster
-  \end{itemize}
-\item
-  Use of a real synthesizer but not actually built to model zf vocal
+    * Use of a real synthesizer but not actually built to model zf vocal
   apparatus
-\item
-  No quantitative means to see how good is the song reproduction
-\item
-  The learning is only babbling, nothing is driving the model in a
+  * No quantitative means to see how good is the song reproduction
+  * The learning is only babbling, nothing is driving the model in a
   specific direction.
-\end{itemize}
 
 \section{Song synthesizer}\label{song-synthesizer}
 
-\subsection{Description of Perl song synthesizer to reproduce Zebra
-Finch
-song}\label{description-of-perl-song-synthesizer-to-reproduce-zebra-finch-song}
+\subsection{G. B. Mindlin's song synthesizer to reproduce Zebra Finch song}
+\label{description-of-perl-song-synthesizer-to-reproduce-zebra-finch-song}
 
-\begin{itemize}
+\begin{figure}[htbp]
+  {\center
+  \includegraphics[width=0.5\linewidth]{media/scheme_vocal_apparatus}
+  \caption{Model of the zebra finch vocal apparatus\label{zf-vocal-aparatus}}}
+  \small
 
-\item
-  Presentation of anatomy simulation, mass and spring\ldots{}
-\item
-  Parameters
+  The air (\(P_{sub}(t)\)) comes from the air sac below the syrinx, then goes up
+  to the trachea, the glottis, resonate in the oro-esophageal cavity (OEC) and
+  the beak (\(P_{out}(t)\)). Each component acts as a filter in G.B. Mindlin's
+  team model of the zebra finch vocal aparatus. Figure 1b taken from
+  \textcite{amador_elemental_2013}.
 
-  \begin{itemize}
+\end{figure}
 
-  \item
-    Air sac pressure
-  \item
-    Syringeal Labial Tension
-  \end{itemize}
-\item
-  Parameters are close to actual motor actions, so close to actual motor
-  command
-\end{itemize}
+G. B. Mindlin and his team built a model of the Zebra Finch vocal apparatus.
+They described with differential equations the behaviour of the components of
+this vocal apparatus (see Fig~\ref{zf-vocal-aparatus}). The differential
+equations model the separation between the syringeal labia. Each labia are
+modeled as a spring and mass system that can produce sustainable oscillations.
+Depending of the parameters it receives, the synthesizer is able to produce a
+vast variety of sounds, either very pure or very rough, depending of the
+strength of the labia tension \parencite{amador_beyond_2008,
+boari_automatic_2015}.
 
-\subsection{Zebra Finches are sensible to song produced by the
-synthesizer}\label{zebra-finches-are-sensible-to-song-produced-by-the-synthesizer}
+They simplified their model and obtained the dynamic system shown in equation \ref{synth_eq_dyn}.
 
-\begin{itemize}
+\begin{equation}
+\systeme*{
+\dv{x}{t} = y,
+\dv{y}{t} = - \alpha \gamma^2 - \beta \gamma^2 x - \gamma^2 x^3 - \gamma x^2 y
+    + \gamma^2 x^2 - \gamma x y
+}
+\label{synth_eq_dyn}
+\end{equation}
 
-\item
-  Show results of Amador where RA neurons were activated by Synth song
-  but not by conspecific song.
-\end{itemize}
+\(x\) describes the position of the syringeal labia. \(\gamma\) is a constant
+which takes into account values specific for the Zebra Finch vocal apparatus.
+\(\alpha\) and \(\beta\) are unit-less time-dependant parameters. \(\alpha\) is
+proportional to the air sac pressure, that is how much air is coming through the
+syrinx, and \(\beta\) is proportional to the syringeal labial tension. It can be
+hypothesized that these two parameters can be easily modified by motor actions.
+Therefore, the whole singing behaviour can be described as the dynamics of
+muscles acting on the air sac pressure and the syringeal labial tension. This
+synthesizer provides thus a way to bridge the gap between actual motor commands
+and song production. Even if the model is simplified, as it assumes a symmetry
+in the labial tensions, it is able to produce a rich variety of sounds.
+\textcite{amador_beyond_2008, perl_reconstruction_2011} studied the parameter
+space and even showed that different categories of sound productions can be
+found in different regions of the parameters space.
 
-\subsection{Gestures and song
-structure}\label{gestures-and-song-structure}
+This model of birdsong production shows that low dimensional but biologically
+realistics parameters can describe the singing behaviour. Simple variations in
+the motor space produces complex and diverse variations in the song production.
+This model simplifies greatly the study of song production behaviour, as it is
+possible to study the dynamics of song production in the motor space while
+keeping realistic constraints.
 
-\begin{itemize}
+\subsection{Zebra Finches are sensible to song produced by the synthesizer}
+\label{zebra-finches-are-sensible-to-song-produced-by-the-synthesizer}
 
-\item
-  Boari's Gesture concept and automatic extraction of the gestures
-\item
-  Could have been correlated to HVC activation but in fact no.
-\end{itemize}
+The computational model of the zebra finch vocal apparatus is a real sound
+synthesizer. It produces sound waves which birds, as we, can listen to. As
+explained in \ref{neurobiology-of-the-zebra-finch}, Zebra Finches have neurons
+which are highly selective to their BOS. When the bird is asleep and listen to
+their own song, these neurons fire in a very specific pattern. To assess the
+quality of their synthesizer, G.B. Mindlin team tested if their synthetical
+song, built from the BOS, will activate these neurons
+\parencite{amador_low_2014, boari_automatic_2015}. They showed that even if the
+strenght of the activation was not as strong as the BOS, their synthesized song
+performed better than a conspecific song or the BOS played in reverse. This
+suggests that the synthesis is sufficiently good to trick a bird and therefore
+a good imitation of its song.
 
-\section{Influence of Sleep in the Zebra Finch song
-development}\label{influence-of-sleep-in-the-zebra-finch-song-development}
+\subsection{Gestures and song structure} \label{gestures-and-song-structure}
 
-\subsection{Margoliash results with song
-replay}\label{margoliash-results-with-song-replay}
+The study of the parameters \(\alpha\) and \(\beta\) over the time course of the
+song reveals interesting results. \textcite{amador_elemental_2013} propose to
+describe songs by the sequence of air sac pressure (\(\alpha\)) and syringeal
+labial tension (\(\beta\)) trajectories, called gestures. A gesture starts and
+stops when there is a discontinuity in the trajectory of either the air sac
+pressure or the tension (see Fig~\ref{gestures_schema}). If notes and syllables
+are the primitives of a song in the sensory space, a gesture is the primitives
+of a song in the motor space. A syllable is most of the time generated by a
+succession of several gestures. Amador and her collaborators suggested that
+spiking pattern observed in HVC is correlated with the onset and offset of
+gestures. It would have suggested that HVC activity is not a clock-like pattern
+but the transmission of high level motor commands which defines the song
+structure. This has been contested by \textcite{lynch_rhythmic_2016} and
+\textcite{picardo_population-level_2016} with extensive statistical analyses.
+Even if HVC neurons do not actually fire on the onset and offset of gestures,
+the gesture framework is very interesting because it allows us to think about
+the song structure representation in the motor space, and especially motor
+discontinuities.
 
-\begin{itemize}
+\begin{figure}[htbp]
+  {\center
+  \includegraphics[width=0.5\linewidth]{media/gesture_schema_amador}
+  \caption{A birdsong and its associated parameters for reproduction segmented
+  in gestures\label{gestures_schema}}}
 
-\item
-  RA neurons activated while singing
-\item
-  Also activated when the bird is asleep and listen to his own song
-\item
-  Spontaneous activity with part of the song: Replays
-\item
-  Replays can be consolidation of memory
-\item
-  Replays can have another role
-\end{itemize}
+  \small
+  \textbf{a)} spectrograph of a bird's song. \textbf{b)} spectrograph of the
+  synthetic song. \textbf{c)} the paramaters \(\alpha\) and \(\beta\) for the
+  song. There is several discontinuities in their trajectories. Each continuous
+  segment forms a gesture. Figure from \textcite{amador_elemental_2013}.
 
-\subsection{Derégnaucourt results about positive impact of sleep for
-development}\label{deruxe9gnaucourt-results-about-positive-impact-of-sleep-for-development}
+\end{figure}
 
-\begin{itemize}
+\section{Influence of Sleep in the Zebra Finch song development}
+\label{influence-of-sleep-in-the-zebra-finch-song-development}
 
-\item
-  Extraction of syllables characteristics and track over time
-\item
-  Global trend for the trajectory of a syllable over time
-\item
-  Each day, the syllables characteristics are closer
-\end{itemize}
+Several studies showed that sleep is involved in the song learning and
+maintenance. \textcite{dave_song_2000} shows thanks to electrophysiology
+recording the . \textcite{deregnaucourt_how_2005} showed that sleep has \todo{}
+
+\subsection{Song replays during sleep}
+\label{song-replays-sleep}
+
+As explained in the Section~\ref{neurobiology-of-the-zebra-finch}, the song
+system in the zebra finch brain is highly specialized. Neurons in HVC or RA have
+a very precise and stereotyped pattern of activation when the adult bird sings.
+\textcite{dave_song_2000} found surprising results. They recorded RA neurons
+while adult birds were asleep. Neurons in RA spontaneously burst in patterns
+similar to their activation patterns while the bird sing. Dave \& Margoliash
+hypothesize that this replay activity could be the product of an off-line
+learning mechanism. Indeed, neural replays have already been found in the rat
+and it has been showed that these replays influence the construction of its cognitive maps \parencite{de_lavilleon_explicit_2015} or the suppression of the replays impairs the learning \parencite{girardeau_selective_2009}.
+
+Dave \& Margoliash's results were obtained on adult birds which have already
+learned their song. Though, we can hypothesize that RA replays also occur in the
+juvenile bird and impacts its learning. The actual function of the mechanism
+that produces these replays must still be determined.
+
+\begin{figure}[tbph]
+  {\center
+  \includegraphics[width=0.7\linewidth]{media/replays_bird_margoliash}
+  \caption{Neuronal replay during sleep}
+  }
+  \small
+  Recording of trace of activity of two different neuron for one bird. For each
+  neuron, a premotor activity is shown with the spectrograph of the song the
+  bird sang and the raw trace of a spontaneous activity during sleep that
+  matches the premotor pattern. Taken from \textcite{dave_song_2000}.
+
+\end{figure}
+
+\subsection{The impact of sleep on the birdsong learning}
+\label{impact-sleep-birdsong-learning}
+
+\textcite{deregnaucourt_how_2005} recorded entire song developments of Zebra
+Finches and studied the vocal trajectories during the whole learning process as
+during the cycles of sleep and wakefulness. They tracked the development of
+syllables and clustered them. Thanks to this database, they computed the shift
+in the mean of the clusters for each syllable either in the same day (2 random
+samples of 100 songs), from evening to the morning (last 100 songs compared to
+the first 100 songs of the next day) or from the middle of one day to the middle
+of the next day (random sample of 100 songs compared to a random sample of 100
+songs of the next day). They computed the total vocal change for each of these
+cluster, that is the relative variation of syllable features
+\textcite{tchernichovski_procedure_2000}\footnote{These measures are detailled
+in Section~\ref{measures}}. They found
+that vocal change was the most important with the comparison of the cluster of
+the evening songs compared to the next day morning song, compared to the changes
+that occur for one day to the next or in the same day (see
+Fig~\ref{der_abs_vocal_change}). This result shows that sleep has a big impact
+in the development of the birdsong, because it cannot be explained by the day to
+day vocal change.
+
+\begin{figure}[htpb]
+  {\center
+  \includegraphics[width=0.7\linewidth]{media/der_absolute_vocal_change}
+  \caption{Absolute vocal change during song development\label{der_abs_vocal_change}}}
+  \small
+  Vocal changes in absolute values (median + s.e.m). Green is the change across random sample during the same day (baseline). Blue is the change between random sample from one day to the next. Red is the vocal change from one evening to the next morning. Taken from \textcite{deregnaucourt_how_2005}.
+\end{figure}
+
+The vocal change measure Derégnaucourt and his team used is an absolute measure.
+That means that this measure cannot tell if the change goes in the same trend as
+the whole learning or in the opposite direction. Thus they introduce a signed
+measure of vocal change. If the change goes in toward the value of the feature
+at the end of the learning, the signed vocal change is positive, otherwise, it
+is negative. The signed vocal change showed that sleep actually has a
+\emph{negative impact} on learning. Indeed, the effect of night-sleep is almost
+always negative (see Fig.~\ref{der_night_signed_change}). The effect cannot be
+explained by the fact the bird has not sung for a long time. Indeed, preventing
+the bird of singing for 8 hours does not yield the same effect. Thus, this
+unlearning is due to a mechanism which occur during sleep.
+
+\begin{figure}[htpb]
+  {\center
+  \subfloat[Vocal changes in signed values during sleep]{
+    \includegraphics[height=5cm]{media/der_night_signed_change}
+    \label{der_night_signed_change}
+  }
+  \subfloat[Entropy variance decreases during sleep]{
+    \includegraphics[height=7cm]{media/entropy_variance_night_effect}
+    \label{entropy_var_night_effect}
+  }
+  }
+  \caption{Sleep has a negative impact on vocal development}
+  \small
+  \textbf{a)} Vocal changes in signed values (median + s.e.m) during night-sleep compared to overall development trend.
+  \textbf{b)} Entropy variance increase overall song development but decrease
+  during night when the bird is still learning. At 90DPH, the bird has reach crystallisation of the song and sleep has little to no impact.
+  Taken from \textcite{deregnaucourt_how_2005}.
+\end{figure}
+
+The authors computed the performance of the bird to reproduce its tutor song at
+the end of its development thanks to a similarity measurement
+\parencite[][developped in
+section~\ref{measures}]{tchernichovski_procedure_2000}. Surprisingly, they found
+that the more the post-sleep deterioration was important overall, the better the
+bird was able to imitate the song of its tutor, as seen on
+Fig.~\ref{der_sim_post_det}. The negative impact sleep has on learning on the
+short term (day to day) has a positive impact in the long run. It shows that a
+learning mechanism is at play during sleep. This learning mechanism has a
+different function than the learning mechanism during the day. The author
+suggest that the oscillations in vocal learning may help the bird get out of
+local maxima in development. Several learning algorithm can be investigated to
+explain these results.
+
+\begin{figure}[htpb]
+  {\center
+  \includegraphics[width=0.3\linewidth]{media/cor_deterioration_sim}
+  \caption{Correlation between post-sleep deterioration and similarity of the
+  tutor song at the end of learning. \label{der_sim_post_det}}}
+  \small
+  The more the sleep deteriorate the bird's learning from one day to the next, the better the bird reproduces its tutor song at the end of its learning. Taken from \textcite{deregnaucourt_how_2005}.
+\end{figure}
+
 
 \section{A computational model of birdsong learning to explain the sleep
-influence}\label{a-computational-model-of-birdsong-learning-to-explain-the-sleep-influence}
+influence}
+\label{a-computational-model-of-birdsong-learning-to-explain-the-sleep-influence}
 
-\subsection{Interest of a computational model of birdsong
-learning}\label{interest-of-a-computational-model-of-birdsong-learning}
+\subsection{Interest of a computational model of birdsong learning}
+\label{interest-of-a-computational-model-of-birdsong-learning}
 
-\begin{itemize}
-
-\item
-  Computational model helps understanding what are the
-  \emph{implementation constraints} of the learning mechanisms
-
-  \begin{itemize}
-
-  \item
-    Use of synthesizer
-  \item
-    Realistic computational budget
-  \end{itemize}
-\item
-  Easily make hypotheses that can be tested experimentally afterwards
-\item
+  * Computational model helps understanding what are the \emph{implementation
+  constraints} of the learning mechanisms
+  * Use of synthesizer Realistic computational budget
+  *Easily make hypotheses that can be tested experimentally afterwards
   Abstracted and controlled environment
-\end{itemize}
 
-\subsection{Goal: Build a modular two-step learning model and look for
-learning algorithm that can account for Derégnaucourt's
-results.}\label{goal-build-a-modular-two-step-learning-model-and-look-for-learning-algorithm-that-can-account-for-deruxe9gnaucourts-results.}
+\subsection{Goal: Build a modular two-step learning model and look for learning
+algorithm that can account for Derégnaucourt's results.}
+\label{goal-build-a-modular-two-step-learning-model}
 
-\chapter{Our Model}\label{our-model}
+\chapter{Our Model} \label{our-model}
 
-\section{Global Architecture}\label{global-architecture}
+The goal of this internship is to build a computational model of birdsong
+learning with realistic constraints and try to model the impact of sleep on song
+development as presented in the Section~\ref{impact-sleep-birdsong-learning}.
+The model is developped from scratch in Python~3. It uses the birdsong
+synthesizer built by G.B.~Mindlin and his team and the standard measures used to
+analyse birdsong.
 
-\subsection{Usage of Boari's implementation of the birdsong
-synthesizer}\label{usage-of-boaris-implementation-of-the-birdsong-synthesizer}
+The Model is a two-step learning model. The model alternates between two
+different learning algorithm. The strong hypothesis we make is that one of these
+learning algorithm correspond to the learning algorithm the bird uses during the
+day, and  the second algorithm is the algorithm used by the bird during its
+sleep. We hypothesize that the algorithm used during sleep should focus on
+restructuration of the song models the bird has and to the diversity . We think
+that an algorithm targetting these\todo{} yields the negative impact of sleep in
+the short term with a positive impact at the end of learning as
+\textcite{deregnaucourt_how_2005} observed.
 
-\subsection{Measurement of song quality with standard
-measures}\label{measurement-of-song-quality-with-standard-measures}
+\section{Global Architecture} \label{global-architecture}
 
-\begin{itemize}
+\subsection{Usage of Boari's implementation of the birdsong synthesizer}
+\label{usage-of-boaris-implementation-of-the-birdsong-synthesizer}
 
-\item
-  Entropy, Pitch, Goodness, Amplitude, Frequency Modulation, Amplitude
+\subsection{Measurement of song quality with standard measures}
+\label{measures}
+
+  * Entropy, Pitch, Goodness, Amplitude, Frequency Modulation, Amplitude
   Modulation
-\item
-  Imported from Matlab implementation, with qualitatively similar
+  * Imported from Matlab implementation, with qualitatively similar
   results
-\end{itemize}
 
-\subsection{Two-step learning model}\label{two-step-learning-model}
+\subsection{Two-step learning model} \label{two-step-learning-model}
 
-\begin{itemize}
-
-\item
-  Bird has several song models it trains to reach tutor
-\item
-  tutor song is known
-\item
-  day algorithm for parameters optimisation
-\item
-  night algorithm for structure optimisation
-\item
-  Hypothesis:~structure optimisation yield unlearning short term, better
+  * Bird has several song models it trains to reach tutor
+  * tutor song is known
+  * day algorithm for parameters optimisation
+  * night algorithm for structure optimisation
+  * Hypothesis:~structure optimisation yield unlearning short term, better
   learning long term
-\end{itemize}
 
 \section{Song Model}\label{song-model}
 
@@ -409,307 +510,141 @@ synthesizer}\label{gesture-paradigm-inherited-from-synthesizer}
 
 \subsection{Song structure}\label{song-structure}
 
-\begin{itemize}
-
-\item
-  List of gestures and their duration
-\item
-  Fixed duration of the song because of measurement
-\end{itemize}
-
+  * List of gestures and their duration
+  * Fixed duration of the song because of measurement
 \subsection{Gesture composed of two generators for the motor
 commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
 
-\begin{itemize}
-
-\item
-  Abstracted in sum of sin \& linear func
-\end{itemize}
-
+  * Abstracted in sum of sin \& linear func
 \section{Day learning algorithm}\label{day-learning-algorithm}
 
 \subsection{goal}\label{goal}
-
-\begin{itemize}
-
-\item
-  Optimise gestures parameters
-\end{itemize}
-
+  * Optimise gestures parameters
 \subsection{Hillclimbing}\label{hillclimbing}
 
-\begin{itemize}
+  * really simple
+  * Choose song model, choose gesture
+  * Choose close parameters, if better keep, if worse trash
+  * Knows if better by comparison of weighted standard measurements
+  * Not whole song but only gesture trained to make faster computations
+        * Actually creates unlearning
 
-\item
-  really simple
-\item
-  Choose song model, choose gesture
-\item
-  Choose close parameters, if better keep, if worse trash
-\item
-  Knows if better by comparison of weighted standard measurements
-\item
-  Not whole song but only gesture trained to make faster computations
-
-  \begin{itemize}
-
-  \item
-    Actually creates unlearning
-  \end{itemize}
-\end{itemize}
-
-\subsection{Prediction}\label{prediction}
-
-\begin{itemize}
-
-\item
-  Should improve song production but get stuck in local maximum because
+  \subsection{Prediction}\label{prediction}
+  * Should improve song production but get stuck in local maximum because
   bad structure
-\end{itemize}
-
 \section{Night learning algorithms}\label{night-learning-algorithms}
 
 \subsection{Goal}\label{goal-1}
 
-\begin{itemize}
-
-\item
-  Find better structure to describe song motor command
-\end{itemize}
-
+  * Find better structure to describe song motor command
 \subsection{Several variations of algorithm have been
 tested}\label{several-variations-of-algorithm-have-been-tested}
 
-\begin{itemize}
+  * Evolutionary algorithm
 
-\item
-  Evolutionary algorithm
-
-  \begin{itemize}
-
-  \item
-    Simple solution for structure variation
-  \end{itemize}
-\item
-  with or without diversity
-\end{itemize}
-
+        * Simple solution for structure variation
+    * with or without diversity
 \subsection{Algorithm}\label{algorithm}
 
-\begin{itemize}
+  * Evolutionary algorithm Microbial GA
+  * Increase population size and add variation in structure
 
-\item
-  Evolutionary algorithm Microbial GA
-\item
-  Increase population size and add variation in structure
+        * Remove, add, change, copy gesture
+      * Song always the same length for comparison reasons.
+    * Compare by tournament
 
-  \begin{itemize}
-
-  \item
-    Remove, add, change, copy gesture
-  \item
-    Song always the same length for comparison reasons.
-  \end{itemize}
-\item
-  Compare by tournament
-
-  \begin{itemize}
-
-  \item
-    The winner put a variation of itself in place of the loser
-  \item
-    Compare number of neighbour * score, lower the better
-  \end{itemize}
-\end{itemize}
-
+        * The winner put a variation of itself in place of the loser
+      * Compare number of neighbour * score, lower the better
 \subsection{Predictions}\label{predictions}
 
-\begin{itemize}
-
-\item
-  Structure variation yields unlearning short term but positive impact
+  * Structure variation yields unlearning short term but positive impact
   long term
-\item
-  Diversity will increase this
-\end{itemize}
+  * Diversity will increase this
 
 \section{Parameters}\label{parameters}
 
-\begin{itemize}
-
-\item
-  Tried to be realistic
-\item
-  most are fit through gridsearch
-\item
-  Realistics: Number of days, number of syllables sung during all dev
-\item
-  Gridsearch optimisation
-\item
-  Default value for gesture parameters
-\item
-  Learning rate
-
-  \begin{itemize}
-
-  \item
-    Prevent part of unlearing
-  \item
-    Could be fitted to match real song learning rate
-  \item
-    Coefficient for score optimisation
-  \end{itemize}
-\item
-  Algorithm way better in score than Boari but qualitatively very
+  * Tried to be realistic
+  * most are fit through gridsearch
+  * Realistics: Number of days, number of syllables sung during all dev
+  * Gridsearch optimisation
+  * Default value for gesture parameters
+  * Learning rate
+        * Prevent part of unlearing
+      * Could be fitted to match real song learning rate
+      * Coefficient for score optimisation
+    * Algorithm way better in score than Boari but qualitatively very
   different to the ear
-\item
-  Look at which parameters boari's method was better than algo and put
+  * Look at which parameters boari's method was better than algo and put
   priority on them
-\item
-  Amplitude and entropy
-\item
-  Diversity threshold to maximise variance in diversity score
+  * Amplitude and entropy
+  * Diversity threshold to maximise variance in diversity score
 
-  \begin{itemize}
-
-  \item
-    Value: 5000
-  \item
-    Other parameters
-  \end{itemize}
-\item
-  Number of song models during day and night: Depend of runs
-\item
-  Boundaries for parameters values: Fixed
-\item
-  Number of tournaments during night: depend of runs
-
-  \begin{itemize}
-
-  \item
-    Correlated with replay? By how much?
-  \end{itemize}
-\end{itemize}
+        * Value: 5000
+      * Other parameters
+    * Number of song models during day and night: Depend of runs
+  * Boundaries for parameters values: Fixed
+  * Number of tournaments during night: depend of runs
+        * Correlated with replay? By how much?
 
 \chapter{Analyses and results}\label{analyses-and-results}
 
 \section{Learning method is as good Boari's method or
 better}\label{learning-method-is-as-good-boaris-method-or-better}
 
-\begin{itemize}
+  * Using standard measure criteria in the birdsong community
+  * Simple description of motor params sufficient to produce good songs
+  * Qualitatively same amount of gestures
+        * Can be due to luck
 
-\item
-  Using standard measure criteria in the birdsong community
-\item
-  Simple description of motor params sufficient to produce good songs
-\item
-  Qualitatively same amount of gestures
-
-  \begin{itemize}
-
-  \item
-    Can be due to luck
-  \end{itemize}
-\end{itemize}
-
-\section{Too little training per model cause
+  \section{Too little training per model cause
 divergence}\label{too-little-training-per-model-cause-divergence}
 
-\begin{itemize}
-
-\item
-  maybe due to global vs local error
-\end{itemize}
-
+  * maybe due to global vs local error
 \section{Derégnaucourt results not
 reproduced}\label{deruxe9gnaucourt-results-not-reproduced}
 
-\begin{itemize}
-
-\item
-  Syllables extracted by time of begin and end
-\item
-  Without or with diversity
-\item
-  No night deterioration
-\item
-  Night deterioration has no impact in overall learning
-\end{itemize}
-
+  * Syllables extracted by time of begin and end
+  * Without or with diversity
+  * No night deterioration
+  * Night deterioration has no impact in overall learning
 \chapter{Discussion}\label{discussion}
 
 \section{The synthesizer which cannot produce every
 sounds}\label{the-synthesizer-which-cannot-produce-every-sounds}
 
-\begin{itemize}
-
-\item
-  Our score really close to boari's method (not way better or way
+  * Our score really close to boari's method (not way better or way
   worst), maybe we reached synthesizer limits
-\end{itemize}
-
 \section{The parameters description we
 choose}\label{the-parameters-description-we-choose}
 
-\begin{itemize}
-
-\item
-  more simple/complexe possible than sum of sin and affine?
-\end{itemize}
-
+  * more simple/complexe possible than sum of sin and affine?
 \section{The unlearning during day due to the gesture
 learning}\label{the-unlearning-during-day-due-to-the-gesture-learning}
 
 \section{Fixed duration of songs in
 learning}\label{fixed-duration-of-songs-in-learning}
 
-\begin{itemize}
-
-\item
-  Dynamic Time Warping can correct that
-\end{itemize}
-
+  * Dynamic Time Warping can correct that
 \section{Big artificial separation between structuration and gestures
 optimisation}\label{big-artificial-separation-between-structuration-and-gestures-optimisation}
 
 \section{Diversity not strong enough? What if only diversity during
 night?}\label{diversity-not-strong-enough-what-if-only-diversity-during-night}
 
-\begin{itemize}
-
-\item
-  Maybe not convergence
-\item
-  Maybe what we are looking for
-\end{itemize}
-
+  * Maybe not convergence
+  * Maybe what we are looking for
 \chapter{Conclusion}\label{conclusion}
 
 \section{Learning algorithm with two step
 learning}\label{learning-algorithm-with-two-step-learning}
 
-\begin{itemize}
-
-\item
-  Very few of them
-\item
-  Working with realistic synthesizer
-\item
-  modular architecture, easy to test new models
-\end{itemize}
-
+  * Very few of them
+  * Working with realistic synthesizer
+  * modular architecture, easy to test new models
 \section{Restructuration didn't yield the expected
 effect}\label{restructuration-didnt-yield-the-expected-effect}
 
-\begin{itemize}
-
-\item
-  More parameters search might be able to fix it
-\end{itemize}
-
-
-
-
+ * More parameters search might be able to fix it
 
 \printbibliography{}
 
