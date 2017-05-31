@@ -663,7 +663,7 @@ results of \textcite{deregnaucourt_how_2005}.
 
 
 
-\section{Day learning algorithm}\label{day-learning-algorithm}
+\section{Day learning algorithm: Parameters optimization}\label{day-learning-algorithm}
 
 \subsection{Algorithm}
 
@@ -677,8 +677,8 @@ bird needs only to be exposed to the tutor song for 10 days before the beginning
 of its learning to be able to reproduce it (as discussed in
 \ref{characteristic-of-zebra-finch-song-learning}).
 
-The bird optimises gesture parameters with a \emph{stochastic hillclimbing}
-algorithm. The bird picks a random song model to optimise, then picks a random
+The bird optimizes gesture parameters with a \emph{stochastic hillclimbing}
+algorithm. The bird picks a random song model to optimize, then picks a random
 gesture from this song model. It compares the sound production of the gesture
 with its actual parameters \(P\) to the expected result from its tutor song
 memory. It then tries a small variation of every parameters of the gesture
@@ -746,17 +746,26 @@ good copy of the song\footnote{Note we cannot test this prediction before the co
 gesture sequences of its Song Models to produce accurate imitation of the tutor
 song.
 
-\section{Night learning algorithms}\label{night-learning-algorithms}
+\section{Night learning algorithms: Sequence Optimization}\label{night-learning-algorithms}
 
+We hypothesize that the sequence optimization algorithm occurs during the bird's
+sleep. We think that sequence optimization can explain Derégnaucourt's results
+showing that sleep has a negative impact on performance in the short term but a
+positive impact on the long term. Indeed, the bird needs to know when he must
+change its motor trajectory, if the sound it targets must be described in more
+gestures, or the gesture to produce a targeted sound must be shorter or longer.
+Modifying the gesture sequence without changing gesture parameters must
+negatively impact the performance, as the parameters were picked for a sequence
+which no longer correspond to their target.
 
-\subsection{Goal}\label{goal}
+Evolutionary algorithms are amongst the simplest algorithms to optimize a
+sequence. We implemented different evolutionary algorithms to test
 
-  * Find better structure to describe song motor command
 \subsection{Several variations of algorithm have been
 tested}\label{several-variations-of-algorithm-have-been-tested}
 
   * Evolutionary algorithm
-
+        * Fitness-proportional
         * Simple solution for structure variation
     * with or without diversity
 \subsection{Algorithm}\label{algorithm}
@@ -780,12 +789,12 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
   * Tried to be realistic
   * most are fit through gridsearch
   * Realistics: Number of days, number of syllables sung during all dev
-  * Gridsearch optimisation
+  * Gridsearch optimization
   * Default value for gesture parameters
   * Learning rate
         * Prevent part of unlearing
       * Could be fitted to match real song learning rate
-      * Coefficient for score optimisation
+      * Coefficient for score optimization
     * Algorithm way better in score than Boari but qualitatively very
   different to the ear
   * Look at which parameters boari's method was better than algo and put
@@ -840,7 +849,7 @@ learning}\label{fixed-duration-of-songs-in-learning}
 
   * Dynamic Time Warping can correct that
 \section{Big artificial separation between structuration and gestures
-optimisation}\label{big-artificial-separation-between-structuration-and-gestures-optimisation}
+optimization}\label{big-artificial-separation-between-structuration-and-gestures-optimization}
 
 \section{Diversity not strong enough? What if only diversity during
 night?}\label{diversity-not-strong-enough-what-if-only-diversity-during-night}
