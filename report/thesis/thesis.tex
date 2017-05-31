@@ -236,7 +236,8 @@ vast variety of sounds, either very pure or very rough, depending of the
 strength of the labia tension \parencite{amador_beyond_2008,
 boari_automatic_2015}.
 
-They simplified their model and obtained the dynamic system shown in equation \ref{synth_eq_dyn}.
+They simplified their model and obtained the dynamic system shown in equation
+\ref{synth_eq_dyn}.
 
 \begin{equation}
 \systeme*{
@@ -462,37 +463,149 @@ algorithm that can account for Derégnaucourt's results.}
 
 \chapter{Our Model} \label{our-model}
 
-The goal of this internship is to build a computational model of birdsong
-learning with realistic constraints and try to model the impact of sleep on song
-development as presented in the Section~\ref{impact-sleep-birdsong-learning}.
-The model is developped from scratch in Python~3. It uses the birdsong
-synthesizer built by G.B.~Mindlin and his team and the standard measures used to
-analyse birdsong.
+The goal of this internship is to build a computational and behavioral model of
+birdsong learning with realistic constraints and try to model the impact of
+sleep on song development as presented in the
+Section~\ref{impact-sleep-birdsong-learning}. The model is developped from
+scratch in Python~3. It uses the birdsong synthesizer built by G.B.~Mindlin and
+his team and the standard measures used to analyse birdsong.
 
 The Model is a two-step learning model. The model alternates between two
 different learning algorithm. The strong hypothesis we make is that one of these
 learning algorithm correspond to the learning algorithm the bird uses during the
 day, and  the second algorithm is the algorithm used by the bird during its
 sleep. We hypothesize that the algorithm used during sleep should focus on
-restructuration of the song models the bird has and to the diversity . We think
-that an algorithm targetting these\todo{} yields the negative impact of sleep in
-the short term with a positive impact at the end of learning as
+restructuration of the song models the bird has and to the diversity \todo{}. We
+think that an algorithm targetting these \todo{} yields the negative impact of
+sleep in the short term with a positive impact at the end of learning as
 \textcite{deregnaucourt_how_2005} observed.
+
+The source code of the model is available at
+\url{https://github.com/PaulEcoffet/birdsonglearningmodel}.
 
 \section{Global Architecture} \label{global-architecture}
 
-\subsection{Usage of Boari's implementation of the birdsong synthesizer}
+The model is built in several modules. First of all, the model uses
+G.B.~Mindlin's team synthesizer to produce realistic song with biologically
+plausible parameters (see Section~\ref{song-synthesizer}). Then, song features
+measurement and songs comparison methods have been implemented and used as the
+hearing system. The song feature measures were taken from the litterature
+\parencite{tchernichovski_procedure_2000}. They are the standard measures used
+to describe songs and syllables in the birdsong research community.
+
+As we are building a computational model, we had to explicit every aspect of the
+song learning.
+
+The birdsong learning model I built is a two step learning algorithm. One
+algorithm models the learning process of the bird during the day, the other
+models the learning during the night. These day and night models can be easily
+changed in the program I wrote.
+
+\subsection{Boari's implementation of the birdsong synthesizer}
 \label{usage-of-boaris-implementation-of-the-birdsong-synthesizer}
 
-\subsection{Measurement of song quality with standard measures}
-\label{measures}
+We want to use G.B.~Mindlin's synthesizer because it allows us to build a
+computational model with realistic constraints. It bridges the gap between the
+motor command and the song production thanks to a biophysical model of the Zebra
+Finch vocal apparatus. Our model can produce simple streams of \(\alpha\) and
+\(\beta\) parameters and send it to the synthesizer. The synthesizer produces
+real sound waves that can be analyzed by the hearing system.
 
-  * Entropy, Pitch, Goodness, Amplitude, Frequency Modulation, Amplitude
-  Modulation
-  * Imported from Matlab implementation, with qualitatively similar
-  results
+We used the implementation of the synthesizer available for download on the
+Dynamical System laboratory of the University of Buenos Aires
+(\url{http://www.lsd.df.uba.ar}) \parencite{boari_automatic_2015}. The
+downloaded program was actually a combination of a \(\alpha\) and \(\beta\)
+parameter extractor from an audio file and the synthesizer from the extracted
+parameters. I extracted the synthesizer from the source code and adapted it so
+that it can receive arbitrary parameters. The synthesizer had several bugs. It
+is suppose to generate a sound stream of the same length of the parameter
+stream, that is, if there is 10~000 values of \(alpha\) and \(beta\) sampled at
+44~100~Hz, the synthesizer should return a sound wave composed of 10~000 values
+sampled at 44~100~Hz. But it actually dismiss 2 values, returning only 9~998
+values. As the implementation of the synthesizer was badly documented and the
+source code was not self explanatory at all, I decided to pad the \(\alpha\)
+\(\beta\) streams with 2 dummy values to prevent this bug.
+
+I have also developped a small Cython package to call Boari's C synthesizer from
+Python. The source code of this package is available at
+\url{https://github.com/PaulEcoffet/birdsynth}.
+
+\subsection{Characterizing and comparing songs}
+
+As we wanted to work on real audio signal, our algorithm must use relevant
+features of the songs to describe them. Indeed, it needs to compare its
+production to the tutor song so as to correct its errors and improve itself.
+
+\subsubsection{Measurement of the song features}
+\label{measures}
+\textcite{tchernichovski_procedure_2000} suggested several measures to
+characterize compare songs. To apply these measures, the song is first cut into
+several time windows, and the measures are computed for each time windows. These
+measures give us a fine-grained description of the song throughout time.
+Tchernikovski and his colleague proposed also a measure of similarity between
+two songs.
+
+They are extensively used in the birdsong research community
+\parencite{coen_learning_2007, deregnaucourt_how_2005, lipkind_stepwise_2013,
+liu_juvenile_2004}.
+
+The measure we used are the Amplitude, the Frequency Modulation, the Amplitude
+Modulation, the Pitch, the Goodness and the Wiener Entropy of the signal.
+Tchernikovski and his team developped a software called Sound Analysis Pro 2011
+to compute these features. Though, this software runs only on Windows and its
+function cannot be called by another program. I have thus ported the
+implementation of the song features measurement from a Matlab implementation
+(called Sound Analysis Toolbox) to a Python implementation. The values of the
+features for the same song computed by my implementation matched qualitatively
+the values of the Matlab implementation (see Figure~\ref{bsa_sat_match}).
+
+I have also reimplemented the spectral derivative plot which is
+extensively used in the songbird research community to represent songs.
+
+\todo{insert graph to show the match}
+
+\subsubsection{Comparison of two songs}
+
+\textcite{tchernichovski_procedure_2000} introduced also a similarity
+measurement. This similarity measurement compares how a song is related to its
+tutor song. To do so, the algorithm of similarity measurement look for matches
+in the features for each sound window of the tutor song and the pupil song. The
+similarity score is the percentage of the tutor song that has been matched to
+the pupil song. The similarity score does not punish wrong order of syllables.
+For instance, if the pupil sings the syllables A-C-B instead of A-B-C, the
+similarity will be very high even if the syllables are sung in the wrong order.
+
+Similarity is really long to compute and is only meaningful when comparing two
+complete songs. It is also almost unaffected by temporal mismatches.Other
+methods are used to compare syllables or notes. For simplicity, syllables are
+compared by the study of means and variance of every features (Pitch, Entropy,
+\ldots{}) during the syllables. Two syllables are considered similar if they
+have the same mean and variance for every features.
+
+The Python module I wrote to compute song features and similarity scores is
+called \emph{birdsonganalysis} and is available for download at
+\url{https://github.com/PaulEcoffet/birdsonganalysis/}.
+
+\subsection{Song Model}\label{song-model}
+
+
+
+\subsubsection{Gesture paradigm inherited from
+synthesizer}\label{gesture-paradigm-inherited-from-synthesizer}
+
+\subsubsection{Gesture sequence}\label{song-structure}
+
+  * List of gestures and their duration
+  * Fixed duration of the song because of measurement
+
+\subsubsection{Gesture composed of two generators for the motor
+commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
+
+  * Abstracted in sum of sin \& linear func
 
 \subsection{Two-step learning model} \label{two-step-learning-model}
+
+Our model is divided in two different phases.
 
   * Bird has several song models it trains to reach tutor
   * tutor song is known
@@ -501,21 +614,7 @@ the short term with a positive impact at the end of learning as
   * Hypothesis:~structure optimisation yield unlearning short term, better
   learning long term
 
-\section{Song Model}\label{song-model}
 
-\subsection{Song Model}\label{song-model-1}
-
-\subsection{Gesture paradigm inherited from
-synthesizer}\label{gesture-paradigm-inherited-from-synthesizer}
-
-\subsection{Song structure}\label{song-structure}
-
-  * List of gestures and their duration
-  * Fixed duration of the song because of measurement
-\subsection{Gesture composed of two generators for the motor
-commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
-
-  * Abstracted in sum of sin \& linear func
 \section{Day learning algorithm}\label{day-learning-algorithm}
 
 \subsection{Goal}\label{goal}
@@ -552,9 +651,8 @@ tested}\label{several-variations-of-algorithm-have-been-tested}
         * Remove, add, change, copy gesture
       * Song always the same length for comparison reasons.
     * Compare by tournament
-
         * The winner put a variation of itself in place of the loser
-      * Compare number of neighbour * score, lower the better
+        * Compare number of neighbour, score, lower the better
 \subsection{Predictions}\label{predictions}
 
   * Structure variation yields unlearning short term but positive impact
