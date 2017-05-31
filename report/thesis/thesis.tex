@@ -593,48 +593,163 @@ this model is to adjust these representations so that they generate an accurate
 imitation of the tutor song with G.B~Mindlin's synthesizer. I call these motor
 representations \emph{Song Models}. The representation we choose for the Song
 Model is highly inspired from \textcite{amador_elemental_2013} works on
-gestures.
+gestures, as our algorithm has to feed the synthesizer with the revelant streams
+of \(\alpha\) and \(\beta\) parameters. Gestures are defined as motor primitives
+and simple, continuous variations of these parameters. Therefore, the Song Model
+is described as an \emph{ordered sequence} of gestures of different durations. A
+gesture describe by two simple formulas the \(\alpha\) and \(\beta\) parameters
+for its duration. For instance, the sequence of a song model could be ``first, gesture A for 50~ms, then gesture B for 30~ms, then gesture C for 120~ms''.
 
+A gesture describe the \(\alpha\) and \(\beta\) stream with two formulas with 18
+parameters. The formulas are sums of affine and sinusoidal functions. These formulas are described in equations~\ref{eq_alpha} and \ref{eq_beta}.
 
-  * List of gestures and their duration
-  * Fixed duration of the song because of measurement
+\begin{align}
+  \alpha(t) &= a_\beta \times t + b_\beta + d_\beta \sin(\omega_\beta \times 2\pi \times t + \phi_\beta) + c_\beta \label{eq_alpha} \\
+  \beta(t) &= a_\alpha \times t + b_\alpha
+          + \sum_{i=1}^{3} \left[ d_{i, \alpha} \sin(\omega_{i, \alpha} \times 2\pi \times t
+          + \phi_{i, \alpha}) \right] + c_\alpha \label{eq_beta}
+\end{align}
 
-\subsubsection{Gesture composed of two generators for the motor
-commands}\label{gesture-composed-of-two-generators-for-the-motor-commands}
+We choose these formulas because they roughly described the gesture pattern we
+have observed using the parameters extractor built by
+\textcite{boari_automatic_2015} while being still relatively simples. Therefore,
+a gesture is always described by 18 parameters, whatever its length. It greatly
+simplify the model as the number of parameters to describe the song reduces
+massively. The synthesizer needs an \alpha and a \beta value at each sound
+sample. It means that at 44~100~Hz, to generate a sound of 20~ms (the average
+duration of a gesture), the synthesizer needs 14~000 values. Our simplified
+formula reduces thes 14~000 values to only 18.
 
-  * Abstracted in sum of sin \& linear func
+At creation, a song model is composed of 30 gestures of random durations. A song
+model has always the exact same duration as the tutor song, and the gesture
+productions target the tutor song at the exact same timing. That is, the gesture
+starting from the 354ms and ending at the 450ms of the song model tries to match
+the segment of the tutor song starting exactly at the 354ms and ending at 450ms.
+This is unrealistic as the pupil song timings do not exactly match the timing of
+the tutor song. This constraint is due to the comparison method we choose to
+assess the resemblance between the generated song and the tutor song.
 
-\subsection{Two-step learning model} \label{two-step-learning-model}
+All gestures at creation have the same 18 parameters (see
+Appendice~\ref{all_parameters}). These inital parameters were found with grid
+search to prevent the algorithm from getting stuck in either producing only
+silence or only sound. Indeed, if the initial parameters produce sound, the
+algorithm may not be able to find the parameters that make the synthesizer
+silent, and reciprocally. The initial parameters we choose are at the boundary
+between silence and phonation to avoid this issue.
 
-Our model is divided in two different phases.
+\subsection{A two-step learning model} \label{two-step-learning-model}
 
-  * Bird has several song models it trains to reach tutor
-  * tutor song is known
-  * day algorithm for parameters optimisation
-  * night algorithm for structure optimisation
-  * Hypothesis:~structure optimisation yield unlearning short term, better
-  learning long term
+Following the architecture of the Song Models, we notice that there are two
+tasks to be fulfilled. First of all, for each gestures, the  parameters must be
+fitted so as to produce the imitation of their corresponding part of the tutor
+song. Secondly, the gesture sequence must be adapted so that the gestures start
+and end at meaningful positions. If there isn't enough gestures to describe all
+the changes needed in the motor trajectories, or if the timing is wrong, the
+bird cannot produce a good imitation of the song.
+
+\todo{graphic for sequence and for parametrization of gesture}
+
+There is therefore two algorithms that must be implemented. we can hypothesize
+that one of these algorithm occurs only during day and the other only during
+night. The optimization of each parameters gesture have only a positive impact
+on the bird performance, but the sequence optimization could destroy the
+progress of the gesture's parameters optimization by changing how the gestures
+are organized. Therefore, we hypothesize that the sequence optimization
+algorithm will have a negative impact on the bird performance on the short term,
+but that it is needed to find the best solution and have a positive impact on
+the long run. We thus think that if the parameter optimization occurs during the
+day and the sequence optimization occurs during the night, we can explain the
+results of \textcite{deregnaucourt_how_2005}.
+
 
 
 \section{Day learning algorithm}\label{day-learning-algorithm}
 
-\subsection{Goal}\label{goal}
-  * Optimise gestures parameters
-\subsection{Hillclimbing}\label{hillclimbing}
+\subsection{Algorithm}
 
-  * really simple
-  * Choose song model, choose gesture
-  * Choose close parameters, if better keep, if worse trash
-  * Knows if better by comparison of weighted standard measurements
-  * Not whole song but only gesture trained to make faster computations
-        * Actually creates unlearning
+The goal of the day learning algorithm is to find the best parameters for each
+gesture of Songs Models. We hypothesize that the bird has a small population of
+concurrent Song Models to optimize. Several values of population size have been
+tested from 1 to 15 Song Models. We also assumed that the bird has perfect
+representation of the tutor song features. It simplifies the model and is
+consistent with the results of \textcite{roper_onset_2006} who showed that the
+bird needs only to be exposed to the tutor song for 10 days before the beginning
+of its learning to be able to reproduce it (as discussed in
+\ref{characteristic-of-zebra-finch-song-learning}).
 
-  \subsection{Prediction}\label{prediction}
-  * Should improve song production but get stuck in local maximum because
-  bad structure
+The bird optimises gesture parameters with a \emph{stochastic hillclimbing}
+algorithm. The bird picks a random song model to optimise, then picks a random
+gesture from this song model. It compares the sound production of the gesture
+with its actual parameters \(P\) to the expected result from its tutor song
+memory. It then tries a small variation of every parameters of the gesture
+\(P'\) according to a normal distribution (See equation~\ref{draw_P}). If \(P'\)
+produces sound matching the tutor song better than \(P\), then the parameters
+\(P'\) are the new parameters of the gesture. Otherwise, the \(P\) stays the
+gesture parameters.
+
+\begin{equation}
+  P' \leftarrow P + \mathcal{N}(\pmb \sigma) \label{draw_P}
+\end{equation}
+
+\(\pmb \sigma\) is the covariance matrix of the parameters, and is analogous to
+the learning rate of the algorithm. Several \(\pmb \sigma\) have been tested. They are described in the appendix \todo{}.
+
+The process is repeated \texttt{nb\_train\_per\_day} times.
+
+\todo{Hillclimbing figure}
+
+\subsection{Comparison method}
+
+To compare the song production of the gesture with the corresponding part of the
+tutor song, we cannot use similarity score as it is only useful with whole songs
+\parencite{tchernichovski_procedure_2000} and is computationaly very expensive
+(computing the similarity between two songs takes approximatively 10 seconds).
+We cannot also use the mean and variance of each song features because it makes
+us lose temporal information of the production. As the gesture matches a precise
+segment of the tutor song, we can compare the features of the sound window by
+window between the tutor segment and the produced segment. We thus computed the
+euclidian distance between these features. Note that we can do that only because
+we hypothesized that a Song Model tries to match exactly the tutor song timing
+as explained in section~\ref{song-model}. Other methods of comparison such as
+Dynamic Time Warping can be investigated to allow a more flexible timing in the
+Song Model. We used simple linear distance for simplicity.
+
+\subsection{Synthesizer issues}
+
+The production of the whole song by the synthesizer is rather long. It takes
+approximately 1 or 2 second of computational time to produce 1 secong of song.
+So as to improve the performance of the program, I decided to generate only the
+sound of the gesture and to compare it with its corresponding tutor song part.
+G.B.~Mindlin's synthesizer is not highly influenced by its previous state,
+although it seems to have a few fixed oscillatory patterns that create phase
+dependant problems. For instance, be $S(\alpha,\beta)$ the sound signal
+generated by the synthesizer, we have slightly different results in phase when
+we generate $S(\alpha_{whole\_song}, \beta_{whole\_song})$ and extract the sound
+from \texttt{gesture\_start} to \texttt{gesture\_end} and compare it to
+$S(\alpha_{gesture}, \beta_{gesture})$. These slightly different phases have an
+impact on the song feature measurements (see Figure~\ref{perf_loss}). Therefore,
+gestures parameters can improve the song imitation for the partial generation
+but impact negatively the whole song production. Loss of performance can happen
+due to this issue. As the speed gain from the partial generation of the song is
+massive, I keep it in the model. Sadly, the loss in performance due to this bug
+is too common and we plan to fix this bug for future simulations.
+
+\todo{figure showing the small differences in measurements}
+
+Nonetheless, our prediction with the day learning algorithm is that it will have
+a positive impact on performance every day. Though, as the gesture sequence may
+not be adapted to describe the motor commands needed to imitate the song, and as
+the hillclimbing algorithm always tries to locally improve the song imitation,
+the bird should get stuck in local optima. The bird can no longer improve its
+performance once in a local optima, even though it is far from reproducing a
+good copy of the song\footnote{Note we cannot test this prediction before the correction of the issues explained above}. The bird also needs to improve the
+gesture sequences of its Song Models to produce accurate imitation of the tutor
+song.
+
 \section{Night learning algorithms}\label{night-learning-algorithms}
 
-\subsection{Goal}\label{goal-1}
+
+\subsection{Goal}\label{goal}
 
   * Find better structure to describe song motor command
 \subsection{Several variations of algorithm have been
