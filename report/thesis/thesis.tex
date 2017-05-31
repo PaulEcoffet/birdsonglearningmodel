@@ -1,4 +1,4 @@
-\documentclass{report}
+\documentclass[a4paper]{report}
 \usepackage[dvipsnames]{xcolor}
 \usepackage[american]{babel}
 \usepackage{fontspec}
@@ -101,32 +101,31 @@ have rather complex structure, with a chaining of syllables that forms a
 ``motif'' \parencite{doupe_birdsong_1999, margoliash_evaluating_2002}.
 
 These common characteristics can be studied easily with Zebra Finch. These birds
-do learn their song quickly and they produce very stable and reproductible
+do learn their song quickly and they produce very stable and reproducible
 songs. Zebra Finches learn only one song from a tutor and will sing it its whole
 life. Therefore, the developmental trajectory of this learning can be tracked
 and evaluation about the quality of the learning can be made.
 
 The neuroanatomy of Zebra Finch has also been studied and the different
-structures involved in singing has been identified. The neurological circuitries
-of Zebra Finch studied.
+structures involved in singing has been identified.
 
 
 
 Why model of speech acquisition:
 * fast learning (90 days)
 * Learning during development \cite{margoliash_offline_2003}
-* Very reproductible result with a tutor song that the bird will mimic its whole
+* Very reproducible result with a tutor song that the bird will mimic its whole
   life \cite{margoliash_sleep_2010}
     * Close ended learners vs open-ended learner \cite{margoliash_sleep_2010}
 * Many-to-many relationship between auditory feedback and muscle outputs \cite{margoliash_offline_2003}
 
-* Can be easily raised domesticaly \parencite{helekar_time_2013}
-* More localised brain structure \parencite{helekar_time_2013}
+* Can be easily raised domestically \parencite{helekar_time_2013}
+* More localized brain structure \parencite{helekar_time_2013}
     * Can study circuitries
 
 
 The stages of learning
-* subsong, plastic, cristallization \cite{margoliash_sleep_2010}
+* subsong, plastic, crystallization \cite{margoliash_sleep_2010}
 
 
 \section{Neurobiology}
@@ -155,26 +154,7 @@ past experiences.
 * Needed to reach new sounds \cite{margoliash_offline_2003}
 * replays with weird burst inside \cite{margoliash_evaluating_2002}
 
-\section{Sum up}
-Our hypothesis is that during its sleep, the zebra finch restructures the
-knowledge it has acquired so far thanks to replay mechanisms. We hypothesize
-that this restructuring can account for the loss of performance in the short
-term and an improvement of performance in the long term.
-
-The goal of this internship is first of all to provide a model of the zebra
-finch song learning with realistic constraints. This model will then allow us to
-explore different strategies that the bird may use to learn the tutor song. The
-strategies that we will test would have different prerequisites that could be
-tested experimentally.
-
-Thanks to this model, we are able to test easily different strategies of
-learning during the day and during sleep. We are therefore able to look for
-learning strategies that yield similar results as the observed data. If a
-combination of strategies yield the correlation between the loss of performance
-every night and the overall performance at the end of learning, we can
-hypothesize that zebra finch are using similar learning strategies and we can
-make new predictions that can be tested experimentally to test the robustness
-of our model.
+\section{Gestures model}
 
 \section{Previous models for birdsong learning with Zebra Finches}
 
@@ -199,7 +179,7 @@ tutor song. Interesting concepts are brought by Marler's approach. For instance,
 he brought the concept of ``songemes'', the song equivalent of phonemes. A
 syllables is composed of several songemes. Indeed, by having to build an
 algorithm that actually produces songs, the notion of syllables or even notes is
-not sufficient enough. Syllables and notes are revelant in the sensory space,
+not sufficient enough. Syllables and notes are relevant in the sensory space,
 but not in the motor space. Songemes are described by Coen as the primitive
 units of bird song. Though, Coen's model has several issues.\todo{list issues}
 
@@ -208,7 +188,26 @@ marler_three_1997}
 * \cite{marler_three_1997}
 * \cite{coen_learning_2007} with a strange clustering technique
 
+\section{Sum up}
+Our hypothesis is that during its sleep, the zebra finch restructures the
+knowledge it has acquired so far thanks to replay mechanisms. We hypothesize
+that this restructuring can account for the loss of performance in the short
+term and an improvement of performance in the long term.
 
+The goal of this internship is first of all to provide a model of the zebra
+finch song learning with realistic constraints. This model will then allow us to
+explore different strategies that the bird may use to learn the tutor song. The
+strategies that we will test would have different prerequisites that could be
+tested experimentally.
+
+Thanks to this model, we are able to test easily different strategies of
+learning during the day and during sleep. We are therefore able to look for
+learning strategies that yield similar results as the observed data. If a
+combination of strategies yield the correlation between the loss of performance
+every night and the overall performance at the end of learning, we can
+hypothesize that zebra finch are using similar learning strategies and we can
+make new predictions that can be tested experimentally to test the robustness
+of our model.
 
 \chapter{Our proposed model}
 
@@ -233,7 +232,7 @@ the bird brain to the muscles of its vocal apparatus have the purpose of
 changing these values.
 
 This synthesizer provides a very interesting framework to work with birdsong
-learning. It constraints a realistic motor space and generates realistics songs
+learning. It constraints a realistic motor space and generates realistic songs
 in the sensory space. Therefore, our algorithm works on real sounds and have to
 find parameters that are roughly equivalent to the parameters send by the bird
 to its muscles.
@@ -264,10 +263,10 @@ Our algorithm looks for the best values to parametrize the synthesizer.
 
 \subsection{Overview}
 
-\subsection{Memorisation of the tutor song template}
+\subsection{Memorization of the tutor song template}
 
 We assumed the tutor song template was already known by the bird and that it has
-a perfect access to it. This is consistent with results in the litterature.
+a perfect access to it. This is consistent with results in the literature.
 Indeed, zebra finches need to listen to the tutor song only for a short critical
 period which occurs a bit before the starting of their babbling, from 20DPH to
 50 DPH \parencite{deregnaucourt_how_2005, margoliash_sleep_2010}. The encoding
@@ -312,14 +311,14 @@ generators for Syringeal Labial Tension (\(\alpha(t)\)) and Air sac Pressure
 
 * Default parameters found th
 
-* hillclimbing
+* hill-climbing
 * Optimize gesture but not song structure
 
 
 \subsection{Night learning models}
 
 * Microbial GA
-* Optimise only song structure, not gestures
+* Optimize only song structure, not gestures
 
 \subsection{Parameters}
 
