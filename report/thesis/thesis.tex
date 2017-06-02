@@ -257,7 +257,8 @@ modeled as a spring and mass system that can produce sustainable oscillations.
 Depending of the parameters it receives, the synthesizer is able to produce a
 vast variety of sounds, either very pure or very rough, depending of the
 strength of the labia tension \parencite{amador_beyond_2008,
-boari_automatic_2015}. The dynamic system shown in equation \ref{synth_eq_dyn} described the mathematical simplification of their model.
+boari_automatic_2015}. The dynamic system shown in equation \ref{synth_eq_dyn}
+described the mathematical simplification of their model.
 
 \begin{equation}
 \systeme*{
@@ -318,7 +319,7 @@ syllable.
 
 Amador and her collaborators suggested that spiking pattern observed
 in HVC is correlated with the onset and offset of gestures and therefore that
-teh HVC activity is not a clock-like pattern but the transmission of high level
+the HVC activity is not a clock-like pattern but the transmission of high level
 motor commands which defines the song structure. This has been contested by
 \textcite{lynch_rhythmic_2016} and \textcite{picardo_population-level_2016} with
 extensive statistical analyses. Even if HVC neurons do not actually fire on the
@@ -346,7 +347,8 @@ of song learning.
 
 Several studies showed that sleep is involved in the song learning and
 maintenance. \textcite{dave_song_2000} shows thanks to electrophysiology
-recording the . \textcite{deregnaucourt_how_2005} showed that sleep has \todo{complete these sentences}
+recording the . \textcite{deregnaucourt_how_2005} showed that sleep has
+\todo{complete these sentences}
 
 \subsection{Song replays during sleep}
 \label{song-replays-sleep}
@@ -376,7 +378,8 @@ that produces these replays must still be determined.
   }
   \small
   Recording of the activity of two different neurons for one bird. For each
-  neuron, a premotor activity is shown with the spectrograph of the BOS and the raw trace of a spontaneous activity during sleep that
+  neuron, a premotor activity is shown with the spectrograph of the BOS and the
+  raw trace of a spontaneous activity during sleep that
   matches the premotor pattern. Taken from \textcite{dave_song_2000}.
 
 \end{figure}
@@ -900,7 +903,8 @@ number of neighbours. Here, as we try to minimize the score, we punish by
 multiplication. Be $score_i$ the score of $SM_i$.
 
 \begin{align}
-  neighbours_i &= \sum_{j=1}^{nb\_song\_models\_night} \mathds{1}_{Seqdist(SM_i, SM_j) < th} \\
+  neighbours_i &= \sum_{j=1}^{nb\_song\_models\_night}
+  \mathds{1}_{Seqdist(SM_i, SM_j) < th} \\
   score_i &= dist(SM_i, TS) \times neighbours_i
 \end{align}
 
@@ -945,8 +949,12 @@ sleep on song development.
 
 \chapter{Analyses and results}\label{analyses-and-results}
 
+
 \section{Learning method is as good Boari's method or
 better}\label{learning-method-is-as-good-boaris-method-or-better}
+
+My model is able to reproduce accurately birdsongs. According to the comparison
+method I use, the reproduction of the song is as good or better
 
   * Using standard measure criteria in the birdsong community
   * Simple description of motor params sufficient to produce good songs
@@ -957,6 +965,7 @@ better}\label{learning-method-is-as-good-boaris-method-or-better}
 divergence}\label{too-little-training-per-model-cause-divergence}
 
   * maybe due to global vs local error
+
 \section{Derégnaucourt results not
 reproduced}\label{deruxe9gnaucourt-results-not-reproduced}
 
@@ -964,6 +973,8 @@ reproduced}\label{deruxe9gnaucourt-results-not-reproduced}
   * Without or with diversity
   * No night deterioration
   * Night deterioration has no impact in overall learning
+
+
 \chapter{Discussion}\label{discussion}
 
 \section{The synthesizer which cannot produce every
@@ -971,8 +982,9 @@ sounds}\label{the-synthesizer-which-cannot-produce-every-sounds}
 
   * Our score really close to boari's method (not way better or way
   worst), maybe we reached synthesizer limits
-\section{The parameters description we
-choose}\label{the-parameters-description-we-choose}
+
+\section{The parameters description we choose}
+\label{the-parameters-description-we-choose}
 
   * more simple/complexe possible than sum of sin and affine?
 \section{The unlearning during day due to the gesture
