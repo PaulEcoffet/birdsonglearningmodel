@@ -39,13 +39,18 @@ def draw_learning_curve(rd, ax=None):
     for i in range(1, len(rd['scores']), 2):
         ax.axvspan(i, i+1, facecolor='darkblue', alpha=0.1)
     sns.tsplot(score_array, err_style='unit_traces', ax=ax)
+    ax.set_xticks(range(0, len(rd['scores']), 20))
+    ax.set_xticklabels(range(0, len(rd['scores'])//2, 10))
+    ax.set_ylabel('Distance from tutor song')
+    ax.set_xlabel('Day')
+    ax.set_title('Learning Curve')
     return ax
 
 
 def plot_to_html(fig):
     # write image data to a string buffer and get the PNG image bytes
     buf = io.BytesIO()
-    fig.tight_layout()
+    #fig.tight_layout()
     fig.savefig(buf, format='png')
     buf.seek(0)
     return widgets.HTML("""<img src='data:image/png;base64,{}'/>""".format(
@@ -66,7 +71,8 @@ class CacheDict(defaultdict):
 class GridAnalyser:
     """Analyser for the grid search."""
 
-    def __init__(self, run_paths):
+    def __init__(self, run_paths, figsize=(5, 2)):
+        self.figsize = figsize
         self.data = CacheDict(lambda i: self._get_data(i))
         self.conf = CacheDict(lambda i: self._get_conf(i))
         self.rd = CacheDict(lambda i: self._get_rd(i))
@@ -118,7 +124,7 @@ class GridAnalyser:
         except IndexError:
             return widgets.HTML('')
         song = sm.gen_sound()
-        fig = plt.figure(figsize=(13, 4))
+        fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         ax = bsa.spectral_derivs_plot(bsa.spectral_derivs(song, 256, 40, 1024),
                                       contrast=0.01, ax=ax)
@@ -135,7 +141,7 @@ class GridAnalyser:
 
     def tutor_spec_plot(self, i):
         sr, tutor = wavfile.read(join(self.run_paths[i], 'tutor.wav'))
-        fig = plt.figure(figsize=(13, 4))
+        fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         bsa.spectral_derivs_plot(bsa.spectral_derivs(tutor, 256, 40, 1024),
                                  contrast=0.01, ax=ax)
@@ -163,12 +169,12 @@ class GridAnalyser:
 
 
     def learning_curve(self, i):
-        fig = plt.figure(figsize=(13, 4))
+        fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         try:
             ax = draw_learning_curve(self.rd[i], ax)
-        except:
-            pass
+        except Exception as e:
+            print(e)
         else:
             sr, synth = wavfile.read('../data/{}_out.wav'.format(
                 basename(self.conf[i]['tutor']).split('.')[0]))
@@ -185,9 +191,10 @@ class GridAnalyser:
             mtutor = bsa_measure(tutor, 44100, coefs=self.conf[i]['coefs'])
             score = np.linalg.norm(msynth[amp > threshold] - mtutor[amp > threshold]) / np.sum(amp > threshold) * len(amp)
             ax.axhline(score, color="orange", label="Boari et al. synth error")
+            print("boari score", score)
             ax.legend()
         finally:
-            fig.savefig('learning_curve_{}.png'.format(i), dpi=300)
+            fig.savefig('learning_curve_{}.pdf'.format(i), dpi=300)
             plt.close(fig)
         return plot_to_html(fig)
 
@@ -237,7 +244,7 @@ class GridAnalyser:
     def synth_spec(self, i):
         sr, synth = wavfile.read('../data/{}_out.wav'.format(
             basename(self.conf[i]['tutor']).split('.')[0]))
-        fig = plt.figure(figsize=(13, 4))
+        fig = plt.figure(figsize=self.figsize)
         ax = fig.gca()
         bsa.spectral_derivs_plot(bsa.spectral_derivs(synth, 256, 40, 1024),
                                  contrast=0.01, ax=ax)
