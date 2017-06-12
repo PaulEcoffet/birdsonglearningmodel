@@ -59,7 +59,7 @@ def start_run(run_name, conf, res_grid_path):
         conf['rng_obj'] = np.random.RandomState()
         conf['measure_obj'] = lambda x: bsa_measure(x, 44100,
                                                     coefs=conf['coefs'])
-        conf['comp_obj'] = COMP_METHODS[conf['comp']]
+        conf['comp_obj'] = COMP_METHODS[conf.get('comp', 'linalg')]
         conf['name'] = run_name
         with open(conf['tutor'], 'rb') as tutor_f:
             sr, tutor = wavfile.read(tutor_f)
