@@ -136,7 +136,7 @@ def fit_song(tutor_song, conf, datasaver=None):
     measure = conf['measure_obj']
     comp = conf['comp_obj']
     rng = conf['rng_obj']
-    nb_split = 30
+    nb_split = conf.get('split', 10)
 
     songs = [SongModel(song=tutor_song, priors=conf['prior'],
                        nb_split=nb_split, rng=rng)

@@ -51,11 +51,11 @@ class SongModel:
         gestures = deepcopy(self.gestures)
         for i in range(n):
             act = self.rng.uniform()
-            if act < 0.1 and len(gestures) > 2:  # Delete a gesture
+            if act < 0.2 and len(gestures) > 2:  # Delete a gesture
                 logger.info('deleted')
                 to_del = self.rng.randint(1, len(gestures))
                 del gestures[to_del]
-            elif act < 0.3:  # Add a new gesture
+            elif act < 0.4:  # Add a new gesture
                 logger.info('added')
                 add_after = np.random.randint(len(gestures) - 1)
                 try:
@@ -65,7 +65,7 @@ class SongModel:
                     continue
                 gestures.insert(add_after + 1,
                                 [add_at, deepcopy(gestures[add_after][1])])
-            elif act < 0.5:  # Take a gesture and put it in another gesture
+            elif act < 0.6:  # Take a gesture and put it in another gesture
                 logger.info('copied')
                 from_, dest = self.rng.randint(len(gestures), size=2)
                 gestures[dest][1] = deepcopy(gestures[from_][1])
