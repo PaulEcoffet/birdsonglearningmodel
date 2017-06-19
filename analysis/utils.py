@@ -41,9 +41,9 @@ def draw_learning_curve(rd, ax=None):
     sns.tsplot(score_array, err_style='unit_traces', ax=ax)
     ax.set_xticks(range(0, len(rd['scores']), 20))
     ax.set_xticklabels(range(0, len(rd['scores'])//2, 10))
-    ax.set_ylabel('Distance from tutor song')
-    ax.set_xlabel('Day')
-    ax.set_title('Learning Curve')
+    ax.set_ylabel('Distance au chant du tuteur')
+    ax.set_xlabel('Jour')
+    ax.set_title('Courbe d\'apprentissage')
     return ax
 
 
@@ -190,7 +190,7 @@ class GridAnalyser:
             msynth = bsa_measure(synth, 44100, coefs=self.conf[i]['coefs'])
             mtutor = bsa_measure(tutor, 44100, coefs=self.conf[i]['coefs'])
             score = np.linalg.norm(msynth[amp > threshold] - mtutor[amp > threshold]) / np.sum(amp > threshold) * len(amp)
-            ax.axhline(score, color="orange", label="Boari et al. synth error")
+            ax.axhline(score, color="orange", label="Erreur avec méthode de Boari")
             print("boari score", score)
             ax.legend()
         finally:
