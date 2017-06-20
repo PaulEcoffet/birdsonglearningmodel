@@ -215,20 +215,21 @@ class GridAnalyser:
         sm = self.rd[irun]['songs'].iloc[iday][ismodel]
         durations = []
         for i in range(len(sm.gestures) - 1):
-            durations.append(sm.gestures[i+1][0] - sm.gestures[i][0])
-        durations.append(len(sm.song) - sm.gestures[-1][0])
+            durations.append((sm.gestures[i+1][0] - sm.gestures[i][0]) /44100 * 1000)
+        durations.append((len(sm.song) - sm.gestures[-1][0]) / 44100 * 1000)
 
         gtes = np.loadtxt('../data/{}_gte.dat'.format(
             basename(self.conf[irun]['tutor']).split('.')[0]))
         tdurations = []
         for i in range(len(gtes) - 1):
-            tdurations.append(gtes[i+1] - gtes[i])
-        tdurations.append(len(sm.song) - gtes[-1])
+            tdurations.append((gtes[i+1] - gtes[i]) / 44100 * 1000)
+        tdurations.append((len(sm.song) - gtes[-1]) / 44100 * 1000)
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(13, 6), sharex=True)
-        ax1 = sns.distplot(durations, ax=ax1)
-        ax1.set_title("{} gestures".format(len(sm.gestures)))
-        ax2 = sns.distplot(tdurations, ax=ax2)
-        ax2.set_title("{} gestures".format(len(gtes)))
+        ax1 = sns.distplot(durations, ax=ax1, kde=False)
+        ax1.set_title("Distribution des durées de gestes identifiés par notre modèle ({} gestes)".format(len(sm.gestures)))
+        ax2 = sns.distplot(tdurations, ax=ax2, kde=False)
+        ax2.set_title("Distribution des durées de gestes identifiés par la méthode de Boari ({} gestes)".format(len(gtes)))
+        ax2.set_xlabel('Durée (ms)')
         plt.close(fig)
         return plot_to_html(fig)
 
