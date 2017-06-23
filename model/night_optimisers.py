@@ -210,7 +210,6 @@ def mutate_microbial_diversity_uniform(songs, tutor_song, cur_day, nb_day,
     datasaver.add(label='night', cond='before_evening', pop=songs)
     new_pop = extend_pop(songs, tutor_song, conf, datasaver)
     datasaver.add(label='night', cond='evening', pop=new_pop)
-    print('begin mutate with decay')
     mutate_pop = mutate_microbial_diversity(new_pop, tutor_song, cur_day,
                                             nb_day, conf, datasaver)
     datasaver.add(label='night', cond="before_morning", pop=mutate_pop)
