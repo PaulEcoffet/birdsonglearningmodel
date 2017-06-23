@@ -1,0 +1,4 @@
+{
+  "name": "linear_decay",
+  "decay": "linear"
+}

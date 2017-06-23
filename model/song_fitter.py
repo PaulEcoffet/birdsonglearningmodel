@@ -159,7 +159,7 @@ def fit_song(tutor_song, conf, datasaver=None):
             logger.info('💤\t💤\t💤\tNight\t💤\t💤\t💤')
             with datasaver.set_context('night_optim'):
                 songs = night_optimisation(songs,
-                                           tutor_song, conf,
+                                           tutor_song, iday, nb_day, conf, 
                                            datasaver=datasaver)
             score = get_scores(tutor_song, songs, measure, comp)
             datasaver.add(moment='AfterNight', songs=songs, scores=score)

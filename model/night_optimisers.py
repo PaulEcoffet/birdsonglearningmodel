@@ -109,7 +109,8 @@ def mutate_microbial(songs, tutor_song, conf, datasaver=None):
     return songs
 
 
-def mutate_microbial_diversity(songs, tutor_song, conf, datasaver=None):
+def mutate_microbial_diversity(songs, tutor_song, cur_day, nb_day,
+                               conf, datasaver=None):
     """Microbial GA implementation for the songs."""
     if datasaver is None:
         datasaver = QuietDataSaver()
@@ -121,18 +122,19 @@ def mutate_microbial_diversity(songs, tutor_song, conf, datasaver=None):
     threshold = conf.get('diversity_threshold', 2000)
     bloat_weight = conf.get('bloat_weight', 0)
     diversity_weight = conf.get('diversity_weight', 1)
+    diversity_decay = conf.get('decay', None)
+    if diversity_decay == 'linear':
+        diversity_weight = diversity_weight * (1 - (cur_day / (nb_day - 1)))
+        print('decay:', diversity_weight)
     for i in range(nb_replay):
         picked_songs = rng.choice(len(songs), size=2, replace=False)
-        if diversity_weight >= 10:  # Do not compute score when useless
-            scores = np.array([1, 1])
-        else:
-            scores = get_scores(tutor_song, songs[picked_songs], measure, comp)
+        scores = get_scores(tutor_song, songs[picked_songs], measure, comp)
         nb_similar = genetic_neighbours(songs[picked_songs], songs, threshold)
         nb_gestures = np.array([len(songs[picked_songs[0]].gestures),
                                 len(songs[picked_songs[1]].gestures)])
         best = np.argmin(scores * (nb_similar**diversity_weight)
                          * (nb_gestures**bloat_weight))
-        loser = 1 - best  # if best = 0, loser = 1, else: loser = 0
+        loser = 1 - best  # if best == 0: loser = 1, else: loser = 0
         songs[picked_songs[loser]] = songs[picked_songs[best]].mutate()
     return songs
 
@@ -202,14 +204,15 @@ def mutate_microbial_extended_uniform(songs, tutor_song, conf, datasaver=None):
     return new_pop
 
 
-def mutate_microbial_diversity_uniform(songs, tutor_song, conf,
-                                       datasaver=None):
+def mutate_microbial_diversity_uniform(songs, tutor_song, cur_day, nb_day,
+                                       conf, datasaver=None):
     """Do a microbial on an extended population and restrict by random."""
     datasaver.add(label='night', cond='before_evening', pop=songs)
     new_pop = extend_pop(songs, tutor_song, conf, datasaver)
     datasaver.add(label='night', cond='evening', pop=new_pop)
-    mutate_pop = mutate_microbial_diversity(new_pop, tutor_song, conf,
-                                            datasaver)
+    print('begin mutate with decay')
+    mutate_pop = mutate_microbial_diversity(new_pop, tutor_song, cur_day,
+                                            nb_day, conf, datasaver)
     datasaver.add(label='night', cond="before_morning", pop=mutate_pop)
     new_pop = restrict_pop_uniform(mutate_pop, conf, datasaver)
     datasaver.add(label='night', cond='morning', pop=new_pop)
